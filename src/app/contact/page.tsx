@@ -15,8 +15,8 @@ const details = [
   {
     icon: Mail,
     label: "Email",
-    value: "hello@safalight.com",
-    href: "mailto:hello@safalight.com",
+    value: "johannj@finnbogasondesign.com",
+    href: "mailto:johannj@finnbogasondesign.com",
   },
   {
     icon: Phone,

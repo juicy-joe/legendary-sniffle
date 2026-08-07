@@ -70,8 +70,8 @@ export default function Footer() {
             </p>
             <ul className="space-y-3.5 text-sm text-paper/65">
               <li>
-                <a href="mailto:hello@safalight.com" className="transition-colors hover:text-gold">
-                  hello@safalight.com
+                <a href="mailto:johannj@finnbogasondesign.com" className="transition-colors hover:text-gold">
+                  johannj@finnbogasondesign.com
                 </a>
               </li>
               <li>
