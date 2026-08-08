@@ -90,10 +90,10 @@ export default function ProductCard({
 
         <div className="mt-4 flex items-start justify-between gap-3">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.16em] text-ink/45">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-ink/65">
               {product.designer}
             </p>
-            <h3 className="mt-1 font-serif text-xl text-ink">{product.name}</h3>
+            <h2 className="mt-1 font-serif text-xl text-ink">{product.name}</h2>
           </div>
           <p className="whitespace-nowrap font-serif text-lg text-gold-dark font-feature-tabular">
             ${product.price.toLocaleString()}

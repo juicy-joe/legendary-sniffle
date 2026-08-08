@@ -64,7 +64,7 @@ export default function AboutPage() {
     <div>
       <section className="bg-ink py-28 text-paper">
         <div className="mx-auto max-w-4xl px-6 text-center md:px-10">
-          <nav aria-label="Breadcrumb" className="mb-8 flex items-center justify-center gap-2 text-xs text-paper/40">
+          <nav aria-label="Breadcrumb" className="mb-8 flex items-center justify-center gap-2 text-xs text-paper/60">
             <Link href="/" className="hover:text-paper">Home</Link>
             <span aria-hidden="true">/</span>
             <span className="text-paper/70">About Us</span>
@@ -133,7 +133,7 @@ export default function AboutPage() {
               delay={i * 0.06}
               className="rounded-[6px] border border-ink/10 bg-paper p-8 transition-colors duration-300 hover:border-gold-dark/40"
             >
-              <p className="text-[11px] uppercase tracking-[0.15em] text-ink/40">
+              <p className="text-[11px] uppercase tracking-[0.15em] text-ink/65">
                 {d.origin}
               </p>
               <h3 className="mt-2 font-serif text-2xl text-ink">{d.name}</h3>

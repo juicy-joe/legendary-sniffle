@@ -95,7 +95,7 @@ export default function ProductPhoto({
               </button>
             ))}
           </div>
-          <span className="ml-1 text-[11px] uppercase tracking-[0.1em] text-ink/40">
+          <span className="ml-1 text-[11px] uppercase tracking-[0.1em] text-ink/65">
             {active.label}
           </span>
         </div>

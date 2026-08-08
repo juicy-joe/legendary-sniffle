@@ -138,7 +138,7 @@ export default function CheckoutFlow() {
           production details by email at {address.email} within one business
           day.
         </p>
-        <p className="mx-auto mt-2 max-w-md text-sm text-ink/50">
+        <p className="mx-auto mt-2 max-w-md text-sm text-ink/65">
           Estimated delivery: {method.eta}
         </p>
         <Link
@@ -166,7 +166,7 @@ export default function CheckoutFlow() {
                     "flex h-6 w-6 items-center justify-center rounded-full text-xs",
                     state === "done" && "bg-gold-dark text-paper",
                     state === "active" && "border border-gold-dark text-gold-dark",
-                    state === "upcoming" && "border border-ink/20 text-ink/30"
+                    state === "upcoming" && "border border-ink/20 text-ink/65"
                   )}
                 >
                   {state === "done" ? <Check className="h-3.5 w-3.5" /> : i + 1}
@@ -174,7 +174,7 @@ export default function CheckoutFlow() {
                 <span
                   className={clsx(
                     "text-sm",
-                    state === "upcoming" ? "text-ink/30" : "text-ink/80"
+                    state === "upcoming" ? "text-ink/65" : "text-ink/80"
                   )}
                 >
                   {s.label}
@@ -247,8 +247,8 @@ export default function CheckoutFlow() {
                       />
                       <div>
                         <p className="font-medium text-ink">{m.label}</p>
-                        <p className="mt-1 text-sm text-ink/55">{m.detail}</p>
-                        <p className="mt-1 text-xs uppercase tracking-[0.1em] text-ink/40">
+                        <p className="mt-1 text-sm text-ink/65">{m.detail}</p>
+                        <p className="mt-1 text-xs uppercase tracking-[0.1em] text-ink/65">
                           {m.eta}
                         </p>
                       </div>
@@ -289,7 +289,7 @@ export default function CheckoutFlow() {
               className="space-y-8"
             >
               <div>
-                <p className="mb-2 text-xs uppercase tracking-[0.15em] text-ink/40">
+                <p className="mb-2 text-xs uppercase tracking-[0.15em] text-ink/65">
                   Shipping To
                 </p>
                 <p className="text-sm leading-relaxed text-ink/75">
@@ -305,7 +305,7 @@ export default function CheckoutFlow() {
               </div>
 
               <div>
-                <p className="mb-2 text-xs uppercase tracking-[0.15em] text-ink/40">
+                <p className="mb-2 text-xs uppercase tracking-[0.15em] text-ink/65">
                   Delivery Method
                 </p>
                 <p className="text-sm text-ink/75">
@@ -314,7 +314,7 @@ export default function CheckoutFlow() {
                 </p>
               </div>
 
-              <p className="max-w-md text-xs text-ink/40">
+              <p className="max-w-md text-xs text-ink/65">
                 This is a preview checkout &mdash; placing your order will not
                 charge a card. Our team will follow up by email to confirm
                 payment and final production details.
@@ -362,7 +362,7 @@ export default function CheckoutFlow() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-ink">{product!.name}</p>
-                  <p className="text-xs text-ink/40">Qty {line.qty}</p>
+                  <p className="text-xs text-ink/65">Qty {line.qty}</p>
                 </div>
                 <p className="text-sm text-ink/70 font-feature-tabular">
                   ${(product!.price * line.qty).toLocaleString()}
@@ -411,7 +411,7 @@ function Field({
     <div>
       <label
         htmlFor={name}
-        className="mb-2 block text-[11px] uppercase tracking-[0.15em] text-ink/50"
+        className="mb-2 block text-[11px] uppercase tracking-[0.15em] text-ink/65"
       >
         {label}
       </label>

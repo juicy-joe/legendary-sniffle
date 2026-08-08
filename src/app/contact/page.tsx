@@ -43,7 +43,7 @@ export default function ContactPage() {
     <div>
       <section className="bg-ink py-24 text-paper md:py-28">
         <div className="mx-auto max-w-4xl px-6 text-center md:px-10">
-          <nav aria-label="Breadcrumb" className="mb-8 flex items-center justify-center gap-2 text-xs text-paper/40">
+          <nav aria-label="Breadcrumb" className="mb-8 flex items-center justify-center gap-2 text-xs text-paper/60">
             <Link href="/" className="hover:text-paper">Home</Link>
             <span aria-hidden="true">/</span>
             <span className="text-paper/70">Contact</span>
@@ -85,7 +85,7 @@ export default function ContactPage() {
                       <d.icon className="h-4 w-4" strokeWidth={1.5} />
                     </div>
                     <div>
-                      <p className="text-[11px] uppercase tracking-[0.15em] text-ink/40">
+                      <p className="text-[11px] uppercase tracking-[0.15em] text-ink/65">
                         {d.label}
                       </p>
                       {d.href ? (

@@ -63,7 +63,7 @@ export default function ContactForm() {
       </div>
 
       <fieldset>
-        <legend className="mb-3 text-[11px] uppercase tracking-[0.15em] text-ink/50">
+        <legend className="mb-3 text-[11px] uppercase tracking-[0.15em] text-ink/65">
           I&rsquo;m Interested In
         </legend>
         <div className="flex flex-wrap gap-2">
@@ -87,7 +87,7 @@ export default function ContactForm() {
       <div>
         <label
           htmlFor="message"
-          className="mb-2 block text-[11px] uppercase tracking-[0.15em] text-ink/50"
+          className="mb-2 block text-[11px] uppercase tracking-[0.15em] text-ink/65"
         >
           Message
         </label>
@@ -139,7 +139,7 @@ function Field({
     <div>
       <label
         htmlFor={name}
-        className="mb-2 block text-[11px] uppercase tracking-[0.15em] text-ink/50"
+        className="mb-2 block text-[11px] uppercase tracking-[0.15em] text-ink/65"
       >
         {label}
       </label>

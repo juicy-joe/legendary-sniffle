@@ -112,7 +112,7 @@ export default function Navbar() {
                   aria-current={active ? "page" : undefined}
                   className={clsx(
                     "relative text-[11px] font-medium uppercase tracking-[0.16em] transition-colors",
-                    active ? "text-ink" : "text-ink/55 hover:text-ink"
+                    active ? "text-ink" : "text-ink/65 hover:text-ink"
                   )}
                 >
                   {link.label}

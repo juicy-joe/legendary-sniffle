@@ -44,7 +44,7 @@ export default function StatCounter({
       </span>
       <p
         className={`mt-2 text-[11px] uppercase tracking-[0.2em] ${
-          dark ? "text-paper/45" : "text-ink/50"
+          dark ? "text-paper/60" : "text-ink/65"
         }`}
       >
         {label}

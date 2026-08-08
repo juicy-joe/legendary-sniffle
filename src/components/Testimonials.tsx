@@ -58,7 +58,7 @@ export default function Testimonials() {
             <p className="font-serif text-2xl font-light italic leading-relaxed text-paper md:text-3xl">
               &ldquo;{testimonials[index].quote}&rdquo;
             </p>
-            <p className="mt-6 text-xs uppercase tracking-[0.2em] text-paper/45">
+            <p className="mt-6 text-xs uppercase tracking-[0.2em] text-paper/60">
               {testimonials[index].name} &middot; {testimonials[index].location}
             </p>
           </motion.div>

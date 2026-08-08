@@ -44,6 +44,7 @@ export const metadata: Metadata = {
     template: "%s | SaFaLight",
   },
   description,
+  alternates: { canonical: "/" },
   keywords: [
     "luxury table lamps",
     "designer lamps",

@@ -79,7 +79,7 @@ export default function Home() {
                 className="drop-shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
               />
             </div>
-            <p className="mt-5 text-center text-[11px] uppercase tracking-[0.16em] text-paper/40">
+            <p className="mt-5 text-center text-[11px] uppercase tracking-[0.16em] text-paper/60">
               {heroProduct.name} &middot; {heroProduct.collection} &middot;{" "}
               <Link href={`/products/${heroProduct.slug}`} className="underline decoration-paper/30 underline-offset-2 hover:text-gold hover:decoration-gold">
                 see it up close
@@ -90,7 +90,7 @@ export default function Home() {
 
         <Link
           href="#featured"
-          className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-paper/45 transition-colors hover:text-gold"
+          className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-paper/60 transition-colors hover:text-gold"
           aria-label="Scroll to featured collection"
         >
           <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>

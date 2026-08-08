@@ -59,7 +59,7 @@ export default function AmbienceConfigurator() {
 
       <div className="space-y-8">
         <div>
-          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-ink/50">
+          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-ink/65">
             01 &mdash; Choose a finish
           </p>
           <div className="flex flex-wrap gap-3">
@@ -82,7 +82,7 @@ export default function AmbienceConfigurator() {
         </div>
 
         <div>
-          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-ink/50">
+          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-ink/65">
             02 &mdash; Choose a silhouette
           </p>
           <div className="flex flex-wrap gap-2">
@@ -105,10 +105,10 @@ export default function AmbienceConfigurator() {
 
         <div>
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs uppercase tracking-[0.2em] text-ink/50">
+            <p className="text-xs uppercase tracking-[0.2em] text-ink/65">
               03 &mdash; Adjust the ambience
             </p>
-            <span className="text-xs text-ink/50">{brightness}%</span>
+            <span className="text-xs text-ink/65">{brightness}%</span>
           </div>
           <input
             type="range"
@@ -121,7 +121,7 @@ export default function AmbienceConfigurator() {
           />
         </div>
 
-        <p className="text-sm leading-relaxed text-ink/55">
+        <p className="text-sm leading-relaxed text-ink/65">
           Every SaFaLight piece is made to order &mdash; and this isn&rsquo;t
           just a preview toy. Our glass and metal ateliers genuinely take
           custom commissions: configure a starting point here, then bring it

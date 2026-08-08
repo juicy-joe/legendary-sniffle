@@ -52,7 +52,7 @@ function ExplorerInner() {
         </div>
 
         <div className="flex items-center gap-3">
-          <label htmlFor="sort" className="text-[11px] uppercase tracking-[0.15em] text-ink/45">
+          <label htmlFor="sort" className="text-[11px] uppercase tracking-[0.15em] text-ink/65">
             Sort
           </label>
           <select
@@ -68,7 +68,7 @@ function ExplorerInner() {
         </div>
       </div>
 
-      <p className="mb-8 text-xs uppercase tracking-[0.2em] text-ink/40" aria-live="polite">
+      <p className="mb-8 text-xs uppercase tracking-[0.2em] text-ink/65" aria-live="polite">
         {filtered.length} {filtered.length === 1 ? "piece" : "pieces"}
       </p>
 

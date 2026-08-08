@@ -85,7 +85,7 @@ export default function CartDrawer() {
             {lines.length === 0 ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
                 <ShoppingBag className="h-10 w-10 text-ink/20" strokeWidth={1} />
-                <p className="text-ink/50">Your selection is empty.</p>
+                <p className="text-ink/65">Your selection is empty.</p>
                 <Link
                   href="/products"
                   onClick={closeCart}
@@ -130,7 +130,7 @@ export default function CartDrawer() {
                           <div className="flex flex-1 flex-col">
                             <div className="flex items-start justify-between gap-2">
                               <div>
-                                <p className="text-[11px] uppercase tracking-[0.1em] text-ink/40">
+                                <p className="text-[11px] uppercase tracking-[0.1em] text-ink/65">
                                   {product.designer}
                                 </p>
                                 <Link
@@ -145,7 +145,7 @@ export default function CartDrawer() {
                                 type="button"
                                 onClick={() => removeItem(line.slug)}
                                 aria-label={`Remove ${product.name} from cart`}
-                                className="text-ink/40 transition-colors hover:text-ink"
+                                className="text-ink/65 transition-colors hover:text-ink"
                               >
                                 <X className="h-4 w-4" />
                               </button>
@@ -190,7 +190,7 @@ export default function CartDrawer() {
                       ${subtotal.toLocaleString()}
                     </span>
                   </div>
-                  <p className="mb-4 text-xs text-ink/40">
+                  <p className="mb-4 text-xs text-ink/65">
                     Shipping &amp; white-glove delivery calculated at checkout.
                   </p>
                   <Link

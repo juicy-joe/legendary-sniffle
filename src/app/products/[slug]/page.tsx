@@ -29,6 +29,7 @@ export async function generateMetadata({
       title: `${product.name} | SaFaLight`,
       description: product.description,
       type: "website",
+      images: ["/opengraph-image"],
     },
   };
 }
@@ -80,7 +81,7 @@ export default async function ProductPage({
         }}
       />
 
-      <nav aria-label="Breadcrumb" className="mb-10 flex items-center gap-2 text-xs text-ink/45">
+      <nav aria-label="Breadcrumb" className="mb-10 flex items-center gap-2 text-xs text-ink/65">
         <Link href="/" className="hover:text-ink">Home</Link>
         <span aria-hidden="true">/</span>
         <Link href="/products" className="hover:text-ink">Products</Link>
@@ -96,7 +97,7 @@ export default async function ProductPage({
                 Limited Edition
               </span>
             )}
-            <span className="absolute right-6 top-6 z-10 font-serif text-xs italic text-ink/35">
+            <span className="absolute right-6 top-6 z-10 font-serif text-xs italic text-ink/65">
               No. {editionNo}
             </span>
             {product.images?.length ? (
@@ -135,13 +136,13 @@ export default async function ProductPage({
 
           <dl className="mt-8 grid grid-cols-2 gap-6 border-y border-ink/10 py-6">
             <div>
-              <dt className="text-xs uppercase tracking-[0.15em] text-ink/40">
+              <dt className="text-xs uppercase tracking-[0.15em] text-ink/65">
                 Materials
               </dt>
               <dd className="mt-1 text-sm text-ink/75">{product.materials}</dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-[0.15em] text-ink/40">
+              <dt className="text-xs uppercase tracking-[0.15em] text-ink/65">
                 Dimensions
               </dt>
               <dd className="mt-1 text-sm text-ink/75 font-feature-tabular">
@@ -158,7 +159,7 @@ export default async function ProductPage({
             <AddToCartPanel slug={product.slug} name={product.name} />
           </div>
 
-          <p className="mt-6 text-xs leading-relaxed text-ink/40">
+          <p className="mt-6 text-xs leading-relaxed text-ink/65">
             Made to order &middot; Average lead time 6&ndash;10 weeks &middot;
             White-glove delivery included &middot; Prefer to talk first?{" "}
             <Link href="/contact" className="text-ink/60 underline underline-offset-2 hover:text-gold-dark">
