@@ -55,7 +55,12 @@ export default function HomeContentForm({ content }: { content: HomeContentData 
       </section>
 
       <section className="space-y-6">
-        <h2 className="font-serif text-xl font-light text-ink">Chroma Editions Section</h2>
+        <h2 className="font-serif text-xl font-light text-ink">Featured Collection Section</h2>
+        <p className="text-xs text-ink/65">
+          Currently spotlights the NatureSphere&rsquo;s collection on the
+          homepage. Only shows up there if that collection has products in
+          it.
+        </p>
 
         <Field label="Headline" name="chromaHeadline" error={err("chromaHeadline")}>
           <input id="chromaHeadline" name="chromaHeadline" defaultValue={content.chromaHeadline} className={inputClass} />
