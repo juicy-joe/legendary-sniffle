@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Heart, ShoppingBag } from "lucide-react";
 import clsx from "clsx";
-import type { Product } from "@/lib/products";
+import type { CatalogProduct } from "@/lib/catalog";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
 import { DURATION, EASE } from "@/lib/motion";
@@ -15,7 +15,7 @@ export default function ProductCard({
   product,
   index = 0,
 }: {
-  product: Product;
+  product: CatalogProduct;
   index?: number;
 }) {
   const { isSaved, toggle } = useWishlist();

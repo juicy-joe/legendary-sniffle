@@ -4,15 +4,16 @@ import { useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "./ProductCard";
-import { categories, products, type Product } from "@/lib/products";
+import { useCatalog } from "@/context/CatalogContext";
 
 type Sort = "featured" | "price-asc" | "price-desc";
 
 function ExplorerInner() {
+  const { products, categories } = useCatalog();
   const params = useSearchParams();
-  const initialCategory = params.get("category") as Product["category"] | null;
+  const initialCategory = params.get("category");
 
-  const [category, setCategory] = useState<Product["category"] | "All">(
+  const [category, setCategory] = useState<string>(
     initialCategory && categories.includes(initialCategory)
       ? initialCategory
       : "All"
@@ -28,7 +29,7 @@ function ExplorerInner() {
     if (sort === "featured")
       list = [...list].sort((a, b) => Number(b.featured) - Number(a.featured));
     return list;
-  }, [category, sort]);
+  }, [products, category, sort]);
 
   return (
     <div>

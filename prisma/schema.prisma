@@ -1,0 +1,229 @@
+// SaFaLight admin platform — Phase 1 schema.
+// See C:\Users\johan\.claude\plans\ancient-tickling-iverson.md for the plan
+// this implements.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum StaffRole {
+  OWNER
+  EDITOR
+}
+
+enum EnquiryStatus {
+  NEW
+  READ
+  REPLIED
+}
+
+enum OrderStatus {
+  NEW
+  CONFIRMED
+  IN_PRODUCTION
+  SHIPPED
+  COMPLETED
+  CANCELLED
+}
+
+// Drive the generated SVG "atelier study" illustration used as a fallback
+// for products that don't have real photography yet (src/components/LampIllustration.tsx).
+enum LampPalette {
+  gold
+  ivory
+  onyx
+  bronze
+  smoke
+}
+
+enum LampShade {
+  dome
+  drum
+  cone
+  sphere
+  pleated
+}
+
+enum LampBase {
+  urn
+  column
+  sculpted
+  orb
+  disc
+}
+
+model AdminUser {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  passwordHash   String
+  name           String
+  role           StaffRole @default(EDITOR)
+  // Brute-force lockout: failedAttempts resets to 0 on any successful
+  // login; lockedUntil is set once attempts cross the threshold (see
+  // src/app/admin/login/actions.ts) and cleared on the next success.
+  failedAttempts Int       @default(0)
+  lockedUntil    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Designer {
+  id        String    @id @default(cuid())
+  name      String
+  origin    String
+  bio       String
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Collection {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id              String  @id @default(cuid())
+  slug            String  @unique
+  name            String
+  price           Int
+  materials       String
+  dimensions      String
+  description     String
+  story           String
+  featured        Boolean @default(false)
+  limited         Boolean @default(false)
+  metaTitle       String?
+  metaDescription String?
+
+  // Fallback SVG illustration params — used when no ProductImage rows exist.
+  palette LampPalette
+  shade   LampShade
+  base    LampBase
+
+  designer     Designer   @relation(fields: [designerId], references: [id])
+  designerId   String
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  collectionId String
+  category     Category   @relation(fields: [categoryId], references: [id])
+  categoryId   String
+
+  images ProductImage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  url       String
+  label     String
+  swatch    String
+  sortOrder Int     @default(0)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+
+  createdAt DateTime @default(now())
+}
+
+// Singleton content tables — always exactly one row, fixed id, upserted from
+// the admin content editors rather than created/deleted like normal records.
+model HomeContent {
+  id                 String   @id @default("home")
+  heroEyebrow        String
+  heroHeadline       String
+  heroHeadlineAccent String
+  heroSubtext        String
+  chromaHeadline     String
+  chromaSubtext      String
+  craftHeadline      String
+  craftSubtext       String
+  updatedAt          DateTime @updatedAt
+}
+
+model AboutContent {
+  id           String   @id @default("about")
+  heroHeadline String
+  heroSubtext  String
+  updatedAt    DateTime @updatedAt
+}
+
+model ContactInfo {
+  id        String   @id @default("contact")
+  email     String
+  phone     String
+  address   String
+  hours     String
+  updatedAt DateTime @updatedAt
+}
+
+model Settings {
+  id               String   @id @default("settings")
+  siteName         String   @default("SaFaLight")
+  siteUrl          String   @default("https://www.safalight.com")
+  defaultMetaTitle String?
+  defaultMetaDesc  String?
+  updatedAt        DateTime @updatedAt
+}
+
+model MenuItem {
+  id        String @id @default(cuid())
+  label     String
+  href      String
+  location  String // "navbar" | "footer-explore" | "footer-collections"
+  sortOrder Int    @default(0)
+}
+
+model SocialLink {
+  id       String @id @default(cuid())
+  platform String // "instagram" | "facebook" | "linkedin"
+  url      String
+}
+
+model Enquiry {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  interest  String
+  message   String
+  status    EnquiryStatus @default(NEW)
+  createdAt DateTime      @default(now())
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  orderNumber    String      @unique
+  customerName   String
+  email          String
+  address        String
+  city           String
+  region         String?
+  postal         String
+  country        String
+  items          Json
+  subtotal       Int
+  shippingMethod String
+  shippingCost   Int
+  total          Int
+  status         OrderStatus @default(NEW)
+  createdAt      DateTime    @default(now())
+}

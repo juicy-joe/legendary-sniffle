@@ -5,13 +5,14 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { getProduct } from "@/lib/products";
+import { useCatalog } from "@/context/CatalogContext";
 import { EASE } from "@/lib/motion";
 import LampIllustration from "./LampIllustration";
 import ProductPhoto from "./ProductPhoto";
 
 export default function CartDrawer() {
   const { lines, isOpen, closeCart, setQty, removeItem, subtotal } = useCart();
+  const { getProduct } = useCatalog();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
 

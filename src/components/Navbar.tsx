@@ -10,14 +10,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
 import { EASE } from "@/lib/motion";
 
-const links = [
-  { href: "/", label: "Home" },
-  { href: "/products", label: "Products" },
-  { href: "/about", label: "About Us" },
-  { href: "/contact", label: "Contact" },
-];
-
-export default function Navbar() {
+export default function Navbar({ links }: { links: { href: string; label: string }[] }) {
   const pathname = usePathname();
   const { count } = useWishlist();
   const { count: cartCount, openCart } = useCart();

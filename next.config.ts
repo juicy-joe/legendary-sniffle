@@ -6,6 +6,26 @@ const nextConfig: NextConfig = {
   // Explicit for clarity — this has been the default since Next 13.
   reactStrictMode: true,
 
+  // A stray package-lock.json one directory up (outside this repo) makes
+  // Next.js's workspace-root auto-detection guess wrong and warn on every
+  // build. Pinning it explicitly silences that without touching anything
+  // outside this project.
+  turbopack: {
+    root: __dirname,
+  },
+
+  // Product photos uploaded through the admin dashboard live in Vercel Blob,
+  // which serves each store from a random `<id>.public.blob.vercel-storage.com`
+  // subdomain — so this has to be a wildcard, not a fixed hostname.
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
+      },
+    ],
+  },
+
   // Note: deliberately not shipping a Content-Security-Policy here.
   // Framer Motion animates via inline `style` attributes, which a strict
   // style-src CSP without 'unsafe-inline' (or per-element nonces) would

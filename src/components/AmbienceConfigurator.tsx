@@ -2,11 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
-import type { Product } from "@/lib/products";
+import type { CatalogProduct } from "@/lib/catalog";
 import LampIllustration from "./LampIllustration";
 import MagneticButton from "./MagneticButton";
 
-const palettes: { key: Product["palette"]; label: string; swatch: string }[] = [
+const palettes: { key: CatalogProduct["palette"]; label: string; swatch: string }[] = [
   { key: "gold", label: "Gilded", swatch: "#a3854f" },
   { key: "ivory", label: "Ivory Marble", swatch: "#efe9d8" },
   { key: "onyx", label: "Onyx", swatch: "#141412" },
@@ -14,7 +14,7 @@ const palettes: { key: Product["palette"]; label: string; swatch: string }[] = [
   { key: "smoke", label: "Smoked Crystal", swatch: "#43434a" },
 ];
 
-const shades: { key: Product["shade"]; label: string }[] = [
+const shades: { key: CatalogProduct["shade"]; label: string }[] = [
   { key: "dome", label: "Dome" },
   { key: "drum", label: "Drum" },
   { key: "cone", label: "Cone" },
@@ -23,11 +23,11 @@ const shades: { key: Product["shade"]; label: string }[] = [
 ];
 
 export default function AmbienceConfigurator() {
-  const [palette, setPalette] = useState<Product["palette"]>("gold");
-  const [shade, setShade] = useState<Product["shade"]>("dome");
+  const [palette, setPalette] = useState<CatalogProduct["palette"]>("gold");
+  const [shade, setShade] = useState<CatalogProduct["shade"]>("dome");
   const [brightness, setBrightness] = useState(65);
 
-  const previewProduct: Product = useMemo(
+  const previewProduct: CatalogProduct = useMemo(
     () => ({
       slug: "atelier-preview",
       name: "Your Design",

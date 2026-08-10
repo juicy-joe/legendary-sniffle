@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { getProduct } from "@/lib/products";
+import { useCatalog } from "./CatalogContext";
 
 export type CartLine = { slug: string; qty: number };
 
@@ -29,6 +29,7 @@ const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "safalight:cart";
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { getProduct } = useCatalog();
   const [lines, setLines] = useState<CartLine[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -103,7 +104,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const product = getProduct(l.slug);
         return product ? sum + product.price * l.qty : sum;
       }, 0),
-    [lines]
+    [lines, getProduct]
   );
 
   const value = useMemo(

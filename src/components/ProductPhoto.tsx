@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import clsx from "clsx";
-import type { ProductPhoto as ProductPhotoType } from "@/lib/products";
+import type { ProductPhoto as ProductPhotoType } from "@/lib/catalog";
 
 function PhotoFallback({ swatch }: { swatch: string }) {
   return (

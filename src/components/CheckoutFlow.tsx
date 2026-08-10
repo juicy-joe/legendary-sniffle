@@ -6,8 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronLeft, ShoppingBag } from "lucide-react";
 import clsx from "clsx";
 import { useCart } from "@/context/CartContext";
-import { getProduct } from "@/lib/products";
+import { useCatalog } from "@/context/CatalogContext";
 import { shippingMethods } from "@/lib/shipping";
+import { placeOrder } from "@/app/(site)/checkout/actions";
 import { EASE } from "@/lib/motion";
 import LampIllustration from "./LampIllustration";
 import ProductPhoto from "./ProductPhoto";
@@ -42,12 +43,14 @@ const emptyAddress: Address = {
 
 export default function CheckoutFlow() {
   const { lines, subtotal, clear } = useCart();
+  const { getProduct } = useCatalog();
   const [step, setStep] = useState<Step>("shipping");
   const [address, setAddress] = useState<Address>(emptyAddress);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [methodId, setMethodId] = useState(shippingMethods[0].id);
   const [placing, setPlacing] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const [placeError, setPlaceError] = useState("");
 
   const method = shippingMethods.find((m) => m.id === methodId)!;
   const total = subtotal + method.price;
@@ -57,7 +60,7 @@ export default function CheckoutFlow() {
       lines
         .map((l) => ({ line: l, product: getProduct(l.slug) }))
         .filter((x) => x.product),
-    [lines]
+    [lines, getProduct]
   );
 
   if (lines.length === 0 && step !== "done") {
@@ -102,14 +105,28 @@ export default function CheckoutFlow() {
     setStep("method");
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     setPlacing(true);
-    window.setTimeout(() => {
-      setOrderNumber(`SFL-${Math.floor(100000 + Math.random() * 900000)}`);
-      setPlacing(false);
-      setStep("done");
-      clear();
-    }, 1400);
+    setPlaceError("");
+    const result = await placeOrder({
+      customerName: address.name,
+      email: address.email,
+      address: address.address,
+      city: address.city,
+      region: address.region,
+      postal: address.postal,
+      country: address.country,
+      shippingMethodId: methodId,
+      items: lines.map((l) => ({ slug: l.slug, qty: l.qty })),
+    });
+    setPlacing(false);
+    if ("error" in result) {
+      setPlaceError(result.error);
+      return;
+    }
+    setOrderNumber(result.orderNumber);
+    setStep("done");
+    clear();
   };
 
   if (step === "done") {
@@ -319,6 +336,12 @@ export default function CheckoutFlow() {
                 charge a card. Our team will follow up by email to confirm
                 payment and final production details.
               </p>
+
+              {placeError && (
+                <p role="alert" className="text-sm text-red-700">
+                  {placeError}
+                </p>
+              )}
 
               <div className="flex items-center gap-6">
                 <button

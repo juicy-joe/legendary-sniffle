@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ArrowRight } from "lucide-react";
+import { submitEnquiry } from "@/app/(site)/contact/actions";
 
 const interests = [
   "General Inquiry",
@@ -12,30 +13,9 @@ const interests = [
 ];
 
 export default function ContactForm() {
-  const [status, setStatus] = useState<"idle" | "loading" | "done">("idle");
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [state, formAction, pending] = useActionState(submitEnquiry, {});
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    const name = String(data.get("name") || "").trim();
-    const email = String(data.get("email") || "").trim();
-    const message = String(data.get("message") || "").trim();
-
-    const nextErrors: Record<string, string> = {};
-    if (!name) nextErrors.name = "Please share your name.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      nextErrors.email = "Please enter a valid email.";
-    if (!message) nextErrors.message = "Tell us a little about what you need.";
-
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
-
-    setStatus("loading");
-    window.setTimeout(() => setStatus("done"), 1000);
-  };
-
-  if (status === "done") {
+  if (state.success) {
     return (
       <motion.div
         role="status"
@@ -56,10 +36,17 @@ export default function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-7" noValidate>
+    <form action={formAction} className="space-y-7" noValidate>
+      {/* Honeypot — hidden from real visitors (off-screen, unreachable by
+          Tab), so anything that fills it in is almost certainly a bot. */}
+      <div className="sr-only" aria-hidden="true">
+        <label htmlFor="company">Company</label>
+        <input id="company" name="company" type="text" tabIndex={-1} autoComplete="off" />
+      </div>
+
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <Field label="Full Name" name="name" error={errors.name} required />
-        <Field label="Email Address" name="email" type="email" error={errors.email} required />
+        <Field label="Full Name" name="name" error={state.fieldErrors?.name} required />
+        <Field label="Email Address" name="email" type="email" error={state.fieldErrors?.email} required />
       </div>
 
       <fieldset>
@@ -95,26 +82,32 @@ export default function ContactForm() {
           id="message"
           name="message"
           rows={5}
-          aria-invalid={Boolean(errors.message)}
-          aria-describedby={errors.message ? "message-error" : undefined}
+          aria-invalid={Boolean(state.fieldErrors?.message)}
+          aria-describedby={state.fieldErrors?.message ? "message-error" : undefined}
           className="w-full resize-none rounded-[3px] border border-ink/20 bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-gold-dark"
           placeholder="Tell us about the space, the piece, or the question on your mind."
         />
-        {errors.message && (
+        {state.fieldErrors?.message && (
           <p id="message-error" role="alert" className="mt-1.5 text-xs text-red-700">
-            {errors.message}
+            {state.fieldErrors.message}
           </p>
         )}
       </div>
 
+      {state.error && (
+        <p role="alert" className="text-sm text-red-700">
+          {state.error}
+        </p>
+      )}
+
       <button
         type="submit"
-        disabled={status === "loading"}
+        disabled={pending}
         className="inline-flex items-center gap-2.5 rounded-[3px] border border-ink bg-ink px-9 py-4 text-[11px] font-medium uppercase tracking-[0.18em] text-paper transition-colors duration-300 hover:bg-gold-dark hover:border-gold-dark disabled:opacity-60"
       >
-        {status === "loading" ? "Sending..." : "Send Message"}
+        {pending ? "Sending..." : "Send Message"}
         <AnimatePresence>
-          {status !== "loading" && <ArrowRight className="h-3.5 w-3.5" />}
+          {!pending && <ArrowRight className="h-3.5 w-3.5" />}
         </AnimatePresence>
       </button>
     </form>

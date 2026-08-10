@@ -1,7 +1,7 @@
-import type { Product } from "@/lib/products";
+import type { CatalogProduct } from "@/lib/catalog";
 
 const paletteMap: Record<
-  Product["palette"],
+  CatalogProduct["palette"],
   { fill: string; fillSoft: string; stroke: string; glow: string; shadow: string }
 > = {
   gold: {
@@ -43,7 +43,7 @@ const paletteMap: Record<
 
 type Colors = (typeof paletteMap)["gold"];
 
-function ShadeShape({ shade, colors }: { shade: Product["shade"]; colors: Colors }) {
+function ShadeShape({ shade, colors }: { shade: CatalogProduct["shade"]; colors: Colors }) {
   switch (shade) {
     case "dome":
       return (
@@ -100,7 +100,7 @@ function ShadeShape({ shade, colors }: { shade: Product["shade"]; colors: Colors
   }
 }
 
-function BaseShape({ base, colors }: { base: Product["base"]; colors: Colors }) {
+function BaseShape({ base, colors }: { base: CatalogProduct["base"]; colors: Colors }) {
   switch (base) {
     case "urn":
       return (
@@ -154,7 +154,7 @@ export default function LampIllustration({
   className = "",
   animated = true,
 }: {
-  product: Product;
+  product: CatalogProduct;
   className?: string;
   animated?: boolean;
 }) {

@@ -1,29 +1,32 @@
 import Link from "next/link";
 import { InstagramIcon, FacebookIcon, LinkedinIcon } from "./SocialIcons";
 import Newsletter from "./Newsletter";
+import { getContactInfo } from "@/lib/content";
+import { getMenuItems, getSocialLinks } from "@/lib/menus";
 
-const columns = [
-  {
-    title: "Explore",
-    links: [
-      { href: "/", label: "Home" },
-      { href: "/products", label: "Products" },
-      { href: "/about", label: "About Us" },
-      { href: "/contact", label: "Contact" },
-    ],
-  },
-  {
-    title: "Collections",
-    links: [
-      { href: "/products?category=Marble", label: "Marble" },
-      { href: "/products?category=Brass", label: "Brass" },
-      { href: "/products?category=Alabaster", label: "Alabaster" },
-      { href: "/products?category=Glass", label: "The Chroma Editions" },
-    ],
-  },
-];
+const socialIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+  instagram: InstagramIcon,
+  facebook: FacebookIcon,
+  linkedin: LinkedinIcon,
+};
 
-export default function Footer() {
+export default async function Footer() {
+  const [contact, explore, collections, socials] = await Promise.all([
+    getContactInfo(),
+    getMenuItems("footer-explore"),
+    getMenuItems("footer-collections"),
+    getSocialLinks(),
+  ]);
+
+  const columns = [
+    { title: "Explore", links: explore },
+    { title: "Collections", links: collections },
+  ].filter((c) => c.links.length > 0);
+
+  // A social row still without a real URL (the "#" placeholder) reads as
+  // not-yet-configured — better to omit the icon than link nowhere.
+  const activeSocials = socials.filter((s) => s.url && s.url !== "#" && socialIcons[s.platform]);
+
   return (
     <footer className="border-t border-gold/20 bg-ink text-paper">
       <div className="mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-24">
@@ -51,7 +54,7 @@ export default function Footer() {
               </p>
               <ul className="space-y-3.5">
                 {col.links.map((link) => (
-                  <li key={link.label}>
+                  <li key={link.id}>
                     <Link
                       href={link.href}
                       className="text-sm text-paper/65 transition-colors hover:text-gold"
@@ -70,18 +73,19 @@ export default function Footer() {
             </p>
             <ul className="space-y-3.5 text-sm text-paper/65">
               <li>
-                <a href="mailto:johannj@finnbogasondesign.com" className="transition-colors hover:text-gold">
-                  johannj@finnbogasondesign.com
+                <a href={`mailto:${contact.email}`} className="transition-colors hover:text-gold">
+                  {contact.email}
                 </a>
               </li>
               <li>
-                <a href="tel:+15550182043" className="transition-colors hover:text-gold">
-                  +1 (555) 018&ndash;2043
+                <a
+                  href={`tel:${contact.phone.replace(/[^\d+]/g, "")}`}
+                  className="transition-colors hover:text-gold"
+                >
+                  {contact.phone}
                 </a>
               </li>
-              <li className="text-paper/60">
-                Tue&ndash;Sat, 11am&ndash;6pm, by appointment
-              </li>
+              <li className="text-paper/60">{contact.hours}</li>
             </ul>
           </div>
         </div>
@@ -90,29 +94,25 @@ export default function Footer() {
           <p className="text-xs text-paper/60">
             &copy; {new Date().getFullYear()} SaFaLight. All rights reserved.
           </p>
-          <div className="flex items-center gap-6">
-            <a
-              href="#"
-              aria-label="SaFaLight on Instagram"
-              className="text-paper/60 transition-colors hover:text-gold"
-            >
-              <InstagramIcon className="h-4 w-4" />
-            </a>
-            <a
-              href="#"
-              aria-label="SaFaLight on Facebook"
-              className="text-paper/60 transition-colors hover:text-gold"
-            >
-              <FacebookIcon className="h-4 w-4" />
-            </a>
-            <a
-              href="#"
-              aria-label="SaFaLight on LinkedIn"
-              className="text-paper/60 transition-colors hover:text-gold"
-            >
-              <LinkedinIcon className="h-4 w-4" />
-            </a>
-          </div>
+          {activeSocials.length > 0 && (
+            <div className="flex items-center gap-6">
+              {activeSocials.map((s) => {
+                const Icon = socialIcons[s.platform];
+                return (
+                  <a
+                    key={s.id}
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`SaFaLight on ${s.platform.charAt(0).toUpperCase() + s.platform.slice(1)}`}
+                    className="text-paper/60 transition-colors hover:text-gold"
+                  >
+                    <Icon className="h-4 w-4" />
+                  </a>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </footer>
