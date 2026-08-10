@@ -45,13 +45,8 @@ Run and fix all errors before deploying:
   isn't a repeatable, checked-in test suite. Needs a decision on a
   framework (Vitest is the lighter-weight fit here; Playwright could also
   cover this project's own component/e2e needs directly) before "unit
-  tests" can be a real gate.
-- **`npm audit` currently reports 6 high-severity vulnerabilities**, all
-  transitive (js-yaml, nanoid, postcss, sharp — pulled in by build tooling
-  and Next.js's own bundled dependencies, not code this project imports
-  directly). `npm audit fix --force` would resolve them by bumping Next.js
-  to 16.3.0, outside the currently pinned range — not done unilaterally;
-  needs explicit approval per the dependency-change rule above.
+  tests" can be a real gate. (Explicitly deferred for now — revisit once
+  the feature set stabilizes.)
 - **No automated link validation.** No broken-link checker currently runs
   in CI or as a script.
 - **No automated environment-variable validation.** Required vars are
@@ -59,6 +54,12 @@ Run and fix all errors before deploying:
   `BLOB_READ_WRITE_TOKEN`, `NEXT_PUBLIC_SITE_URL`) but nothing currently
   asserts they're present at build/boot time and fails fast with a clear
   message if not.
+
+`npm audit` is clean (0 vulnerabilities) as of the Next.js 16.3.0 bump —
+was 6 high-severity, all transitive via Next.js's own bundled deps
+(js-yaml, nanoid, postcss, sharp), resolved by `npm audit fix --force`
+after confirming it stayed within the same major version and running the
+full check suite + a manual smoke test.
 
 ## Architecture
 
