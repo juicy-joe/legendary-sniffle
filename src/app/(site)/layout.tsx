@@ -79,7 +79,9 @@ export async function generateMetadata(): Promise<Metadata> {
       follow: true,
       googleBot: { index: true, follow: true, "max-image-preview": "large" },
     },
-    icons: { icon: "/favicon.ico" },
+    // No explicit `icons` entry — src/app/icon.tsx (Next.js's icon file
+    // convention) generates the favicon and wires up the <link rel="icon">
+    // tag automatically.
   };
 }
 
