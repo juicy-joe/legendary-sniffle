@@ -75,6 +75,7 @@ export default function Navbar({ links }: { links: { href: string; label: string
   }, [open]);
 
   return (
+    <>
     <header
       className={clsx(
         "sticky top-0 z-50 transition-transform duration-500 ease-out",
@@ -183,7 +184,15 @@ export default function Navbar({ links }: { links: { href: string; label: string
           </button>
         </div>
       </nav>
+    </header>
 
+      {/* Deliberately a sibling of <header>, not nested inside it — the
+          header has a `translate-y-*` transform for its hide-on-scroll
+          behavior, and ANY transform on an ancestor (even translateY(0))
+          makes that ancestor the containing block for descendant
+          `position: fixed` elements instead of the viewport. Nested here,
+          this overlay was being sized against the header's own short box
+          instead of the screen, collapsing to zero height. */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -235,6 +244,6 @@ export default function Navbar({ links }: { links: { href: string; label: string
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }
