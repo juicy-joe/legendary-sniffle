@@ -6,7 +6,6 @@ import RevealOnScroll from "@/components/RevealOnScroll";
 import Marquee from "@/components/Marquee";
 import ProductCard from "@/components/ProductCard";
 import StatCounter from "@/components/StatCounter";
-import AmbienceConfigurator from "@/components/AmbienceConfigurator";
 import Testimonials from "@/components/Testimonials";
 import Newsletter from "@/components/Newsletter";
 import LampIllustration from "@/components/LampIllustration";
@@ -181,22 +180,10 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Configurator */}
-      <section className="border-y border-ink/10 bg-paper-dim py-24 md:py-32">
-        <div className="mx-auto max-w-6xl px-6 md:px-10">
-          <RevealOnScroll className="mb-14 text-center">
-            <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
-              Design Your Light
-            </p>
-            <h2 className="font-serif text-4xl text-ink md:text-5xl">
-              Preview a Finish, Live
-            </h2>
-          </RevealOnScroll>
-          <RevealOnScroll delay={0.1}>
-            <AmbienceConfigurator />
-          </RevealOnScroll>
-        </div>
-      </section>
+      {/* "Design Your Light" configurator section is intentionally pulled
+          for now — not deleted, just not wired in. Re-add by restoring this
+          block (see git history) once it's ready to ship; the component
+          itself is untouched at @/components/AmbienceConfigurator. */}
 
       {/* Testimonials */}
       <section className="bg-ink py-24 text-paper md:py-32">

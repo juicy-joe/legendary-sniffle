@@ -148,6 +148,15 @@ export default async function ContactPage() {
             </div>
           </RevealOnScroll>
         </div>
+
+        <div className="mt-16 text-center">
+          <Link
+            href="/terms"
+            className="text-sm text-ink/60 underline underline-offset-2 transition-colors hover:text-ink"
+          >
+            Terms and Conditions
+          </Link>
+        </div>
       </section>
     </div>
   );
