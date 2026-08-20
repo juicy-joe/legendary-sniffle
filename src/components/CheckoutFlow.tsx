@@ -10,6 +10,7 @@ import { useCatalog } from "@/context/CatalogContext";
 import { shippingMethods } from "@/lib/shipping";
 import { placeOrder } from "@/app/(site)/checkout/actions";
 import { EASE } from "@/lib/motion";
+import { formatPrice } from "@/lib/format";
 import LampIllustration from "./LampIllustration";
 import ProductPhoto from "./ProductPhoto";
 
@@ -271,7 +272,7 @@ export default function CheckoutFlow() {
                       </div>
                     </div>
                     <p className="whitespace-nowrap font-serif text-lg text-gold-dark font-feature-tabular">
-                      {m.price === 0 ? "Included" : `$${m.price.toLocaleString()}`}
+                      {m.price === 0 ? "Included" : formatPrice(m.price)}
                     </p>
                   </label>
                 ))}
@@ -327,7 +328,7 @@ export default function CheckoutFlow() {
                 </p>
                 <p className="text-sm text-ink/75">
                   {method.label} &middot;{" "}
-                  {method.price === 0 ? "Included" : `$${method.price.toLocaleString()}`}
+                  {method.price === 0 ? "Included" : formatPrice(method.price)}
                 </p>
               </div>
 
@@ -388,7 +389,7 @@ export default function CheckoutFlow() {
                   <p className="text-xs text-ink/65">Qty {line.qty}</p>
                 </div>
                 <p className="text-sm text-ink/70 font-feature-tabular">
-                  ${(product!.price * line.qty).toLocaleString()}
+                  {formatPrice(product!.price * line.qty)}
                 </p>
               </li>
             ))}
@@ -397,17 +398,17 @@ export default function CheckoutFlow() {
           <div className="mt-6 space-y-2 border-t border-ink/10 pt-4 text-sm">
             <div className="flex justify-between text-ink/60">
               <span>Subtotal</span>
-              <span className="font-feature-tabular">${subtotal.toLocaleString()}</span>
+              <span className="font-feature-tabular">{formatPrice(subtotal)}</span>
             </div>
             <div className="flex justify-between text-ink/60">
               <span>Shipping</span>
               <span className="font-feature-tabular">
-                {method.price === 0 ? "Included" : `$${method.price.toLocaleString()}`}
+                {method.price === 0 ? "Included" : formatPrice(method.price)}
               </span>
             </div>
             <div className="flex justify-between border-t border-ink/10 pt-2 font-serif text-lg text-ink">
               <span>Total</span>
-              <span className="font-feature-tabular">${total.toLocaleString()}</span>
+              <span className="font-feature-tabular">{formatPrice(total)}</span>
             </div>
           </div>
         </div>

@@ -8,6 +8,7 @@ import type { CatalogProduct } from "@/lib/catalog";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
 import { DURATION, EASE } from "@/lib/motion";
+import { formatPrice } from "@/lib/format";
 import LampIllustration from "./LampIllustration";
 import ProductPhoto from "./ProductPhoto";
 
@@ -92,7 +93,7 @@ export default function ProductCard({
             <h2 className="mt-1 font-serif text-xl text-ink">{product.name}</h2>
           </div>
           <p className="whitespace-nowrap font-serif text-lg text-gold-dark font-feature-tabular">
-            ${product.price.toLocaleString()}
+            {formatPrice(product.price)}
           </p>
         </div>
       </Link>

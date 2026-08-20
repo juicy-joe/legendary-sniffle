@@ -9,6 +9,7 @@ import RevealOnScroll from "@/components/RevealOnScroll";
 import { getCatalog, getProductBySlug, getRelatedProducts } from "@/lib/catalog";
 import { siteUrl } from "@/lib/site";
 import { jsonLdScriptProps } from "@/lib/json-ld";
+import { formatPrice } from "@/lib/format";
 
 export async function generateStaticParams() {
   const products = await getCatalog();
@@ -73,7 +74,7 @@ export default async function ProductPage({
           offers: {
             "@type": "Offer",
             price: product.price,
-            priceCurrency: "USD",
+            priceCurrency: "EUR",
             availability: "https://schema.org/InStock",
           },
         })}
@@ -125,7 +126,7 @@ export default async function ProductPage({
           </p>
 
           <p className="mt-6 font-serif text-3xl text-gold-dark font-feature-tabular">
-            ${product.price.toLocaleString()}
+            {formatPrice(product.price)}
           </p>
 
           <p className="mt-6 max-w-lg text-base leading-relaxed text-ink/70">

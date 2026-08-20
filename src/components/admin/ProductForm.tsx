@@ -102,7 +102,7 @@ export default function ProductForm({
           />
         </Field>
 
-        <Field label="Price (USD, whole dollars)" name="price" error={err("price")}>
+        <Field label="Price (EUR, whole euros)" name="price" error={err("price")}>
           <input
             id="price"
             name="price"

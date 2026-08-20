@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { formatPrice } from "@/lib/format";
 
 export const metadata = { title: "Orders — Admin" };
 
@@ -59,7 +60,7 @@ export default async function AdminOrdersPage() {
                     <span className="block text-xs text-ink/60">{o.email}</span>
                   </td>
                   <td className="px-4 py-3 text-ink/70 font-feature-tabular">
-                    ${o.total.toLocaleString("en-US")}
+                    {formatPrice(o.total)}
                   </td>
                   <td className="px-4 py-3 text-ink/70">
                     {o.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}

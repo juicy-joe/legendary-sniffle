@@ -6,6 +6,7 @@ import OrderStatusControl from "@/components/admin/OrderStatusControl";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 import { deleteOrder } from "../actions";
 import type { OrderStatusValue } from "@/lib/order-status";
+import { formatPrice } from "@/lib/format";
 
 export const metadata = { title: "Order — Admin" };
 
@@ -86,7 +87,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                   {item.name} <span className="text-ink/50">&times; {item.qty}</span>
                 </span>
                 <span className="text-ink/70 font-feature-tabular">
-                  ${(item.price * item.qty).toLocaleString("en-US")}
+                  {formatPrice(item.price * item.qty)}
                 </span>
               </li>
             ))}
@@ -95,17 +96,17 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <div className="mt-4 space-y-1.5 border-t border-ink/10 pt-4 text-sm">
             <div className="flex justify-between text-ink/60">
               <span>Subtotal</span>
-              <span className="font-feature-tabular">${order.subtotal.toLocaleString("en-US")}</span>
+              <span className="font-feature-tabular">{formatPrice(order.subtotal)}</span>
             </div>
             <div className="flex justify-between text-ink/60">
               <span>Shipping</span>
               <span className="font-feature-tabular">
-                {order.shippingCost === 0 ? "Included" : `$${order.shippingCost.toLocaleString("en-US")}`}
+                {order.shippingCost === 0 ? "Included" : formatPrice(order.shippingCost)}
               </span>
             </div>
             <div className="flex justify-between border-t border-ink/10 pt-2 font-serif text-lg text-ink">
               <span>Total</span>
-              <span className="font-feature-tabular">${order.total.toLocaleString("en-US")}</span>
+              <span className="font-feature-tabular">{formatPrice(order.total)}</span>
             </div>
           </div>
         </div>

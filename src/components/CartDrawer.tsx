@@ -7,6 +7,7 @@ import { Minus, Plus, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useCatalog } from "@/context/CatalogContext";
 import { EASE } from "@/lib/motion";
+import { formatPrice } from "@/lib/format";
 import LampIllustration from "./LampIllustration";
 import ProductPhoto from "./ProductPhoto";
 
@@ -174,7 +175,7 @@ export default function CartDrawer() {
                                 </button>
                               </div>
                               <p className="font-serif text-gold-dark font-feature-tabular">
-                                ${(product.price * line.qty).toLocaleString()}
+                                {formatPrice(product.price * line.qty)}
                               </p>
                             </div>
                           </div>
@@ -188,7 +189,7 @@ export default function CartDrawer() {
                   <div className="mb-4 flex items-center justify-between text-sm text-ink/60">
                     <span>Subtotal</span>
                     <span className="font-serif text-lg text-ink font-feature-tabular">
-                      ${subtotal.toLocaleString()}
+                      {formatPrice(subtotal)}
                     </span>
                   </div>
                   <p className="mb-4 text-xs text-ink/65">

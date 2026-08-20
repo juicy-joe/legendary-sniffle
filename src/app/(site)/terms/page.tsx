@@ -94,10 +94,9 @@ export default async function TermsPage() {
             differences).
           </p>
           <p className="mt-3">
-            3.2. All prices are listed in <Placeholder>Insert Currency, e.g. EUR (&euro;)</Placeholder>{" "}
-            and are inclusive of applicable Spanish VAT (IVA) unless otherwise stated. Shipping
-            costs, if applicable, will be displayed separately at checkout before order
-            confirmation.
+            3.2. All prices are listed in EUR (&euro;) and are inclusive of applicable Spanish VAT
+            (IVA) unless otherwise stated. Shipping costs, if applicable, will be displayed
+            separately at checkout before order confirmation.
           </p>
           <p className="mt-3">
             3.3. We reserve the right to modify prices at any time; however, the price charged will
@@ -323,8 +322,7 @@ export default async function TermsPage() {
         <RevealOnScroll className="rounded-[6px] border border-ink/10 bg-paper-dim p-6 text-xs leading-relaxed text-ink/60">
           This document is a starting point, not a substitute for advice from a qualified lawyer —
           have it reviewed by one familiar with Spanish and EU consumer law before relying on it,
-          particularly the placeholders above and the checkout currency (the storefront currently
-          displays prices in USD, which this document doesn&rsquo;t yet address).
+          particularly the placeholders above.
         </RevealOnScroll>
       </div>
     </div>

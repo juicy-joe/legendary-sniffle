@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Plus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import DeleteProductButton from "@/components/admin/DeleteProductButton";
+import { formatPrice } from "@/lib/format";
 
 export const metadata = { title: "Products — Admin" };
 
@@ -66,7 +67,7 @@ export default async function AdminProductsPage() {
                   </td>
                   <td className="px-4 py-3 text-ink/70">{p.designer.name}</td>
                   <td className="px-4 py-3 text-ink/70">{p.collection.name}</td>
-                  <td className="px-4 py-3 text-ink/70">${p.price.toLocaleString("en-US")}</td>
+                  <td className="px-4 py-3 text-ink/70">{formatPrice(p.price)}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1.5">
                       {p.featured && (
