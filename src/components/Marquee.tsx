@@ -9,10 +9,10 @@ export default function Marquee({ items }: { items: string[] }) {
         {loop.map((item, i) => (
           <span
             key={`${item}-${i}`}
-            className="flex items-center gap-16 whitespace-nowrap font-serif text-lg italic tracking-wide text-ink/65"
+            className="flex items-center gap-16 whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.2em] text-ink/65"
           >
             {item}
-            <span className="text-gold">&#10022;</span>
+            <span className="text-gold">&middot;</span>
           </span>
         ))}
       </div>

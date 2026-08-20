@@ -114,8 +114,8 @@ export default async function ContactPage() {
               >
                 <defs>
                   <radialGradient id="mapGlow" cx="65%" cy="40%" r="60%">
-                    <stop offset="0%" stopColor="#a3854f" stopOpacity="0.5" />
-                    <stop offset="100%" stopColor="#a3854f" stopOpacity="0" />
+                    <stop offset="0%" stopColor="var(--color-gold)" stopOpacity="0.5" />
+                    <stop offset="100%" stopColor="var(--color-gold)" stopOpacity="0" />
                   </radialGradient>
                 </defs>
                 <rect width="400" height="300" fill="url(#mapGlow)" />
@@ -126,18 +126,18 @@ export default async function ContactPage() {
                       cx={20 + col * 34}
                       cy={20 + row * 32}
                       r="1.4"
-                      fill="#d8c69a"
+                      fill="var(--color-gold-light)"
                       opacity={0.25}
                     />
                   ))
                 )}
-                <circle cx="260" cy="120" r="6" fill="#a3854f" />
+                <circle cx="260" cy="120" r="6" fill="var(--color-gold)" />
                 <circle
                   cx="260"
                   cy="120"
                   r="14"
                   fill="none"
-                  stroke="#a3854f"
+                  stroke="var(--color-gold)"
                   strokeWidth="1.5"
                   opacity="0.6"
                 />

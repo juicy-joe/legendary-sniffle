@@ -95,7 +95,7 @@ export default async function ProductPage({
                 Limited Edition
               </span>
             )}
-            <span className="absolute right-6 top-6 z-10 font-serif text-xs italic text-ink/65">
+            <span className="absolute right-6 top-6 z-10 text-xs uppercase tracking-[0.14em] text-ink/65">
               No. {editionNo}
             </span>
             {product.images?.length ? (
@@ -149,7 +149,7 @@ export default async function ProductPage({
             </div>
           </dl>
 
-          <blockquote className="mt-8 border-l border-gold pl-5 font-serif text-lg italic leading-relaxed text-ink/70">
+          <blockquote className="mt-8 border-l border-gold pl-5 font-serif text-lg font-light leading-relaxed text-ink/70">
             &ldquo;{product.story}&rdquo;
           </blockquote>
 

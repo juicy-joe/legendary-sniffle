@@ -36,8 +36,7 @@ export default async function Footer() {
               Sa<span className="text-gold">Fa</span>Light
             </Link>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-paper/55">
-              Curated designer table lamps, hand-finished by master artisans.
-              Each piece is light, treated as sculpture.
+              Designer table lamps, hand-finished by independent studios.
             </p>
             <div className="mt-8">
               <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-paper/60">
@@ -91,8 +90,12 @@ export default async function Footer() {
         </div>
 
         <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-paper/10 pt-8 md:flex-row">
-          <p className="text-xs text-paper/60">
-            &copy; {new Date().getFullYear()} SaFaLight. All rights reserved.
+          <p className="flex flex-wrap items-center gap-x-2 text-xs text-paper/60">
+            <span>&copy; {new Date().getFullYear()} SaFaLight. All rights reserved.</span>
+            <span aria-hidden="true">&middot;</span>
+            <Link href="/privacy" className="underline-offset-2 transition-colors hover:text-gold hover:underline">
+              Privacy Policy
+            </Link>
           </p>
           {activeSocials.length > 0 && (
             <div className="flex items-center gap-6">

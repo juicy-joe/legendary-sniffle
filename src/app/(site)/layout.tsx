@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Archivo } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CursorGlow from "@/components/CursorGlow";
@@ -14,18 +14,23 @@ import { siteUrl } from "@/lib/site";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import "../globals.css";
 
-// Weight lists are trimmed to exactly what's used in the UI (verified via
+// Theme C ("Monochrome Atelier") uses one typeface family for everything —
+// hierarchy comes from size/weight, not a serif/sans pairing. Loaded twice
+// under the two variable names the rest of the app already references
+// (--font-serif for display headings, --font-sans for body/UI) so no
+// component className needed to change — see globals.css for the same
+// reasoning applied to the color tokens.
+// Weight list is trimmed to exactly what's used in the UI (verified via
 // grep for font-* weight utility classes) — every unused weight is another
 // font file the browser has to download.
-const fraunces = Fraunces({
+const archivoDisplay = Archivo({
   variable: "--font-serif",
   subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  style: ["normal", "italic"],
+  weight: ["300", "500", "600"],
   display: "swap",
 });
 
-const inter = Inter({
+const archivoText = Archivo({
   variable: "--font-sans",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
@@ -34,8 +39,8 @@ const inter = Inter({
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f8f6f1" },
-    { media: "(prefers-color-scheme: dark)", color: "#0e0d0b" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#121212" },
   ],
 };
 
@@ -103,7 +108,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${inter.variable} h-full antialiased`}
+      className={`${archivoDisplay.variable} ${archivoText.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-paper text-ink font-sans">
         <script

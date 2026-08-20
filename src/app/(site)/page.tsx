@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { ArrowDown, ArrowRight, Sparkles } from "lucide-react";
-import MagneticButton from "@/components/MagneticButton";
+import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 import TextLink from "@/components/TextLink";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import Marquee from "@/components/Marquee";
 import ProductCard from "@/components/ProductCard";
-import ProductPhoto from "@/components/ProductPhoto";
 import StatCounter from "@/components/StatCounter";
 import AmbienceConfigurator from "@/components/AmbienceConfigurator";
 import Testimonials from "@/components/Testimonials";
@@ -42,79 +41,50 @@ export default async function Home() {
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative flex min-h-[92vh] items-center overflow-hidden bg-ink text-paper">
+      {/* Hero — Theme C: one product, full-bleed, minimal text bottom-left.
+          No split layout, no stat counters, no decorative eyebrow icon —
+          the image is the argument. */}
+      <section className="relative h-[100svh] min-h-[560px] w-full overflow-hidden bg-ink text-paper">
+        {heroProduct.images?.length ? (
+          <Image
+            src={heroProduct.images[0].src}
+            alt={`${heroProduct.name} by ${heroProduct.designer}`}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        ) : (
+          <LampIllustration product={heroProduct} className="h-full w-full" />
+        )}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-40"
-          style={{
-            background:
-              "radial-gradient(60% 50% at 80% 20%, rgba(163,133,79,0.22), transparent 70%)",
-          }}
+          className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/10 to-transparent"
         />
-        <div className="relative mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-14 px-6 py-24 md:grid-cols-2 md:px-10">
-          <div>
-            <div className="mb-7 inline-flex items-center gap-2 border border-paper/15 px-4 py-1.5 text-[11px] uppercase tracking-[0.2em] text-paper/70">
-              <Sparkles className="h-3.5 w-3.5 text-gold" />
+
+        <div className="absolute inset-x-0 bottom-0 px-6 pb-14 md:px-14 md:pb-16">
+          <div className="max-w-lg">
+            <p className="mb-4 text-[11px] uppercase tracking-[0.2em] text-paper/70">
               {content.heroEyebrow}
-            </div>
-            <h1 className="font-serif text-5xl font-light leading-[1.05] tracking-tight md:text-7xl">
-              {content.heroHeadline}{" "}
-              <span className="italic text-gold" style={{ fontWeight: 400 }}>
-                {content.heroHeadlineAccent}
-              </span>
-              .
+            </p>
+            <h1 className="font-serif text-4xl font-light leading-[1.08] md:text-6xl">
+              {content.heroHeadline} {content.heroHeadlineAccent}.
             </h1>
-            <p className="mt-7 max-w-md text-base leading-relaxed text-paper/60 md:text-lg">
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-paper/65 md:text-base">
               {content.heroSubtext}
             </p>
-            <div className="mt-10 flex flex-wrap items-center gap-4">
-              <MagneticButton href="/products" variant="paper">
-                Explore the Collection <ArrowRight className="h-3.5 w-3.5" />
-              </MagneticButton>
-              <MagneticButton href="/contact" variant="ghost-light">
-                Book a Consultation
-              </MagneticButton>
-            </div>
-
-            <div className="mt-16 grid max-w-md grid-cols-3 gap-6 border-t border-paper/10 pt-8">
-              <StatCounter value={4} label="Resident Designers" dark />
-              <StatCounter value={1200} suffix="+" label="Homes Illuminated" dark />
-              <StatCounter value={12} label="Rare Materials" dark />
-            </div>
-          </div>
-
-          <div className="relative mx-auto w-full max-w-sm">
-            <div className="relative aspect-square">
-              {heroProduct.images?.length ? (
-                <ProductPhoto
-                  images={heroProduct.images}
-                  alt={`${heroProduct.name} by ${heroProduct.designer}`}
-                  priority
-                  showSelector={false}
-                  className="drop-shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
-                />
-              ) : (
-                <LampIllustration product={heroProduct} className="h-full w-full" />
-              )}
-            </div>
-            <p className="mt-5 text-center text-[11px] uppercase tracking-[0.16em] text-paper/60">
-              {heroProduct.name} &middot; {heroProduct.collection} &middot;{" "}
-              <Link href={`/products/${heroProduct.slug}`} className="underline decoration-paper/30 underline-offset-2 hover:text-gold hover:decoration-gold">
-                see it up close
-              </Link>
-            </p>
+            <Link
+              href="/products"
+              className="mt-8 inline-flex items-center gap-2 border-b border-paper/40 pb-1 text-[11px] font-medium uppercase tracking-[0.16em] text-paper transition-colors hover:border-paper"
+            >
+              Explore the Collection <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
         </div>
 
-        <Link
-          href="#featured"
-          className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-paper/60 transition-colors hover:text-gold"
-          aria-label="Scroll to featured collection"
-        >
-          <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>
-          <ArrowDown className="h-4 w-4" />
-        </Link>
+        <p className="absolute bottom-14 right-6 hidden text-[11px] uppercase tracking-[0.16em] text-paper/60 md:right-14 md:block">
+          {heroProduct.name} &middot; {heroProduct.collection}
+        </p>
       </section>
 
       <Marquee

@@ -31,13 +31,16 @@ export default function ProductCard({
       className="group relative"
     >
       <Link href={`/products/${product.slug}`} className="block">
-        <div className="corner-ticks relative aspect-[3/4] overflow-hidden rounded-[6px] border border-ink/10 bg-paper-dim">
+        <div className="corner-ticks relative aspect-[3/4] overflow-hidden rounded-[2px] border border-ink/10 bg-paper-dim">
           {product.limited && (
             <span className="absolute left-4 top-4 z-10 border border-paper/40 bg-ink/90 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-paper backdrop-blur-sm">
               Limited Edition
             </span>
           )}
-          <div className="absolute right-4 top-4 z-10 flex flex-col gap-2">
+          {/* Icons stay hidden until hover/focus on pointer devices — Theme C
+              keeps the resting card down to just the image and its caption
+              below. Always visible on touch (no hover to reveal them). */}
+          <div className="absolute right-4 top-4 z-10 flex flex-col gap-2 transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
             <button
               type="button"
               onClick={(e) => {
@@ -46,7 +49,7 @@ export default function ProductCard({
               }}
               aria-label={saved ? "Remove from wishlist" : "Add to wishlist"}
               aria-pressed={saved}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-paper/85 backdrop-blur transition-transform duration-200 hover:scale-110"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-paper/85 backdrop-blur transition-colors"
             >
               <Heart
                 className={clsx(
@@ -62,7 +65,7 @@ export default function ProductCard({
                 addItem(product.slug);
               }}
               aria-label={`Add ${product.name} to cart`}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-paper/85 backdrop-blur transition-transform duration-200 hover:scale-110"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-paper/85 backdrop-blur transition-colors"
             >
               <ShoppingBag className="h-4 w-4 text-ink/60" />
             </button>
@@ -73,19 +76,12 @@ export default function ProductCard({
               images={product.images}
               alt={`${product.name} by ${product.designer}`}
               showSelector={false}
-              className="transition-transform duration-700 ease-out group-hover:scale-[1.035]"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center p-6 transition-transform duration-700 ease-out group-hover:scale-[1.035]">
+            <div className="flex h-full w-full items-center justify-center p-6">
               <LampIllustration product={product} className="h-full w-full" />
             </div>
           )}
-
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-3 bg-gradient-to-t from-ink/90 via-ink/40 to-transparent p-5 opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100">
-            <p className="text-xs leading-relaxed text-paper/85">
-              {product.description}
-            </p>
-          </div>
         </div>
 
         <div className="mt-4 flex items-start justify-between gap-3">

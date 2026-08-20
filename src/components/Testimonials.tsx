@@ -55,7 +55,7 @@ export default function Testimonials() {
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <p className="font-serif text-2xl font-light italic leading-relaxed text-paper md:text-3xl">
+            <p className="font-serif text-2xl font-light leading-relaxed text-paper md:text-3xl">
               &ldquo;{testimonials[index].quote}&rdquo;
             </p>
             <p className="mt-6 text-xs uppercase tracking-[0.2em] text-paper/60">

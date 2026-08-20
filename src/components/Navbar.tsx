@@ -1,18 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Heart, Menu, ShoppingBag, X } from "lucide-react";
+import { Menu, ShoppingBag, X } from "lucide-react";
 import clsx from "clsx";
-import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
 import { EASE } from "@/lib/motion";
 
+// Theme C ("Monochrome Atelier") header: logo, nav links, cart — nothing
+// else. The wishlist icon and "Book a Consultation" button that used to
+// live here are dropped from the nav specifically (not removed as
+// features — the heart toggle still lives on every product card, and
+// "Book a Consultation" still appears on the pages that need it); B&O's
+// header is the direct reference: logo left, cart right, no clutter.
 export default function Navbar({ links }: { links: { href: string; label: string }[] }) {
   const pathname = usePathname();
-  const { count } = useWishlist();
   const { count: cartCount, openCart } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -86,11 +91,15 @@ export default function Navbar({ links }: { links: { href: string; label: string
       )}
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-10">
-        <Link
-          href="/"
-          className="font-serif text-2xl font-medium tracking-wide text-ink"
-        >
-          Sa<span className="text-gold-gradient">Fa</span>Light
+        <Link href="/" className="shrink-0">
+          <Image
+            src="/logo.webp"
+            alt="SaFaLight"
+            width={1600}
+            height={307}
+            priority
+            className="h-6 w-auto md:h-7"
+          />
         </Link>
 
         <ul className="hidden items-center gap-9 md:flex">
@@ -123,32 +132,11 @@ export default function Navbar({ links }: { links: { href: string; label: string
         </ul>
 
         <div className="flex items-center gap-5">
-          <Link
-            href="/products"
-            aria-label={`Wishlist, ${count} saved`}
-            className="relative hidden text-ink/70 transition-colors hover:text-gold-dark md:inline-flex"
-          >
-            <Heart className="h-[18px] w-[18px]" strokeWidth={1.5} />
-            <AnimatePresence>
-              {count > 0 && (
-                <motion.span
-                  key={count}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0 }}
-                  className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[10px] font-semibold text-ink"
-                >
-                  {count}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </Link>
-
           <button
             type="button"
             onClick={openCart}
             aria-label={`Cart, ${cartCount} items`}
-            className="relative hidden text-ink/70 transition-colors hover:text-gold-dark md:inline-flex"
+            className="relative text-ink/70 transition-colors hover:text-gold-dark"
           >
             <ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.5} />
             <AnimatePresence>
@@ -158,20 +146,13 @@ export default function Navbar({ links }: { links: { href: string; label: string
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   exit={{ scale: 0 }}
-                  className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[10px] font-semibold text-ink"
+                  className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[10px] font-semibold text-paper"
                 >
                   {cartCount}
                 </motion.span>
               )}
             </AnimatePresence>
           </button>
-
-          <Link
-            href="/contact"
-            className="hidden rounded-[3px] border border-ink/25 px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.16em] text-ink transition-colors duration-300 hover:border-ink hover:bg-ink hover:text-paper md:inline-block"
-          >
-            Book a Consultation
-          </Link>
 
           <button
             type="button"
@@ -215,16 +196,13 @@ export default function Navbar({ links }: { links: { href: string; label: string
                   transition={{ duration: 0.4, delay: 0.05 + i * 0.06, ease: EASE }}
                   className="border-b border-ink/10 py-4"
                 >
-                  <Link href={link.href} className="font-serif text-4xl text-ink">
+                  <Link href={link.href} className="font-serif text-4xl font-medium text-ink">
                     {link.label}
                   </Link>
                 </motion.li>
               ))}
             </ul>
-            <div className="flex items-center justify-between border-t border-ink/10 px-8 py-6">
-              <Link href="/products" className="flex items-center gap-2 text-sm text-ink/70">
-                <Heart className="h-4 w-4" /> Wishlist ({count})
-              </Link>
+            <div className="border-t border-ink/10 px-8 py-6">
               <button
                 type="button"
                 onClick={openCart}
@@ -232,14 +210,6 @@ export default function Navbar({ links }: { links: { href: string; label: string
               >
                 <ShoppingBag className="h-4 w-4" /> Cart ({cartCount})
               </button>
-            </div>
-            <div className="px-8 pb-8">
-              <Link
-                href="/contact"
-                className="block rounded-[3px] bg-ink py-4 text-center text-[11px] font-medium uppercase tracking-[0.16em] text-paper"
-              >
-                Book a Consultation
-              </Link>
             </div>
           </motion.div>
         )}
