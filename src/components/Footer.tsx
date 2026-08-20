@@ -96,6 +96,10 @@ export default async function Footer() {
             <Link href="/privacy" className="underline-offset-2 transition-colors hover:text-gold hover:underline">
               Privacy Policy
             </Link>
+            <span aria-hidden="true">&middot;</span>
+            <Link href="/terms" className="underline-offset-2 transition-colors hover:text-gold hover:underline">
+              Terms and Conditions
+            </Link>
           </p>
           {activeSocials.length > 0 && (
             <div className="flex items-center gap-6">

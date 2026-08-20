@@ -14,7 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Legal pages change rarely and aren't a discovery priority for search
   // engines, but should still be listed so they're indexable.
-  const legalRoutes = ["/privacy"].map((path) => ({
+  const legalRoutes = ["/privacy", "/terms"].map((path) => ({
     url: `${siteUrl}${path}`,
     lastModified: new Date(),
     changeFrequency: "yearly" as const,

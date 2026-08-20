@@ -148,6 +148,16 @@ export default async function PrivacyPage() {
           </p>
         </RevealOnScroll>
 
+        <RevealOnScroll>
+          <p>
+            For the terms that govern purchases made on this website, see our{" "}
+            <Link href="/terms" className="text-gold-dark underline underline-offset-2 hover:text-ink">
+              Terms and Conditions
+            </Link>
+            .
+          </p>
+        </RevealOnScroll>
+
         <RevealOnScroll className="rounded-[6px] border border-ink/10 bg-paper-dim p-6 text-xs leading-relaxed text-ink/60">
           This policy describes, in plain language, what this website actually does with visitor
           and customer data. It is a starting point rather than a substitute for advice from a
