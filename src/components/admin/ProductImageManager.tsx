@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import Image from "next/image";
+import { upload } from "@vercel/blob/client";
 import { Trash2, ImagePlus, Pencil, ArrowUp, ArrowDown, RotateCcw, RotateCw, Check, X } from "lucide-react";
 import {
   uploadProductImage,
@@ -9,7 +10,6 @@ import {
   deleteProductImage,
   moveProductImage,
   rotateProductImage,
-  type ImageUploadState,
 } from "@/app/admin/(dashboard)/products/image-actions";
 
 type ProductImage = {
@@ -20,6 +20,20 @@ type ProductImage = {
   sortOrder: number;
 };
 
+// Uploads a file straight from the browser to Vercel Blob (via the token
+// endpoint at /api/admin/blob-upload) rather than routing the bytes through
+// a Server Action. Server Actions are subject to Vercel's serverless
+// request-body cap (~4.5MB) — anything larger came back as a raw platform
+// 413 that the Server Actions client runtime can't parse, crashing the
+// whole page instead of showing a friendly error. A direct-to-blob upload
+// has no such limit.
+function uploadFile(productId: string, file: File) {
+  return upload(`products/${productId}/${Date.now()}-${file.name}`, file, {
+    access: "public",
+    handleUploadUrl: "/api/admin/blob-upload",
+  });
+}
+
 export default function ProductImageManager({
   productId,
   images,
@@ -29,8 +43,42 @@ export default function ProductImageManager({
   images: ProductImage[];
   blobConfigured: boolean;
 }) {
-  const boundUpload = uploadProductImage.bind(null, productId);
-  const [state, formAction, pending] = useActionState<ImageUploadState, FormData>(boundUpload, {});
+  const formRef = useRef<HTMLFormElement>(null);
+  const [isUploading, startUpload] = useTransition();
+  const [uploadError, setUploadError] = useState<string | undefined>();
+
+  const handleUpload = (formData: FormData) => {
+    startUpload(async () => {
+      const file = formData.get("file");
+      const label = String(formData.get("label") || "");
+      const swatch = String(formData.get("swatch") || "");
+
+      if (!(file instanceof File) || file.size === 0) {
+        setUploadError("Choose an image file.");
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        setUploadError("That file doesn't look like an image.");
+        return;
+      }
+
+      let blobUrl: string;
+      try {
+        blobUrl = (await uploadFile(productId, file)).url;
+      } catch (e) {
+        setUploadError(e instanceof Error ? e.message : "Upload failed — try again.");
+        return;
+      }
+
+      const result = await uploadProductImage(productId, blobUrl, label, swatch);
+      if (result.error) {
+        setUploadError(result.error);
+      } else {
+        setUploadError(undefined);
+        formRef.current?.reset();
+      }
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -63,7 +111,7 @@ export default function ProductImageManager({
           everything else on this product can be edited now.
         </p>
       ) : (
-        <form action={formAction} className="flex flex-wrap items-end gap-3 border-t border-ink/10 pt-5">
+        <form ref={formRef} action={handleUpload} className="flex flex-wrap items-end gap-3 border-t border-ink/10 pt-5">
           <div className="flex-1 min-w-[10rem]">
             <label htmlFor="file" className="mb-1.5 block text-[11px] uppercase tracking-[0.15em] text-ink/65">
               Image
@@ -103,18 +151,18 @@ export default function ProductImageManager({
           </div>
           <button
             type="submit"
-            disabled={pending}
+            disabled={isUploading}
             className="flex items-center gap-1.5 rounded-[3px] border border-ink px-4 py-2 text-[11px] uppercase tracking-[0.15em] text-ink transition-colors hover:bg-ink hover:text-paper disabled:opacity-60"
           >
             <ImagePlus className="h-3.5 w-3.5" />
-            {pending ? "Uploading..." : "Upload"}
+            {isUploading ? "Uploading..." : "Upload"}
           </button>
         </form>
       )}
 
-      {state.error && (
+      {uploadError && (
         <p role="alert" className="text-xs text-red-700">
-          {state.error}
+          {uploadError}
         </p>
       )}
     </div>
@@ -152,7 +200,25 @@ function ProductImageCard({
   // succeeds — no separate effect needed to react to a state change.
   const save = (formData: FormData) => {
     startSave(async () => {
-      const result = await updateProductImage(image.id, productId, {}, formData);
+      const label = String(formData.get("label") || "");
+      const swatch = String(formData.get("swatch") || "");
+      const file = formData.get("file");
+
+      let newUrl: string | undefined;
+      if (file instanceof File && file.size > 0) {
+        if (!file.type.startsWith("image/")) {
+          setSaveError("That file doesn't look like an image.");
+          return;
+        }
+        try {
+          newUrl = (await uploadFile(productId, file)).url;
+        } catch (e) {
+          setSaveError(e instanceof Error ? e.message : "Upload failed — try again.");
+          return;
+        }
+      }
+
+      const result = await updateProductImage(image.id, productId, label, swatch, newUrl);
       if (result.error) {
         setSaveError(result.error);
       } else {
