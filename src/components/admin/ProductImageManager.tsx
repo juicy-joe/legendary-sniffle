@@ -2,12 +2,13 @@
 
 import { useActionState, useState, useTransition } from "react";
 import Image from "next/image";
-import { Trash2, ImagePlus, Pencil, ArrowUp, ArrowDown, Check, X } from "lucide-react";
+import { Trash2, ImagePlus, Pencil, ArrowUp, ArrowDown, RotateCcw, RotateCw, Check, X } from "lucide-react";
 import {
   uploadProductImage,
   updateProductImage,
   deleteProductImage,
   moveProductImage,
+  rotateProductImage,
   type ImageUploadState,
 } from "@/app/admin/(dashboard)/products/image-actions";
 
@@ -136,6 +137,14 @@ function ProductImageCard({
   const [isDeleting, startDelete] = useTransition();
   const [isSaving, startSave] = useTransition();
   const [saveError, setSaveError] = useState<string | undefined>();
+  const [isRotating, startRotate] = useTransition();
+  const [rotateError, setRotateError] = useState<string | undefined>();
+
+  const rotate = (direction: "cw" | "ccw") =>
+    startRotate(async () => {
+      const result = await rotateProductImage(image.id, productId, direction);
+      setRotateError(result.error);
+    });
 
   // Calling updateProductImage directly (rather than through
   // useActionState) means the result is available right where the submit
@@ -238,6 +247,26 @@ function ProductImageCard({
             <ArrowDown className="h-3.5 w-3.5" />
           </button>
         </div>
+        <div className="absolute right-1 top-1 flex flex-col gap-1 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
+          <button
+            type="button"
+            disabled={isRotating}
+            onClick={() => rotate("ccw")}
+            aria-label={`Rotate ${image.label} counterclockwise`}
+            className="flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm transition-colors hover:text-gold-dark disabled:cursor-not-allowed disabled:opacity-30"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            disabled={isRotating}
+            onClick={() => rotate("cw")}
+            aria-label={`Rotate ${image.label} clockwise`}
+            className="flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm transition-colors hover:text-gold-dark disabled:cursor-not-allowed disabled:opacity-30"
+          >
+            <RotateCw className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
       <div className="flex items-center justify-between gap-2 bg-white px-2 py-1.5">
         <span className="flex items-center gap-1.5 truncate text-xs text-ink/70">
@@ -267,6 +296,11 @@ function ProductImageCard({
           </button>
         </span>
       </div>
+      {rotateError && (
+        <p role="alert" className="bg-white px-2 pb-1.5 text-[11px] text-red-700">
+          {rotateError}
+        </p>
+      )}
     </li>
   );
 }

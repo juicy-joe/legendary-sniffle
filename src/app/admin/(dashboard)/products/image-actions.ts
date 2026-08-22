@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { put, del } from "@vercel/blob";
+import sharp from "sharp";
 import { prisma } from "@/lib/prisma";
 import { blobConfigured } from "@/lib/blob";
 
@@ -168,4 +169,57 @@ export async function moveProductImage(imageId: string, productId: string, direc
   ]);
 
   await revalidateProductImagePaths(productId);
+}
+
+export type RotateState = { error?: string };
+
+// Rotates the actual pixel data (via sharp) rather than storing a CSS
+// transform — a stored rotation value would need to be reapplied
+// consistently everywhere the photo renders (admin thumbnail, product
+// card, product detail viewer, homepage fallback) and a 90°/270° rotation
+// doesn't fit its own bounding box under object-cover anyway. Re-encoding
+// once here means every consumer just displays the image normally.
+export async function rotateProductImage(
+  imageId: string,
+  productId: string,
+  direction: "cw" | "ccw"
+): Promise<RotateState> {
+  if (!blobConfigured()) {
+    return { error: "Image storage isn't configured yet — add BLOB_READ_WRITE_TOKEN." };
+  }
+
+  const existing = await prisma.productImage.findUnique({ where: { id: imageId } });
+  if (!existing) return { error: "That image no longer exists." };
+
+  let rotated: Buffer;
+  try {
+    const res = await fetch(existing.url);
+    if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
+    const original = Buffer.from(await res.arrayBuffer());
+    rotated = await sharp(original)
+      .rotate(direction === "cw" ? 90 : -90)
+      .jpeg({ quality: 90 })
+      .toBuffer();
+  } catch {
+    return { error: "Couldn't rotate that image — try again." };
+  }
+
+  const blob = await put(`products/${productId}/${Date.now()}-rotated.jpg`, rotated, {
+    access: "public",
+    contentType: "image/jpeg",
+    addRandomSuffix: true,
+  });
+
+  await prisma.productImage.update({ where: { id: imageId }, data: { url: blob.url } });
+
+  if (existing.url.includes("blob.vercel-storage.com")) {
+    try {
+      await del(existing.url);
+    } catch {
+      // ignore — best-effort cleanup, same as elsewhere in this file
+    }
+  }
+
+  await revalidateProductImagePaths(productId);
+  return {};
 }
