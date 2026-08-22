@@ -2,10 +2,12 @@
 
 import { useActionState, useState, useTransition } from "react";
 import Image from "next/image";
-import { Trash2, ImagePlus } from "lucide-react";
+import { Trash2, ImagePlus, Pencil, ArrowUp, ArrowDown, Check, X } from "lucide-react";
 import {
   uploadProductImage,
+  updateProductImage,
   deleteProductImage,
+  moveProductImage,
   type ImageUploadState,
 } from "@/app/admin/(dashboard)/products/image-actions";
 
@@ -28,44 +30,29 @@ export default function ProductImageManager({
 }) {
   const boundUpload = uploadProductImage.bind(null, productId);
   const [state, formAction, pending] = useActionState<ImageUploadState, FormData>(boundUpload, {});
-  const [isDeleting, startDelete] = useTransition();
-  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   return (
     <div className="space-y-6">
       {images.length > 0 && (
-        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-          {images.map((img) => (
-            <li key={img.id} className="group relative overflow-hidden rounded-[3px] border border-ink/10">
-              <div className="relative aspect-square bg-paper-warm">
-                <Image src={img.url} alt={img.label} fill sizes="200px" className="object-cover" />
-              </div>
-              <div className="flex items-center justify-between gap-2 bg-white px-2 py-1.5">
-                <span className="flex items-center gap-1.5 truncate text-xs text-ink/70">
-                  <span
-                    className="h-2.5 w-2.5 shrink-0 rounded-full border border-ink/10"
-                    style={{ backgroundColor: img.swatch }}
-                  />
-                  {img.label}
-                </span>
-                <button
-                  type="button"
-                  disabled={isDeleting && deletingId === img.id}
-                  onClick={() => {
-                    setDeletingId(img.id);
-                    startDelete(async () => {
-                      await deleteProductImage(img.id, productId);
-                    });
-                  }}
-                  aria-label={`Delete ${img.label}`}
-                  className="shrink-0 text-ink/40 transition-colors hover:text-red-700 disabled:opacity-50"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <>
+          {/* The first image here is what the storefront's product cards and
+              the homepage fallback use — reordering matters, not just which
+              photos exist. */}
+          <p className="text-xs text-ink/60">
+            The first photo is used on product cards and the homepage. Use the arrows to reorder.
+          </p>
+          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            {images.map((img, i) => (
+              <ProductImageCard
+                key={img.id}
+                image={img}
+                productId={productId}
+                isFirst={i === 0}
+                isLast={i === images.length - 1}
+              />
+            ))}
+          </ul>
+        </>
       )}
 
       {!blobConfigured ? (
@@ -130,5 +117,156 @@ export default function ProductImageManager({
         </p>
       )}
     </div>
+  );
+}
+
+function ProductImageCard({
+  image,
+  productId,
+  isFirst,
+  isLast,
+}: {
+  image: ProductImage;
+  productId: string;
+  isFirst: boolean;
+  isLast: boolean;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [isMoving, startMove] = useTransition();
+  const [isDeleting, startDelete] = useTransition();
+  const [isSaving, startSave] = useTransition();
+  const [saveError, setSaveError] = useState<string | undefined>();
+
+  // Calling updateProductImage directly (rather than through
+  // useActionState) means the result is available right where the submit
+  // happens, so the editor can close itself only once a save actually
+  // succeeds — no separate effect needed to react to a state change.
+  const save = (formData: FormData) => {
+    startSave(async () => {
+      const result = await updateProductImage(image.id, productId, {}, formData);
+      if (result.error) {
+        setSaveError(result.error);
+      } else {
+        setSaveError(undefined);
+        setEditing(false);
+      }
+    });
+  };
+
+  // Server Actions like moveProductImage/deleteProductImage return void, so
+  // they're called directly inside startTransition rather than through
+  // useActionState.
+  const move = (direction: "up" | "down") =>
+    startMove(() => moveProductImage(image.id, productId, direction));
+
+  if (editing) {
+    return (
+      <li className="col-span-2 space-y-3 rounded-[3px] border border-gold-dark/40 bg-paper-warm p-3 sm:col-span-1">
+        <div className="relative aspect-square overflow-hidden rounded-[3px] bg-white">
+          <Image src={image.url} alt={image.label} fill sizes="200px" className="object-cover" />
+        </div>
+        <form action={save} className="space-y-2">
+          <input
+            name="label"
+            defaultValue={image.label}
+            required
+            placeholder="Label"
+            className="w-full rounded-[3px] border border-ink/20 bg-white px-2 py-1.5 text-xs text-ink outline-none focus:border-gold-dark"
+          />
+          <div className="flex items-center gap-2">
+            <input
+              name="swatch"
+              type="color"
+              defaultValue={image.swatch}
+              className="h-8 w-10 shrink-0 rounded-[3px] border border-ink/20 bg-white p-0.5"
+            />
+            <input
+              name="file"
+              type="file"
+              accept="image/*"
+              title="Replace this photo (optional)"
+              className="min-w-0 flex-1 text-[11px] text-ink/70 file:mr-2 file:rounded-[3px] file:border file:border-ink/20 file:bg-transparent file:px-2 file:py-1 file:text-[10px] file:text-ink"
+            />
+          </div>
+          {saveError && (
+            <p role="alert" className="text-[11px] text-red-700">
+              {saveError}
+            </p>
+          )}
+          <div className="flex items-center gap-2">
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="flex items-center gap-1 rounded-[3px] bg-ink px-3 py-1.5 text-[11px] uppercase tracking-[0.1em] text-paper transition-colors hover:bg-gold-dark disabled:opacity-60"
+            >
+              <Check className="h-3 w-3" /> {isSaving ? "Saving..." : "Save"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              className="flex items-center gap-1 text-[11px] uppercase tracking-[0.1em] text-ink/60 hover:text-ink"
+            >
+              <X className="h-3 w-3" /> Cancel
+            </button>
+          </div>
+        </form>
+      </li>
+    );
+  }
+
+  return (
+    <li className="group relative overflow-hidden rounded-[3px] border border-ink/10">
+      <div className="relative aspect-square bg-paper-warm">
+        <Image src={image.url} alt={image.label} fill sizes="200px" className="object-cover" />
+        <div className="absolute left-1 top-1 flex flex-col gap-1 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
+          <button
+            type="button"
+            disabled={isFirst || isMoving}
+            onClick={() => move("up")}
+            aria-label={`Move ${image.label} earlier`}
+            className="flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm transition-colors hover:text-gold-dark disabled:cursor-not-allowed disabled:opacity-30"
+          >
+            <ArrowUp className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            disabled={isLast || isMoving}
+            onClick={() => move("down")}
+            aria-label={`Move ${image.label} later`}
+            className="flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm transition-colors hover:text-gold-dark disabled:cursor-not-allowed disabled:opacity-30"
+          >
+            <ArrowDown className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+      <div className="flex items-center justify-between gap-2 bg-white px-2 py-1.5">
+        <span className="flex items-center gap-1.5 truncate text-xs text-ink/70">
+          <span
+            className="h-2.5 w-2.5 shrink-0 rounded-full border border-ink/10"
+            style={{ backgroundColor: image.swatch }}
+          />
+          {image.label}
+        </span>
+        <span className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            aria-label={`Edit ${image.label}`}
+            className="text-ink/40 transition-colors hover:text-gold-dark"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            disabled={isDeleting}
+            onClick={() => startDelete(() => deleteProductImage(image.id, productId))}
+            aria-label={`Delete ${image.label}`}
+            className="text-ink/40 transition-colors hover:text-red-700 disabled:opacity-50"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </span>
+      </div>
+    </li>
   );
 }
