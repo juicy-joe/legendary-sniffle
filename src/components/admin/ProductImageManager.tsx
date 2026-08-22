@@ -1,8 +1,7 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useActionState, useState, useTransition } from "react";
 import Image from "next/image";
-import { upload } from "@vercel/blob/client";
 import { Trash2, ImagePlus, Pencil, ArrowUp, ArrowDown, RotateCcw, RotateCw, Check, X } from "lucide-react";
 import {
   uploadProductImage,
@@ -10,6 +9,7 @@ import {
   deleteProductImage,
   moveProductImage,
   rotateProductImage,
+  type ImageUploadState,
 } from "@/app/admin/(dashboard)/products/image-actions";
 
 type ProductImage = {
@@ -20,18 +20,45 @@ type ProductImage = {
   sortOrder: number;
 };
 
-// Uploads a file straight from the browser to Vercel Blob (via the token
-// endpoint at /api/admin/blob-upload) rather than routing the bytes through
-// a Server Action. Server Actions are subject to Vercel's serverless
-// request-body cap (~4.5MB) — anything larger came back as a raw platform
-// 413 that the Server Actions client runtime can't parse, crashing the
-// whole page instead of showing a friendly error. A direct-to-blob upload
-// has no such limit.
-function uploadFile(productId: string, file: File) {
-  return upload(`products/${productId}/${Date.now()}-${file.name}`, file, {
-    access: "public",
-    handleUploadUrl: "/api/admin/blob-upload",
-  });
+const COMPRESS_THRESHOLD_BYTES = 1.5 * 1024 * 1024;
+const COMPRESS_MAX_DIMENSION = 2400;
+
+// Server Actions cap the request body at ~4.5MB (Vercel's serverless
+// function limit) — a phone or camera photo routinely exceeds that. Rather
+// than reject those files, shrink them in the browser first via canvas so
+// the upload just works without the admin needing to know what "too large"
+// means. Small files pass through untouched.
+async function compressImageIfNeeded(file: File): Promise<File> {
+  if (file.size <= COMPRESS_THRESHOLD_BYTES || !file.type.startsWith("image/")) {
+    return file;
+  }
+
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    return file; // Fall back to the original — the server-side size check still applies.
+  }
+
+  const scale = Math.min(1, COMPRESS_MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return file;
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+
+  let quality = 0.85;
+  let blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
+  while (blob && blob.size > COMPRESS_THRESHOLD_BYTES && quality > 0.5) {
+    quality -= 0.1;
+    blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
+  }
+
+  if (!blob) return file;
+  const newName = file.name.replace(/\.\w+$/, "") + ".jpg";
+  return new File([blob], newName, { type: "image/jpeg" });
 }
 
 export default function ProductImageManager({
@@ -43,41 +70,18 @@ export default function ProductImageManager({
   images: ProductImage[];
   blobConfigured: boolean;
 }) {
-  const formRef = useRef<HTMLFormElement>(null);
-  const [isUploading, startUpload] = useTransition();
-  const [uploadError, setUploadError] = useState<string | undefined>();
+  const boundUpload = uploadProductImage.bind(null, productId);
+  const [state, rawFormAction, pending] = useActionState<ImageUploadState, FormData>(boundUpload, {});
 
-  const handleUpload = (formData: FormData) => {
-    startUpload(async () => {
-      const file = formData.get("file");
-      const label = String(formData.get("label") || "");
-      const swatch = String(formData.get("swatch") || "");
-
-      if (!(file instanceof File) || file.size === 0) {
-        setUploadError("Choose an image file.");
-        return;
-      }
-      if (!file.type.startsWith("image/")) {
-        setUploadError("That file doesn't look like an image.");
-        return;
-      }
-
-      let blobUrl: string;
-      try {
-        blobUrl = (await uploadFile(productId, file)).url;
-      } catch (e) {
-        setUploadError(e instanceof Error ? e.message : "Upload failed — try again.");
-        return;
-      }
-
-      const result = await uploadProductImage(productId, blobUrl, label, swatch);
-      if (result.error) {
-        setUploadError(result.error);
-      } else {
-        setUploadError(undefined);
-        formRef.current?.reset();
-      }
-    });
+  // useActionState's dispatch only accepts FormData synchronously, so the
+  // async compression step happens in a plain wrapper that rebuilds the
+  // FormData with the (possibly shrunk) file before handing off to it.
+  const formAction = async (formData: FormData) => {
+    const file = formData.get("file");
+    if (file instanceof File) {
+      formData.set("file", await compressImageIfNeeded(file));
+    }
+    rawFormAction(formData);
   };
 
   return (
@@ -111,7 +115,7 @@ export default function ProductImageManager({
           everything else on this product can be edited now.
         </p>
       ) : (
-        <form ref={formRef} action={handleUpload} className="flex flex-wrap items-end gap-3 border-t border-ink/10 pt-5">
+        <form action={formAction} className="flex flex-wrap items-end gap-3 border-t border-ink/10 pt-5">
           <div className="flex-1 min-w-[10rem]">
             <label htmlFor="file" className="mb-1.5 block text-[11px] uppercase tracking-[0.15em] text-ink/65">
               Image
@@ -151,18 +155,18 @@ export default function ProductImageManager({
           </div>
           <button
             type="submit"
-            disabled={isUploading}
+            disabled={pending}
             className="flex items-center gap-1.5 rounded-[3px] border border-ink px-4 py-2 text-[11px] uppercase tracking-[0.15em] text-ink transition-colors hover:bg-ink hover:text-paper disabled:opacity-60"
           >
             <ImagePlus className="h-3.5 w-3.5" />
-            {isUploading ? "Uploading..." : "Upload"}
+            {pending ? "Uploading..." : "Upload"}
           </button>
         </form>
       )}
 
-      {uploadError && (
+      {state.error && (
         <p role="alert" className="text-xs text-red-700">
-          {uploadError}
+          {state.error}
         </p>
       )}
     </div>
@@ -183,10 +187,25 @@ function ProductImageCard({
   const [editing, setEditing] = useState(false);
   const [isMoving, startMove] = useTransition();
   const [isDeleting, startDelete] = useTransition();
-  const [isSaving, startSave] = useTransition();
-  const [saveError, setSaveError] = useState<string | undefined>();
   const [isRotating, startRotate] = useTransition();
   const [rotateError, setRotateError] = useState<string | undefined>();
+
+  const boundUpdate = updateProductImage.bind(null, image.id, productId);
+  const [state, rawFormAction, pending] = useActionState<ImageUploadState, FormData>(boundUpdate, {});
+
+  const save = async (formData: FormData) => {
+    const file = formData.get("file");
+    if (file instanceof File && file.size > 0) {
+      formData.set("file", await compressImageIfNeeded(file));
+    }
+    rawFormAction(formData);
+  };
+
+  // Closing the editor is driven by state.success rather than guessing at
+  // pending in the click handler — an error should leave the form open.
+  if (state.success && editing) {
+    setEditing(false);
+  }
 
   const rotate = (direction: "cw" | "ccw") =>
     startRotate(async () => {
@@ -194,43 +213,8 @@ function ProductImageCard({
       setRotateError(result.error);
     });
 
-  // Calling updateProductImage directly (rather than through
-  // useActionState) means the result is available right where the submit
-  // happens, so the editor can close itself only once a save actually
-  // succeeds — no separate effect needed to react to a state change.
-  const save = (formData: FormData) => {
-    startSave(async () => {
-      const label = String(formData.get("label") || "");
-      const swatch = String(formData.get("swatch") || "");
-      const file = formData.get("file");
-
-      let newUrl: string | undefined;
-      if (file instanceof File && file.size > 0) {
-        if (!file.type.startsWith("image/")) {
-          setSaveError("That file doesn't look like an image.");
-          return;
-        }
-        try {
-          newUrl = (await uploadFile(productId, file)).url;
-        } catch (e) {
-          setSaveError(e instanceof Error ? e.message : "Upload failed — try again.");
-          return;
-        }
-      }
-
-      const result = await updateProductImage(image.id, productId, label, swatch, newUrl);
-      if (result.error) {
-        setSaveError(result.error);
-      } else {
-        setSaveError(undefined);
-        setEditing(false);
-      }
-    });
-  };
-
-  // Server Actions like moveProductImage/deleteProductImage return void, so
-  // they're called directly inside startTransition rather than through
-  // useActionState.
+  // moveProductImage/deleteProductImage return void, so they're called
+  // directly inside startTransition rather than through useActionState.
   const move = (direction: "up" | "down") =>
     startMove(() => moveProductImage(image.id, productId, direction));
 
@@ -263,18 +247,18 @@ function ProductImageCard({
               className="min-w-0 flex-1 text-[11px] text-ink/70 file:mr-2 file:rounded-[3px] file:border file:border-ink/20 file:bg-transparent file:px-2 file:py-1 file:text-[10px] file:text-ink"
             />
           </div>
-          {saveError && (
+          {state.error && (
             <p role="alert" className="text-[11px] text-red-700">
-              {saveError}
+              {state.error}
             </p>
           )}
           <div className="flex items-center gap-2">
             <button
               type="submit"
-              disabled={isSaving}
+              disabled={pending}
               className="flex items-center gap-1 rounded-[3px] bg-ink px-3 py-1.5 text-[11px] uppercase tracking-[0.1em] text-paper transition-colors hover:bg-gold-dark disabled:opacity-60"
             >
-              <Check className="h-3 w-3" /> {isSaving ? "Saving..." : "Save"}
+              <Check className="h-3 w-3" /> {pending ? "Saving..." : "Save"}
             </button>
             <button
               type="button"

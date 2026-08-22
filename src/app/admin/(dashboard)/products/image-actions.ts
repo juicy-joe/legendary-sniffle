@@ -8,6 +8,18 @@ import { blobConfigured } from "@/lib/blob";
 
 export type ImageUploadState = { error?: string; success?: boolean };
 
+// Vercel serverless functions cap the request body at ~4.5MB — anything
+// larger comes back as a platform-level 413 that the Server Actions client
+// runtime can't parse as an RSC response, which crashes the whole page
+// instead of showing a friendly error. 4MB leaves headroom under that.
+// (A client-side direct-to-Blob upload would sidestep this cap entirely,
+// but this store's client-upload endpoint returns 404 — confirmed against
+// the live deployment, not just a guess — so this stays server-side.) The
+// real fix for the common case is client-side compression before the file
+// ever reaches this action; see compressImageIfNeeded in
+// ProductImageManager.tsx.
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
+
 // A product's photos also appear on its live storefront page (and drive
 // whether the homepage/cards show a photo or the SVG fallback), so both
 // need to be revalidated alongside the admin edit screen.
@@ -21,37 +33,51 @@ async function revalidateProductImagePaths(productId: string) {
   }
 }
 
-// The file itself is uploaded client-side straight to Vercel Blob (see
-// src/app/api/admin/blob-upload/route.ts) before this ever runs — this
-// action only records the resulting blob URL. Keeping this as a real
-// Server Action (rather than a plain fetch to some other endpoint) means
-// it still gets Next's built-in CSRF-equivalent origin check and can call
-// revalidatePath directly.
 export async function uploadProductImage(
   productId: string,
-  url: string,
-  label: string,
-  swatch: string
+  _prevState: ImageUploadState,
+  formData: FormData
 ): Promise<ImageUploadState> {
-  const trimmedLabel = label.trim();
-  if (!trimmedLabel) {
+  if (!blobConfigured()) {
+    return { error: "Image storage isn't configured yet — add BLOB_READ_WRITE_TOKEN." };
+  }
+
+  const file = formData.get("file");
+  const label = String(formData.get("label") || "").trim();
+  const swatch = String(formData.get("swatch") || "#a3854f").trim();
+
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Choose an image file." };
+  }
+  if (!label) {
     return { error: "Give this image a label (e.g. the room or setting)." };
+  }
+  if (!file.type.startsWith("image/")) {
+    return { error: "That file doesn't look like an image." };
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    return { error: "That image is still too large after compression — try a smaller photo." };
   }
 
   const currentCount = await prisma.productImage.count({ where: { productId } });
 
+  const blob = await put(`products/${productId}/${Date.now()}-${file.name}`, file, {
+    access: "public",
+    addRandomSuffix: true,
+  });
+
   await prisma.productImage.create({
     data: {
       productId,
-      url,
-      label: trimmedLabel,
-      swatch: swatch.trim() || "#a3854f",
+      url: blob.url,
+      label,
+      swatch,
       sortOrder: currentCount,
     },
   });
 
   await revalidateProductImagePaths(productId);
-  return { success: true };
+  return {};
 }
 
 export async function deleteProductImage(imageId: string, productId: string) {
@@ -76,16 +102,36 @@ export async function deleteProductImage(imageId: string, productId: string) {
 export async function updateProductImage(
   imageId: string,
   productId: string,
-  label: string,
-  swatch: string,
-  // Set only when the admin picked a replacement file — that file was
-  // already uploaded client-side to Blob (same reasoning as
-  // uploadProductImage above) before this runs.
-  newUrl?: string
+  _prevState: ImageUploadState,
+  formData: FormData
 ): Promise<ImageUploadState> {
-  const trimmedLabel = label.trim();
-  if (!trimmedLabel) {
+  const label = String(formData.get("label") || "").trim();
+  const swatch = String(formData.get("swatch") || "").trim();
+  const file = formData.get("file");
+
+  if (!label) {
     return { error: "Give this image a label (e.g. the room or setting)." };
+  }
+
+  let newUrl: string | undefined;
+  // Replacing the photo itself is optional — the field is only filled in
+  // when the admin actually chose a new file, so label/swatch-only edits
+  // don't require re-selecting an image.
+  if (file instanceof File && file.size > 0) {
+    if (!blobConfigured()) {
+      return { error: "Image storage isn't configured yet — add BLOB_READ_WRITE_TOKEN." };
+    }
+    if (!file.type.startsWith("image/")) {
+      return { error: "That file doesn't look like an image." };
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      return { error: "That image is still too large after compression — try a smaller photo." };
+    }
+    const blob = await put(`products/${productId}/${Date.now()}-${file.name}`, file, {
+      access: "public",
+      addRandomSuffix: true,
+    });
+    newUrl = blob.url;
   }
 
   const existing = await prisma.productImage.findUnique({ where: { id: imageId } });
@@ -93,7 +139,7 @@ export async function updateProductImage(
 
   await prisma.productImage.update({
     where: { id: imageId },
-    data: { label: trimmedLabel, swatch: swatch.trim() || existing.swatch, ...(newUrl ? { url: newUrl } : {}) },
+    data: { label, swatch: swatch || existing.swatch, ...(newUrl ? { url: newUrl } : {}) },
   });
 
   // Old blob is only replaced, not deleted automatically — best-effort
