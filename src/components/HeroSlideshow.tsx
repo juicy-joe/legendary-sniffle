@@ -36,7 +36,12 @@ export default function HeroSlideshow({
 
   return (
     <div className="absolute inset-0">
-      <AnimatePresence>
+      {/* initial={false} — without it, AnimatePresence plays the first
+          image's own enter transition on mount too, so a first-time visitor
+          sees ~1.5s of empty hero before it fades in. Only slide *changes*
+          (index updating) should crossfade; the first paint should just be
+          there. */}
+      <AnimatePresence initial={false}>
         <motion.div
           key={index}
           initial={{ opacity: 0 }}
