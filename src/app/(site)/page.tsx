@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import TextLink from "@/components/TextLink";
 import RevealOnScroll from "@/components/RevealOnScroll";
@@ -9,6 +8,7 @@ import StatCounter from "@/components/StatCounter";
 import Testimonials from "@/components/Testimonials";
 import Newsletter from "@/components/Newsletter";
 import LampIllustration from "@/components/LampIllustration";
+import HeroSlideshow from "@/components/HeroSlideshow";
 import { getCatalog } from "@/lib/catalog";
 import { getHomeContent } from "@/lib/content";
 
@@ -25,11 +25,15 @@ export default async function Home() {
   const craftMosaic = ["obsidian-ceramic-drum", "meridian-glass-cone", "vesper-brass-orb", "atelier-marble-disc"]
     .map((slug) => bySlug.get(slug))
     .filter((p): p is NonNullable<typeof p> => Boolean(p));
-  // Falls back to any product with photos, then to any product at all, so
-  // the hero never breaks if this exact slug is ever renamed or removed via
-  // the admin panel.
+  // "Moss" is the deliberate pick — its two photos were re-processed from
+  // the original camera files specifically for hero use (3200px wide vs.
+  // the ~1000px WhatsApp-sourced photos most other products have; at
+  // full-bleed viewport width, that difference is the whole "why does the
+  // hero look soft" story). Falls back to any product with photos, then to
+  // any product at all, so the hero never breaks if this one is ever
+  // renamed or removed via the admin panel.
   const heroProduct =
-    bySlug.get("carnevale-confetti-sphere") ??
+    bySlug.get("moss") ??
     products.find((p) => p.images?.length) ??
     products[0];
 
@@ -45,13 +49,11 @@ export default async function Home() {
           the image is the argument. */}
       <section className="relative h-[100svh] min-h-[560px] w-full overflow-hidden bg-ink text-paper">
         {heroProduct.images?.length ? (
-          <Image
-            src={heroProduct.images[0].src}
-            alt={`${heroProduct.name} by ${heroProduct.designer}`}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
+          <HeroSlideshow
+            images={heroProduct.images.map((img) => ({
+              src: img.src,
+              alt: `${heroProduct.name} by ${heroProduct.designer} — ${img.label}`,
+            }))}
           />
         ) : (
           <LampIllustration product={heroProduct} className="h-full w-full" />

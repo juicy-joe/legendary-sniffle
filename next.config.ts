@@ -24,6 +24,11 @@ const nextConfig: NextConfig = {
         hostname: "*.public.blob.vercel-storage.com",
       },
     ],
+    // Next 16 rejects any `quality` prop not in this allowlist (defaults to
+    // just [75]). The homepage hero explicitly requests 92 — it's the
+    // single largest image on the site (full-bleed, up to 100vw), so it's
+    // worth the extra bytes that the default doesn't budget for.
+    qualities: [75, 92],
   },
 
   // Note: deliberately not shipping a Content-Security-Policy here.
