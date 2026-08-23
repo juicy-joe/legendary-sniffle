@@ -5,10 +5,11 @@ import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "./ProductCard";
 import { useCatalog } from "@/context/CatalogContext";
+import { slugify } from "@/lib/slugify";
 
 type Sort = "featured" | "price-asc" | "price-desc";
 
-function ExplorerInner() {
+function ExplorerInner({ collectionOrder }: { collectionOrder: string[] }) {
   const { products, categories } = useCatalog();
   const params = useSearchParams();
   const initialCategory = params.get("category");
@@ -30,6 +31,19 @@ function ExplorerInner() {
       list = [...list].sort((a, b) => Number(b.featured) - Number(a.featured));
     return list;
   }, [products, category, sort]);
+
+  // Grouped in the same order as the collection showcase cards above this
+  // component (collectionOrder, passed down from the server), so a
+  // showcase card's #slug link always lands on the matching section here —
+  // a collection with zero matches under the current filter just doesn't
+  // render a section rather than showing an empty one.
+  const groups = useMemo(
+    () =>
+      collectionOrder
+        .map((name) => ({ name, items: filtered.filter((p) => p.collection === name) }))
+        .filter((g) => g.items.length > 0),
+    [collectionOrder, filtered]
+  );
 
   return (
     <div>
@@ -69,7 +83,7 @@ function ExplorerInner() {
         </div>
       </div>
 
-      <p className="mb-8 text-xs uppercase tracking-[0.2em] text-ink/65" aria-live="polite">
+      <p className="mb-14 text-xs uppercase tracking-[0.2em] text-ink/65" aria-live="polite">
         {filtered.length} {filtered.length === 1 ? "piece" : "pieces"}
       </p>
 
@@ -79,10 +93,21 @@ function ExplorerInner() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {filtered.map((product, i) => (
-            <ProductCard key={product.slug} product={product} index={i} />
+          {groups.map((group) => (
+            <section key={group.name} id={slugify(group.name)} className="mb-20 scroll-mt-28 last:mb-0">
+              <div className="mb-8 flex items-baseline justify-between gap-4 border-b border-ink/10 pb-4">
+                <h2 className="font-serif text-2xl text-ink md:text-3xl">{group.name}</h2>
+                <span className="shrink-0 text-xs uppercase tracking-[0.16em] text-ink/50">
+                  {group.items.length} {group.items.length === 1 ? "piece" : "pieces"}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+                {group.items.map((product, i) => (
+                  <ProductCard key={product.slug} product={product} index={i} />
+                ))}
+              </div>
+            </section>
           ))}
         </motion.div>
       </AnimatePresence>
@@ -90,10 +115,10 @@ function ExplorerInner() {
   );
 }
 
-export default function ProductsExplorer() {
+export default function ProductsExplorer({ collectionOrder }: { collectionOrder: string[] }) {
   return (
     <Suspense fallback={null}>
-      <ExplorerInner />
+      <ExplorerInner collectionOrder={collectionOrder} />
     </Suspense>
   );
 }

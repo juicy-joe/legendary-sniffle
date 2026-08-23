@@ -102,3 +102,7 @@ export function getCategories(catalog: CatalogProduct[]) {
 export async function getDesigners() {
   return prisma.designer.findMany({ orderBy: { name: "asc" } });
 }
+
+export async function getCollections() {
+  return prisma.collection.findMany({ orderBy: { name: "asc" } });
+}
