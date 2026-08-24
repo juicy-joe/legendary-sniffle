@@ -104,6 +104,10 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                 {order.shippingCost === 0 ? "Included" : formatPrice(order.shippingCost)}
               </span>
             </div>
+            <div className="flex justify-between text-ink/60">
+              <span>Tax</span>
+              <span className="font-feature-tabular">{formatPrice(order.taxAmount)}</span>
+            </div>
             <div className="flex justify-between border-t border-ink/10 pt-2 font-serif text-lg text-ink">
               <span>Total</span>
               <span className="font-feature-tabular">{formatPrice(order.total)}</span>

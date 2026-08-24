@@ -223,7 +223,16 @@ model Order {
   subtotal       Int
   shippingMethod String
   shippingCost   Int
+  // Tax is calculated by Stripe Tax at checkout (based on the shipping
+  // address entered on Stripe's hosted page), not computed by this app —
+  // stored here purely as a record of what was actually charged.
+  taxAmount      Int         @default(0)
   total          Int
   status         OrderStatus @default(NEW)
+  // The order row is created by the Stripe webhook once payment actually
+  // succeeds (checkout.session.completed), never by the client directly —
+  // this id is both the link back to Stripe and the idempotency key that
+  // stops a retried webhook delivery from creating a duplicate order.
+  stripeSessionId String?    @unique
   createdAt      DateTime    @default(now())
 }

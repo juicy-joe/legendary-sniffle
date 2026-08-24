@@ -1,45 +1,56 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import type Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
+import { getStripe } from "@/lib/stripe";
 import { shippingMethods } from "@/lib/shipping";
+import { siteUrl } from "@/lib/site";
 
-const placeOrderSchema = z.object({
-  customerName: z.string().min(1, "Required"),
-  email: z.string().min(1, "Required").email("Enter a valid email"),
-  address: z.string().min(1, "Required"),
-  city: z.string().min(1, "Required"),
-  region: z.string().optional(),
-  postal: z.string().min(1, "Required"),
-  country: z.string().min(1, "Required"),
-  shippingMethodId: z.string().min(1, "Required"),
+// A curated list rather than every ISO country code Stripe supports —
+// matches the markets the existing shipping tiers ("White-Glove",
+// "International Air Freight") were actually written for (EU/EEA, UK,
+// North America, a handful of other developed markets). Easy to extend;
+// not worth enumerating all ~240 codes for a boutique lighting business
+// with no stated ambition to ship literally everywhere yet.
+const ALLOWED_SHIPPING_COUNTRIES: Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[] =
+  [
+    "AD", "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE",
+    "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "MC", "NL", "NO", "PL",
+    "PT", "RO", "SK", "SI", "ES", "SE", "CH", "GB", "US", "CA", "AU", "NZ",
+    "JP", "SG", "AE", "IS",
+  ];
+
+const createCheckoutSessionSchema = z.object({
   // Only the slug + quantity come from the client — price and name are
   // looked up server-side so a tampered request can't under-charge or
-  // misrepresent what was actually ordered.
+  // misrepresent what was actually ordered. Same anti-tampering reasoning
+  // the old placeOrder() used.
   items: z.array(z.object({ slug: z.string().min(1), qty: z.number().int().positive() })).min(1),
 });
 
-export type PlaceOrderInput = z.infer<typeof placeOrderSchema>;
-export type PlaceOrderResult = { orderNumber: string } | { error: string };
+export type CreateCheckoutSessionInput = z.infer<typeof createCheckoutSessionSchema>;
+export type CreateCheckoutSessionResult = { url: string } | { error: string };
 
-function generateOrderNumber() {
-  return `SFL-${Math.floor(100000 + Math.random() * 900000)}`;
-}
-
-export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResult> {
-  const parsed = placeOrderSchema.safeParse(input);
+// Replaces the old placeOrder() action, which wrote an Order row directly
+// from the client-submitted form before any money had actually changed
+// hands. Stripe Checkout collects the shipping address, lets the customer
+// pick a shipping tier, calculates tax, and takes payment on its own
+// hosted page — this action's only job is building that session and
+// handing back the URL to redirect to. The Order row itself is created by
+// the webhook (see src/app/api/stripe/webhook/route.ts) once Stripe
+// confirms the payment actually succeeded, not by this action or by the
+// browser reaching a "success" URL on its own (which anyone could visit
+// without paying).
+export async function createCheckoutSession(
+  input: CreateCheckoutSessionInput
+): Promise<CreateCheckoutSessionResult> {
+  const parsed = createCheckoutSessionSchema.safeParse(input);
   if (!parsed.success) {
-    return { error: "Something's missing from your order — please check the form and try again." };
-  }
-  const data = parsed.data;
-
-  const method = shippingMethods.find((m) => m.id === data.shippingMethodId);
-  if (!method) {
-    return { error: "That delivery method is no longer available — please choose another." };
+    return { error: "Your cart looks empty — add something before checking out." };
   }
 
-  const slugs = data.items.map((i) => i.slug);
+  const slugs = parsed.data.items.map((i) => i.slug);
   const products = await prisma.product.findMany({
     where: { slug: { in: slugs } },
     select: { slug: true, name: true, price: true },
@@ -53,46 +64,50 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
     };
   }
 
-  const orderItems = data.items.map((i) => {
-    const product = bySlug.get(i.slug)!;
-    return { slug: i.slug, name: product.name, price: product.price, qty: i.qty };
-  });
-  const subtotal = orderItems.reduce((sum, i) => sum + i.price * i.qty, 0);
-  const total = subtotal + method.price;
+  const stripe = getStripe();
 
-  // Order numbers are random and unique-constrained — retry a few times on
-  // the astronomically unlikely chance of a collision rather than adding
-  // sequence-table complexity for a six-digit code.
-  for (let attempt = 0; attempt < 5; attempt++) {
-    try {
-      const order = await prisma.order.create({
-        data: {
-          orderNumber: generateOrderNumber(),
-          customerName: data.customerName,
-          email: data.email,
-          address: data.address,
-          city: data.city,
-          region: data.region || null,
-          postal: data.postal,
-          country: data.country,
-          items: orderItems,
-          subtotal,
-          shippingMethod: method.label,
-          shippingCost: method.price,
-          total,
-          status: "NEW",
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      line_items: parsed.data.items.map((item) => {
+        const product = bySlug.get(item.slug)!;
+        return {
+          quantity: item.qty,
+          price_data: {
+            currency: "eur",
+            unit_amount: Math.round(product.price * 100),
+            product_data: { name: product.name, metadata: { slug: item.slug } },
+          },
+        };
+      }),
+      // Stripe Tax — calculated automatically from the shipping address the
+      // customer enters on the Checkout page itself.
+      automatic_tax: { enabled: true },
+      shipping_address_collection: { allowed_countries: ALLOWED_SHIPPING_COUNTRIES },
+      // The three existing shipping tiers, carried over as real Stripe
+      // shipping-rate options the customer chooses between on Stripe's
+      // page — same labels/prices as before, just now actually charged.
+      shipping_options: shippingMethods.map((method) => ({
+        shipping_rate_data: {
+          type: "fixed_amount",
+          fixed_amount: { amount: Math.round(method.price * 100), currency: "eur" },
+          display_name: method.label,
+          delivery_estimate: {
+            minimum: { unit: "week", value: 1 },
+            maximum: { unit: "week", value: 12 },
+          },
         },
-      });
-      revalidatePath("/admin/orders");
-      revalidatePath("/admin");
-      return { orderNumber: order.orderNumber };
-    } catch (err) {
-      const isUniqueViolation =
-        typeof err === "object" && err !== null && "code" in err && err.code === "P2002";
-      if (!isUniqueViolation) throw err;
-      // Collision on orderNumber — loop and try a fresh one.
-    }
-  }
+      })),
+      metadata: { items: JSON.stringify(parsed.data.items) },
+      success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${siteUrl}/checkout`,
+    });
 
-  return { error: "Something went wrong placing your order. Please try again." };
+    if (!session.url) {
+      return { error: "Something went wrong starting checkout. Please try again." };
+    }
+    return { url: session.url };
+  } catch {
+    return { error: "Something went wrong starting checkout. Please try again." };
+  }
 }
