@@ -7,17 +7,29 @@ import { useCart } from "@/context/CartContext";
 import { useCatalog } from "@/context/CatalogContext";
 import { createCheckoutSession } from "@/app/(site)/checkout/actions";
 import { formatPrice } from "@/lib/format";
+import {
+  SHIPPABLE_COUNTRIES,
+  getShippingPrice,
+  type ShippingSpeed,
+} from "@/lib/shipping";
 import LampIllustration from "./LampIllustration";
 import ProductPhoto from "./ProductPhoto";
 
-// Deliberately just a cart review + one button now — the multi-step
-// address/delivery-method wizard this used to be is gone because Stripe
-// Checkout's own hosted page collects the shipping address, presents the
-// shipping-tier choice, and calculates tax itself. Building a second
-// address form here would mean asking for the same information twice.
+const sortedCountries = [...SHIPPABLE_COUNTRIES].sort((a, b) => a.name.localeCompare(b.name));
+
+// Deliberately just a cart review + destination/speed picker + one button
+// now — the multi-step address form this used to be is gone because
+// Stripe Checkout's own hosted page collects the rest of the address and
+// takes payment itself. The country and shipping speed are decided here,
+// before Stripe is ever involved, because Stripe Checkout has no way to
+// show/hide a shipping option based on the address someone types into its
+// own page — the destination has to be known upfront so the right single
+// price (free within the EU, a flat rate otherwise) can be charged.
 export default function CheckoutFlow() {
   const { lines, subtotal } = useCart();
   const { getProduct } = useCatalog();
+  const [country, setCountry] = useState("");
+  const [shippingSpeed, setShippingSpeed] = useState<ShippingSpeed>("regular");
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState("");
 
@@ -44,11 +56,19 @@ export default function CheckoutFlow() {
     );
   }
 
+  const shippingCost = country ? getShippingPrice(country, shippingSpeed) : null;
+
   const handleContinue = async () => {
+    if (!country) {
+      setError("Please select your country before continuing.");
+      return;
+    }
     setStarting(true);
     setError("");
     const result = await createCheckoutSession({
       items: lines.map((l) => ({ slug: l.slug, qty: l.qty })),
+      country,
+      shippingSpeed,
     });
     if ("error" in result) {
       setStarting(false);
@@ -92,9 +112,68 @@ export default function CheckoutFlow() {
             <span>Subtotal</span>
             <span className="font-feature-tabular">{formatPrice(subtotal)}</span>
           </div>
-          <p className="text-xs text-ink/50">
-            Shipping and tax are calculated on the next step, based on your delivery address.
-          </p>
+          {shippingCost !== null && (
+            <div className="flex justify-between text-ink/60">
+              <span>Shipping</span>
+              <span className="font-feature-tabular">
+                {shippingCost === 0 ? "Free" : formatPrice(shippingCost)}
+              </span>
+            </div>
+          )}
+          <p className="text-xs text-ink/50">Tax is calculated on the next step, based on your delivery address.</p>
+        </div>
+      </div>
+
+      <div className="mt-6 space-y-5 rounded-[6px] border border-ink/10 bg-paper-dim p-6">
+        <div>
+          <label htmlFor="checkout-country" className="mb-2 block text-[11px] uppercase tracking-[0.15em] text-ink/65">
+            Country
+          </label>
+          <select
+            id="checkout-country"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            className="w-full rounded-[3px] border border-ink/20 bg-paper px-3 py-2.5 text-sm text-ink focus:border-ink focus:outline-none"
+          >
+            <option value="">Select your country&hellip;</option>
+            {sortedCountries.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <p className="mb-2 text-[11px] uppercase tracking-[0.15em] text-ink/65">Shipping Speed</p>
+          <div className="space-y-2">
+            {(["regular", "express"] as const).map((speed) => {
+              const price = country ? getShippingPrice(country, speed) : null;
+              return (
+                <label
+                  key={speed}
+                  className={`flex cursor-pointer items-center justify-between rounded-[3px] border px-3.5 py-3 text-sm transition-colors ${
+                    shippingSpeed === speed ? "border-ink bg-paper" : "border-ink/15 bg-paper/50"
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">
+                    <input
+                      type="radio"
+                      name="shipping-speed"
+                      value={speed}
+                      checked={shippingSpeed === speed}
+                      onChange={() => setShippingSpeed(speed)}
+                      className="accent-ink"
+                    />
+                    <span className="text-ink">{speed === "express" ? "Express Shipping" : "Regular Shipping"}</span>
+                  </span>
+                  <span className="text-ink/60 font-feature-tabular">
+                    {price === null ? "—" : price === 0 ? "Free" : formatPrice(price)}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -113,7 +192,7 @@ export default function CheckoutFlow() {
         {starting ? "Redirecting to Payment..." : "Continue to Payment"}
       </button>
       <p className="mt-3 text-center text-xs text-ink/50">
-        You&rsquo;ll enter your address and pay securely on Stripe&rsquo;s checkout page.
+        You&rsquo;ll enter your full address and pay securely on Stripe&rsquo;s checkout page.
       </p>
     </div>
   );

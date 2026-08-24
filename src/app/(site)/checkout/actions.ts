@@ -4,22 +4,8 @@ import { z } from "zod";
 import type Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
-import { shippingMethods } from "@/lib/shipping";
+import { getShippingLabel, getShippingPrice, isShippableCountry } from "@/lib/shipping";
 import { siteUrl } from "@/lib/site";
-
-// A curated list rather than every ISO country code Stripe supports —
-// matches the markets the existing shipping tiers ("White-Glove",
-// "International Air Freight") were actually written for (EU/EEA, UK,
-// North America, a handful of other developed markets). Easy to extend;
-// not worth enumerating all ~240 codes for a boutique lighting business
-// with no stated ambition to ship literally everywhere yet.
-const ALLOWED_SHIPPING_COUNTRIES: Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[] =
-  [
-    "AD", "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE",
-    "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "MC", "NL", "NO", "PL",
-    "PT", "RO", "SK", "SI", "ES", "SE", "CH", "GB", "US", "CA", "AU", "NZ",
-    "JP", "SG", "AE", "IS",
-  ];
 
 const createCheckoutSessionSchema = z.object({
   // Only the slug + quantity come from the client — price and name are
@@ -27,6 +13,15 @@ const createCheckoutSessionSchema = z.object({
   // misrepresent what was actually ordered. Same anti-tampering reasoning
   // the old placeOrder() used.
   items: z.array(z.object({ slug: z.string().min(1), qty: z.number().int().positive() })).min(1),
+  // Chosen on our own checkout page, before Stripe is ever involved —
+  // Stripe Checkout can't show/hide a shipping option based on the address
+  // someone types into its own hosted page, so the destination has to be
+  // known upfront to charge the right, single, non-negotiable price. The
+  // country is re-validated below against the same allow-list the client
+  // picked from, and re-priced from it — never trusting a client-submitted
+  // price here either.
+  country: z.string().length(2),
+  shippingSpeed: z.enum(["regular", "express"]),
 });
 
 export type CreateCheckoutSessionInput = z.infer<typeof createCheckoutSessionSchema>;
@@ -34,20 +29,24 @@ export type CreateCheckoutSessionResult = { url: string } | { error: string };
 
 // Replaces the old placeOrder() action, which wrote an Order row directly
 // from the client-submitted form before any money had actually changed
-// hands. Stripe Checkout collects the shipping address, lets the customer
-// pick a shipping tier, calculates tax, and takes payment on its own
-// hosted page — this action's only job is building that session and
-// handing back the URL to redirect to. The Order row itself is created by
-// the webhook (see src/app/api/stripe/webhook/route.ts) once Stripe
-// confirms the payment actually succeeded, not by this action or by the
-// browser reaching a "success" URL on its own (which anyone could visit
-// without paying).
+// hands. Stripe Checkout collects the rest of the shipping address and
+// takes payment on its own hosted page — this action's only job is
+// building that session and handing back the URL to redirect to. The Order
+// row itself is created by the webhook (see
+// src/app/api/stripe/webhook/route.ts) once Stripe confirms the payment
+// actually succeeded, not by this action or by the browser reaching a
+// "success" URL on its own (which anyone could visit without paying).
 export async function createCheckoutSession(
   input: CreateCheckoutSessionInput
 ): Promise<CreateCheckoutSessionResult> {
   const parsed = createCheckoutSessionSchema.safeParse(input);
   if (!parsed.success) {
     return { error: "Your cart looks empty — add something before checking out." };
+  }
+
+  const { country, shippingSpeed } = parsed.data;
+  if (!isShippableCountry(country)) {
+    return { error: "Sorry, we don't currently ship to that country." };
   }
 
   const slugs = parsed.data.items.map((i) => i.slug);
@@ -65,6 +64,7 @@ export async function createCheckoutSession(
   }
 
   const stripe = getStripe();
+  const shippingPrice = getShippingPrice(country, shippingSpeed);
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -83,22 +83,34 @@ export async function createCheckoutSession(
       // Stripe Tax — calculated automatically from the shipping address the
       // customer enters on the Checkout page itself.
       automatic_tax: { enabled: true },
-      shipping_address_collection: { allowed_countries: ALLOWED_SHIPPING_COUNTRIES },
-      // The three existing shipping tiers, carried over as real Stripe
-      // shipping-rate options the customer chooses between on Stripe's
-      // page — same labels/prices as before, just now actually charged.
-      shipping_options: shippingMethods.map((method) => ({
-        shipping_rate_data: {
-          type: "fixed_amount",
-          fixed_amount: { amount: Math.round(method.price * 100), currency: "eur" },
-          display_name: method.label,
-          delivery_estimate: {
-            minimum: { unit: "week", value: 1 },
-            maximum: { unit: "week", value: 12 },
+      // Locked to the single country already chosen on our own page, so
+      // the address Stripe collects can't end up in a different region
+      // than the one the shipping price above was actually calculated for.
+      shipping_address_collection: {
+        allowed_countries: [country as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry],
+      },
+      // A single, already-decided shipping price — not a menu of tiers for
+      // the customer to pick between on Stripe's page, since the region
+      // (and therefore the price) was fixed the moment they chose a
+      // country above.
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: "fixed_amount",
+            fixed_amount: { amount: Math.round(shippingPrice * 100), currency: "eur" },
+            display_name: getShippingLabel(shippingSpeed),
+            delivery_estimate:
+              shippingSpeed === "express"
+                ? { minimum: { unit: "week", value: 1 }, maximum: { unit: "week", value: 3 } }
+                : { minimum: { unit: "week", value: 2 }, maximum: { unit: "week", value: 12 } },
           },
         },
-      })),
-      metadata: { items: JSON.stringify(parsed.data.items) },
+      ],
+      metadata: {
+        items: JSON.stringify(parsed.data.items),
+        shippingSpeed,
+        shippingCountry: country,
+      },
       success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/checkout`,
     });

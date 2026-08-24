@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
-import { shippingMethods } from "@/lib/shipping";
+import { getShippingLabel, type ShippingSpeed } from "@/lib/shipping";
 
 // The only thing that's allowed to create an Order row for a Stripe-paid
 // purchase — never the browser reaching /checkout/success on its own
@@ -93,11 +93,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // The webhook payload never expands shipping_cost.shipping_rate (event
   // objects don't support the `expand` param the way direct API calls do) —
   // it only ever arrives as a rate ID string, not the object with its
-  // display_name. Since the checkout session was built from this app's own
-  // fixed shippingMethods list, matching the charged amount back to that
-  // list is simpler and cheaper than an extra API call to look the rate up.
+  // display_name. The speed was recorded in the session's own metadata
+  // when it was created, so that's used to rebuild the same label instead
+  // of an extra API call to look the rate up.
   const shippingCostAmount = Math.round((session.shipping_cost?.amount_total ?? 0) / 100);
-  const matchedShippingMethod = shippingMethods.find((m) => m.price === shippingCostAmount);
+  const shippingSpeed = session.metadata?.shippingSpeed;
+  const shippingLabel =
+    shippingSpeed === "regular" || shippingSpeed === "express"
+      ? getShippingLabel(shippingSpeed as ShippingSpeed)
+      : "Shipping";
 
   try {
     const order = await prisma.order.create({
@@ -112,7 +116,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         country: address?.country ?? "—",
         items: orderItems,
         subtotal: Math.round((session.amount_subtotal ?? 0) / 100),
-        shippingMethod: matchedShippingMethod?.label ?? "Shipping",
+        shippingMethod: shippingLabel,
         shippingCost: shippingCostAmount,
         taxAmount: Math.round((session.total_details?.amount_tax ?? 0) / 100),
         total: Math.round((session.amount_total ?? 0) / 100),
