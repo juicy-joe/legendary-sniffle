@@ -9,6 +9,10 @@ type SettingsData = {
   siteUrl: string;
   defaultMetaTitle: string;
   defaultMetaDesc: string;
+  euRegularShippingPrice: number;
+  euExpressShippingPrice: number;
+  nonEuRegularShippingPrice: number;
+  nonEuExpressShippingPrice: number;
 };
 
 export default function SettingsForm({ settings }: { settings: SettingsData }) {
@@ -51,6 +55,72 @@ export default function SettingsForm({ settings }: { settings: SettingsData }) {
           Used as the homepage&rsquo;s title/description and as the fallback
           for any page that doesn&rsquo;t set its own.
         </p>
+      </div>
+
+      <div>
+        <h2 className="mb-1 font-serif text-lg font-light text-ink">Shipping Rates</h2>
+        <p className="mb-4 text-xs text-ink/60">
+          Charged automatically based on the country a customer selects at checkout — free (or your chosen
+          price) within the EU, a flat rate everywhere else. Whole euros.
+        </p>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <Field label="EU — Regular" name="euRegularShippingPrice" error={err("euRegularShippingPrice")}>
+            <input
+              id="euRegularShippingPrice"
+              name="euRegularShippingPrice"
+              type="number"
+              min={0}
+              step={1}
+              inputMode="numeric"
+              defaultValue={settings.euRegularShippingPrice}
+              className={inputClass}
+            />
+          </Field>
+          <Field label="EU — Express" name="euExpressShippingPrice" error={err("euExpressShippingPrice")}>
+            <input
+              id="euExpressShippingPrice"
+              name="euExpressShippingPrice"
+              type="number"
+              min={0}
+              step={1}
+              inputMode="numeric"
+              defaultValue={settings.euExpressShippingPrice}
+              className={inputClass}
+            />
+          </Field>
+          <Field
+            label="Rest of World — Regular"
+            name="nonEuRegularShippingPrice"
+            error={err("nonEuRegularShippingPrice")}
+          >
+            <input
+              id="nonEuRegularShippingPrice"
+              name="nonEuRegularShippingPrice"
+              type="number"
+              min={0}
+              step={1}
+              inputMode="numeric"
+              defaultValue={settings.nonEuRegularShippingPrice}
+              className={inputClass}
+            />
+          </Field>
+          <Field
+            label="Rest of World — Express"
+            name="nonEuExpressShippingPrice"
+            error={err("nonEuExpressShippingPrice")}
+          >
+            <input
+              id="nonEuExpressShippingPrice"
+              name="nonEuExpressShippingPrice"
+              type="number"
+              min={0}
+              step={1}
+              inputMode="numeric"
+              defaultValue={settings.nonEuExpressShippingPrice}
+              className={inputClass}
+            />
+          </Field>
+        </div>
       </div>
 
       {state.error && (

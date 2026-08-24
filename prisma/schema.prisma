@@ -182,7 +182,18 @@ model Settings {
   siteUrl          String   @default("https://www.safalight.com")
   defaultMetaTitle String?
   defaultMetaDesc  String?
-  updatedAt        DateTime @updatedAt
+
+  // Shipping — euros, matching Product.price. Regular within the EU
+  // defaults to free but is left editable rather than hardcoded to 0, in
+  // case that ever changes. See src/lib/shipping.ts for how these are
+  // actually applied (region + speed, decided before a Stripe Checkout
+  // Session is created).
+  euRegularShippingPrice    Int @default(0)
+  euExpressShippingPrice    Int @default(50)
+  nonEuRegularShippingPrice Int @default(450)
+  nonEuExpressShippingPrice Int @default(650)
+
+  updatedAt DateTime @updatedAt
 }
 
 model MenuItem {

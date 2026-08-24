@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import CheckoutFlow from "@/components/CheckoutFlow";
+import { getShippingRates } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "Checkout",
   robots: { index: false, follow: false },
 };
 
-export default function CheckoutPage() {
+export default async function CheckoutPage() {
+  const rates = await getShippingRates();
+
   return (
     <div className="mx-auto max-w-6xl px-6 py-16 md:px-10 md:py-24">
       <RevealOnScroll className="mb-12">
@@ -19,7 +22,7 @@ export default function CheckoutPage() {
         </h1>
       </RevealOnScroll>
 
-      <CheckoutFlow />
+      <CheckoutFlow rates={rates} />
     </div>
   );
 }

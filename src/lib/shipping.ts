@@ -74,12 +74,28 @@ export function isEuCountry(code: string): boolean {
   return EU_COUNTRIES.has(code);
 }
 
-const EU_PRICE: Record<ShippingSpeed, number> = { regular: 0, express: 50 };
-const NON_EU_PRICE: Record<ShippingSpeed, number> = { regular: 450, express: 650 };
+export type ShippingRates = {
+  euRegular: number;
+  euExpress: number;
+  nonEuRegular: number;
+  nonEuExpress: number;
+};
+
+// Used only if the Settings row is somehow missing — src/lib/settings.ts's
+// getShippingRates() has its own matching defaults and is the actual
+// source of truth (admin-editable via Admin → Settings).
+export const DEFAULT_SHIPPING_RATES: ShippingRates = {
+  euRegular: 0,
+  euExpress: 50,
+  nonEuRegular: 450,
+  nonEuExpress: 650,
+};
 
 /** Euros, not cents — matches how prices are stored elsewhere in the app. */
-export function getShippingPrice(countryCode: string, speed: ShippingSpeed): number {
-  return isEuCountry(countryCode) ? EU_PRICE[speed] : NON_EU_PRICE[speed];
+export function getShippingPrice(rates: ShippingRates, countryCode: string, speed: ShippingSpeed): number {
+  const eu = isEuCountry(countryCode);
+  if (eu) return speed === "express" ? rates.euExpress : rates.euRegular;
+  return speed === "express" ? rates.nonEuExpress : rates.nonEuRegular;
 }
 
 export function getShippingLabel(speed: ShippingSpeed): string {

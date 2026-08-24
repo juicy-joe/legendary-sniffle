@@ -10,6 +10,7 @@ import { formatPrice } from "@/lib/format";
 import {
   SHIPPABLE_COUNTRIES,
   getShippingPrice,
+  type ShippingRates,
   type ShippingSpeed,
 } from "@/lib/shipping";
 import LampIllustration from "./LampIllustration";
@@ -25,7 +26,7 @@ const sortedCountries = [...SHIPPABLE_COUNTRIES].sort((a, b) => a.name.localeCom
 // show/hide a shipping option based on the address someone types into its
 // own page — the destination has to be known upfront so the right single
 // price (free within the EU, a flat rate otherwise) can be charged.
-export default function CheckoutFlow() {
+export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
   const { lines, subtotal } = useCart();
   const { getProduct } = useCatalog();
   const [country, setCountry] = useState("");
@@ -56,7 +57,7 @@ export default function CheckoutFlow() {
     );
   }
 
-  const shippingCost = country ? getShippingPrice(country, shippingSpeed) : null;
+  const shippingCost = country ? getShippingPrice(rates, country, shippingSpeed) : null;
 
   const handleContinue = async () => {
     if (!country) {
@@ -148,7 +149,7 @@ export default function CheckoutFlow() {
           <p className="mb-2 text-[11px] uppercase tracking-[0.15em] text-ink/65">Shipping Speed</p>
           <div className="space-y-2">
             {(["regular", "express"] as const).map((speed) => {
-              const price = country ? getShippingPrice(country, speed) : null;
+              const price = country ? getShippingPrice(rates, country, speed) : null;
               return (
                 <label
                   key={speed}

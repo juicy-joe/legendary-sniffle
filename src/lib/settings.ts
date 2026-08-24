@@ -10,6 +10,10 @@ const defaults = {
   defaultMetaTitle: "SaFaLight | Luxury Designer Table Lamps",
   defaultMetaDesc:
     "SaFaLight curates rare, museum-quality designer table lamps from the world's most celebrated lighting artisans — hand-finished, individually numbered, made to be inherited.",
+  euRegularShippingPrice: 0,
+  euExpressShippingPrice: 50,
+  nonEuRegularShippingPrice: 450,
+  nonEuExpressShippingPrice: 650,
 };
 
 export async function getSettings() {
@@ -19,5 +23,20 @@ export async function getSettings() {
     siteUrl: settings?.siteUrl || defaults.siteUrl,
     defaultMetaTitle: settings?.defaultMetaTitle || defaults.defaultMetaTitle,
     defaultMetaDesc: settings?.defaultMetaDesc || defaults.defaultMetaDesc,
+    euRegularShippingPrice: settings?.euRegularShippingPrice ?? defaults.euRegularShippingPrice,
+    euExpressShippingPrice: settings?.euExpressShippingPrice ?? defaults.euExpressShippingPrice,
+    nonEuRegularShippingPrice: settings?.nonEuRegularShippingPrice ?? defaults.nonEuRegularShippingPrice,
+    nonEuExpressShippingPrice: settings?.nonEuExpressShippingPrice ?? defaults.nonEuExpressShippingPrice,
+  };
+}
+
+/** Just the four shipping prices, shaped for src/lib/shipping.ts's getShippingPrice(). */
+export async function getShippingRates() {
+  const settings = await getSettings();
+  return {
+    euRegular: settings.euRegularShippingPrice,
+    euExpress: settings.euExpressShippingPrice,
+    nonEuRegular: settings.nonEuRegularShippingPrice,
+    nonEuExpress: settings.nonEuExpressShippingPrice,
   };
 }

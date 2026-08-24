@@ -5,6 +5,7 @@ import type Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 import { getShippingLabel, getShippingPrice, isShippableCountry } from "@/lib/shipping";
+import { getShippingRates } from "@/lib/settings";
 import { siteUrl } from "@/lib/site";
 
 const createCheckoutSessionSchema = z.object({
@@ -64,7 +65,10 @@ export async function createCheckoutSession(
   }
 
   const stripe = getStripe();
-  const shippingPrice = getShippingPrice(country, shippingSpeed);
+  // Re-fetched server-side rather than trusting a client-submitted price —
+  // same anti-tampering reasoning as the product price lookup above.
+  const rates = await getShippingRates();
+  const shippingPrice = getShippingPrice(rates, country, shippingSpeed);
 
   try {
     const session = await stripe.checkout.sessions.create({
