@@ -49,13 +49,15 @@ export async function markOrderShipped(
   const order = await prisma.order.findUnique({ where: { id } });
   if (!order) return { error: "Order not found." };
 
+  // shippedEmailSentAt is deliberately NOT set here — only once the send
+  // below actually succeeds, so the admin UI's "Customer notified" state
+  // can never be true for an email that never went out.
   const updated = await prisma.order.update({
     where: { id },
     data: {
       status: "SHIPPED",
       trackingNumber: parsed.data.trackingNumber,
       trackingUrl: parsed.data.trackingUrl,
-      shippedEmailSentAt: new Date(),
     },
   });
 
@@ -69,11 +71,18 @@ export async function markOrderShipped(
     });
   } catch (err) {
     console.error("Failed to send shipped email:", err);
+    // Status and tracking info were still saved — reflect that in the UI
+    // even though the notification itself didn't go out.
+    revalidatePath("/admin/orders");
+    revalidatePath(`/admin/orders/${id}`);
+    revalidatePath("/admin");
     return {
       error:
         "Tracking info was saved and the order marked shipped, but the notification email failed to send. You can try resending it below.",
     };
   }
+
+  await prisma.order.update({ where: { id }, data: { shippedEmailSentAt: new Date() } });
 
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${id}`);
