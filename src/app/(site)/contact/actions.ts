@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { sendEnquiryAutoReplyEmail } from "@/lib/email";
 
 const enquirySchema = z.object({
   name: z.string().min(1, "Please share your name."),
@@ -53,5 +54,18 @@ export async function submitEnquiry(
   });
 
   revalidatePath("/admin/enquiries");
+
+  // Best-effort — a flaky email provider shouldn't turn a successfully
+  // saved enquiry into a failed submission from the visitor's perspective.
+  try {
+    await sendEnquiryAutoReplyEmail({
+      name: parsed.data.name,
+      email: parsed.data.email,
+      message: parsed.data.message,
+    });
+  } catch (err) {
+    console.error("Failed to send enquiry auto-reply:", err);
+  }
+
   return { success: true };
 }

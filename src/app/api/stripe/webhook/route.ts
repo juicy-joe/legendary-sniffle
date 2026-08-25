@@ -4,6 +4,7 @@ import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 import { getShippingLabel, type ShippingSpeed } from "@/lib/shipping";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 
 // The only thing that's allowed to create an Order row for a Stripe-paid
 // purchase — never the browser reaching /checkout/success on its own
@@ -126,6 +127,26 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     });
     revalidatePath("/admin/orders");
     revalidatePath("/admin");
+
+    // Best-effort — the order is already safely recorded at this point;
+    // an email-provider hiccup shouldn't make Stripe think the webhook
+    // failed and retry it (which would just re-hit the idempotency guard
+    // above and skip the email a second time anyway).
+    try {
+      await sendOrderConfirmationEmail({
+        orderNumber: order.orderNumber,
+        email: order.email,
+        customerName: order.customerName,
+        items: orderItems,
+        subtotal: order.subtotal,
+        shippingCost: order.shippingCost,
+        taxAmount: order.taxAmount,
+        total: order.total,
+      });
+    } catch (err) {
+      console.error("Failed to send order confirmation email:", err);
+    }
+
     return NextResponse.json({ received: true, orderNumber: order.orderNumber });
   } catch (err) {
     const isUniqueViolation =

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import OrderStatusControl from "@/components/admin/OrderStatusControl";
+import OrderTrackingPanel from "@/components/admin/OrderTrackingPanel";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 import { deleteOrder } from "../actions";
 import type { OrderStatusValue } from "@/lib/order-status";
@@ -119,6 +120,15 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <p className="mb-3 text-[11px] uppercase tracking-[0.15em] text-ink/65">Status</p>
           <OrderStatusControl id={order.id} status={order.status as OrderStatusValue} />
         </div>
+
+        <OrderTrackingPanel
+          order={{
+            id: order.id,
+            trackingNumber: order.trackingNumber,
+            trackingUrl: order.trackingUrl,
+            shippedEmailSentAt: order.shippedEmailSentAt,
+          }}
+        />
       </div>
     </div>
   );
