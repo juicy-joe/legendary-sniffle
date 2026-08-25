@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Gem, Hammer, Leaf, Sparkles } from "lucide-react";
 import RevealOnScroll from "@/components/RevealOnScroll";
-import StatCounter from "@/components/StatCounter";
 import MagneticButton from "@/components/MagneticButton";
 import { getDesigners } from "@/lib/catalog";
 import { getAboutContent } from "@/lib/content";
@@ -18,12 +17,12 @@ const values = [
   {
     icon: Hammer,
     title: "Made by Hand",
-    body: "No injection molds, no assembly lines. Every base is turned, cast, or blown by a named craftsperson.",
+    body: "Mouth-blown by master artisans — no molds, no assembly lines, every piece individually shaped by hand.",
   },
   {
     icon: Gem,
-    title: "Rare Materials",
-    body: "Calacatta marble, Persian alabaster, mouth-blown crystal — sourced in small batches, never substituted.",
+    title: "Premium Raw Materials",
+    body: "Our proprietary glass composition yields a lead-free crystal, prized for its exceptional strength and a brilliant, luminous shine.",
   },
   {
     icon: Leaf,
@@ -32,31 +31,8 @@ const values = [
   },
   {
     icon: Sparkles,
-    title: "Individually Numbered",
-    body: "Each piece carries a signed edition number and a certificate of authenticity from its designer.",
-  },
-];
-
-const timeline = [
-  {
-    year: "2016",
-    text: "SaFaLight begins as a two-person atelier representing a single Genevan sculptor.",
-  },
-  {
-    year: "2019",
-    text: "The Murano Editions launch in partnership with Nadia Kessler's glass studio.",
-  },
-  {
-    year: "2022",
-    text: "SaFaLight opens private viewing rooms for collectors in three cities.",
-  },
-  {
-    year: "2025",
-    text: "Four resident designers, one shared belief: light deserves the same craft as sculpture.",
-  },
-  {
-    year: "2026",
-    text: "The Chroma Editions debut — hand-blown glass spheres with an adaptive light core, Kessler's most ambitious series yet.",
+    title: "Limited Editions",
+    body: "Produced in small series with meticulous attention to detail — no design is ever made more than 100 times.",
   },
 ];
 
@@ -83,37 +59,6 @@ export default async function AboutPage() {
               {content.heroSubtext}
             </p>
           </RevealOnScroll>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 py-24 md:px-10">
-        <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
-          <StatCounter value={4} label="Resident Designers" />
-          <StatCounter value={1200} suffix="+" label="Homes Illuminated" />
-          <StatCounter value={9} label="Years of Craft" />
-          <StatCounter value={100} suffix="%" label="Hand-Finished" />
-        </div>
-      </section>
-
-      <section className="bg-paper-dim py-24">
-        <div className="mx-auto max-w-4xl px-6 md:px-10">
-          <RevealOnScroll className="mb-16 text-center">
-            <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
-              Timeline
-            </p>
-            <h2 className="font-serif text-4xl font-light text-ink">
-              A Decade of Restraint
-            </h2>
-          </RevealOnScroll>
-          <div className="space-y-10 border-l border-ink/15 pl-8">
-            {timeline.map((item, i) => (
-              <RevealOnScroll key={item.year} delay={i * 0.05} className="relative">
-                <span className="absolute -left-[38px] top-1 h-2.5 w-2.5 rounded-full border-2 border-gold bg-paper-dim" />
-                <p className="font-serif text-2xl text-gold-dark">{item.year}</p>
-                <p className="mt-1 max-w-lg text-ink/65">{item.text}</p>
-              </RevealOnScroll>
-            ))}
-          </div>
         </div>
       </section>
 

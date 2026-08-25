@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, ShoppingBag, X } from "lucide-react";
+import { Menu, ShoppingBag, Truck, X } from "lucide-react";
 import clsx from "clsx";
 import { useCart } from "@/context/CartContext";
 import { EASE } from "@/lib/motion";
@@ -90,6 +90,10 @@ export default function Navbar({ links }: { links: { href: string; label: string
           : "border-b border-transparent bg-transparent"
       )}
     >
+      <div className="flex items-center justify-center gap-2 bg-ink px-4 py-2 text-center text-[11px] font-medium uppercase tracking-[0.14em] text-paper">
+        <Truck className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
+        Free Shipping within the EU
+      </div>
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-10">
         <Link href="/" className="shrink-0">
           <Image
@@ -173,7 +177,11 @@ export default function Navbar({ links }: { links: { href: string; label: string
           makes that ancestor the containing block for descendant
           `position: fixed` elements instead of the viewport. Nested here,
           this overlay was being sized against the header's own short box
-          instead of the screen, collapsing to zero height. */}
+          instead of the screen, collapsing to zero height.
+          top-[98px] is the measured height of the header on mobile — the
+          free-shipping strip plus the nav row (was 73px before that strip
+          was added; re-measure and update this if the header's height
+          changes again). */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -185,7 +193,7 @@ export default function Navbar({ links }: { links: { href: string; label: string
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35, ease: EASE }}
-            className="fixed inset-0 top-[73px] z-40 flex flex-col bg-paper md:hidden"
+            className="fixed inset-0 top-[98px] z-40 flex flex-col bg-paper md:hidden"
           >
             <ul className="flex flex-1 flex-col justify-center gap-1 px-8">
               {links.map((link, i) => (
