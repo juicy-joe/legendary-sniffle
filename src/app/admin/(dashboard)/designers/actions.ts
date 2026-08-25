@@ -7,8 +7,16 @@ import { prisma } from "@/lib/prisma";
 
 const designerSchema = z.object({
   name: z.string().min(1, "Required"),
+  // Empty string (the field left blank) means "use the full name" —
+  // stored as null, not an empty string, so getCatalog()'s `|| p.designer.name`
+  // fallback works.
+  shortName: z
+    .string()
+    .optional()
+    .transform((v) => (v && v.trim() ? v.trim() : null)),
   origin: z.string().min(1, "Required"),
   bio: z.string().min(1, "Required"),
+  sortOrder: z.coerce.number().int("Whole numbers only."),
 });
 
 export type DesignerFormState = {
@@ -20,8 +28,10 @@ export type DesignerFormState = {
 function parseDesignerForm(formData: FormData) {
   return designerSchema.safeParse({
     name: formData.get("name"),
+    shortName: formData.get("shortName"),
     origin: formData.get("origin"),
     bio: formData.get("bio"),
+    sortOrder: formData.get("sortOrder"),
   });
 }
 

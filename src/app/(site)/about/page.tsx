@@ -17,7 +17,7 @@ const values = [
   {
     icon: Hammer,
     title: "Made by Hand",
-    body: "Mouth-blown by master artisans — no molds, no assembly lines, every piece individually shaped by hand.",
+    body: "Mouth-blown by master artisans — every piece individually shaped by hand.",
   },
   {
     icon: Gem,

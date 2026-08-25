@@ -5,7 +5,14 @@ import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
 import { createDesigner, updateDesigner } from "@/app/admin/(dashboard)/designers/actions";
 
-type DesignerData = { id: string; name: string; origin: string; bio: string };
+type DesignerData = {
+  id: string;
+  name: string;
+  shortName: string | null;
+  origin: string;
+  bio: string;
+  sortOrder: number;
+};
 
 export default function DesignerForm({
   mode,
@@ -30,6 +37,21 @@ export default function DesignerForm({
         <input id="name" name="name" defaultValue={designer?.name} className={inputClass} />
       </Field>
 
+      <div>
+        <Field label="Short Name" name="shortName" error={err("shortName")}>
+          <input
+            id="shortName"
+            name="shortName"
+            placeholder="e.g. J. J. Finnbogason"
+            defaultValue={designer?.shortName ?? ""}
+            className={inputClass}
+          />
+        </Field>
+        <p className="mt-1.5 text-xs text-ink/60">
+          Shown on product pages instead of the full name above. Leave blank to use the full name everywhere.
+        </p>
+      </div>
+
       <Field label="Origin" name="origin" error={err("origin")}>
         <input
           id="origin"
@@ -42,6 +64,16 @@ export default function DesignerForm({
 
       <Field label="Bio" name="bio" error={err("bio")}>
         <textarea id="bio" name="bio" rows={4} defaultValue={designer?.bio} className={inputClass} />
+      </Field>
+
+      <Field label="Sort Order (lower shows first on the About page)" name="sortOrder" error={err("sortOrder")}>
+        <input
+          id="sortOrder"
+          name="sortOrder"
+          type="number"
+          defaultValue={designer?.sortOrder ?? 0}
+          className={inputClass}
+        />
       </Field>
 
       {state.error && (

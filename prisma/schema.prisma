@@ -75,8 +75,16 @@ model AdminUser {
 model Designer {
   id        String    @id @default(cuid())
   name      String
+  // Shown on product cards/detail pages instead of the full name when set
+  // (e.g. "J. J. Finnbogason" instead of "Johann Julius Finnbogason") —
+  // falls back to the full name if left blank, so this is opt-in per
+  // designer rather than a second required field.
+  shortName String?
   origin    String
   bio       String
+  // Controls display order on the About page's designer grid — lower
+  // shows first. Ties break by name (see getDesigners()).
+  sortOrder Int       @default(0)
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

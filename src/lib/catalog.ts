@@ -50,7 +50,10 @@ function toCatalogProduct(p: ProductRow): CatalogProduct {
   return {
     slug: p.slug,
     name: p.name,
-    designer: p.designer.name,
+    // Product-facing pages show the designer's short form (e.g. "J. J.
+    // Finnbogason") when one's set — the About page's own designer cards
+    // use the full name directly (see getDesigners()), not this.
+    designer: p.designer.shortName || p.designer.name,
     collection: p.collection.name,
     price: p.price,
     category: p.category.name,
@@ -100,7 +103,7 @@ export function getCategories(catalog: CatalogProduct[]) {
 }
 
 export async function getDesigners() {
-  return prisma.designer.findMany({ orderBy: { name: "asc" } });
+  return prisma.designer.findMany({ orderBy: [{ sortOrder: "asc" }, { name: "asc" }] });
 }
 
 export async function getCollections() {
