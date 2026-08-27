@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import type { OrderStatusValue } from "@/lib/order-status";
-import { sendShippedEmail } from "@/lib/email";
+import { orderStatuses } from "@/lib/order-status";
+import { sendShippedEmail, sendOrderConfirmationEmail } from "@/lib/email";
 import { getSession } from "@/lib/get-session";
 
 type OrderItem = { slug: string; name: string; price: number; qty: number };
@@ -180,4 +181,128 @@ export async function deleteOrder(id: string) {
   await prisma.order.delete({ where: { id } });
   revalidatePath("/admin/orders");
   redirect("/admin/orders");
+}
+
+const manualOrderItemSchema = z.object({
+  // Empty for a free-text/custom line item (no matching Product row) —
+  // deductStockForShippedOrder already treats an unmatched slug as "no
+  // stock to touch" rather than erroring, and the order detail page's
+  // item parser only requires this field to be a string, not non-empty,
+  // so both stay correct with slug left blank here.
+  slug: z.string(),
+  name: z.string().min(1),
+  price: z.coerce.number().int().nonnegative(),
+  qty: z.coerce.number().int().positive(),
+});
+
+const manualOrderSchema = z.object({
+  customerName: z.string().min(1, "Required"),
+  email: z.string().min(1, "Required").email("Enter a valid email."),
+  address: z.string().min(1, "Required"),
+  city: z.string().min(1, "Required"),
+  region: z.string().optional(),
+  postal: z.string().min(1, "Required"),
+  country: z.string().min(1, "Required"),
+  shippingCost: z.coerce.number().int().nonnegative(),
+  taxAmount: z.coerce.number().int().nonnegative(),
+  paymentMethod: z.string().min(1, "Required"),
+  status: z.enum(orderStatuses),
+  itemsJson: z.string().min(1),
+});
+
+export type ManualOrderState = {
+  error?: string;
+  fieldErrors?: Record<string, string>;
+};
+
+// For phone orders paid straight into the bank account — everything after
+// this behaves exactly like a Stripe order (same Orders list, same
+// shipping/tracking flow, same warehouse deduction on shipment, and —
+// per the specific ask — the exact same confirmation email a Stripe order
+// triggers), the only difference is who created the row and how it was
+// paid. Unlike the retail/wholesale checkout actions, prices here are NOT
+// re-verified against Product.price — the whole point of this form is
+// letting an admin enter a phone-negotiated price, and the admin is
+// already an authenticated, trusted party for this action.
+export async function createManualOrder(
+  _prevState: ManualOrderState,
+  formData: FormData
+): Promise<ManualOrderState> {
+  const parsed = manualOrderSchema.safeParse({
+    customerName: formData.get("customerName"),
+    email: formData.get("email"),
+    address: formData.get("address"),
+    city: formData.get("city"),
+    region: formData.get("region") || undefined,
+    postal: formData.get("postal"),
+    country: formData.get("country"),
+    shippingCost: formData.get("shippingCost") || "0",
+    taxAmount: formData.get("taxAmount") || "0",
+    paymentMethod: formData.get("paymentMethod"),
+    status: formData.get("status"),
+    itemsJson: formData.get("itemsJson"),
+  });
+  if (!parsed.success) {
+    const fieldErrors: Record<string, string> = {};
+    for (const issue of parsed.error.issues) fieldErrors[String(issue.path[0])] = issue.message;
+    return { error: "Check the highlighted fields.", fieldErrors };
+  }
+
+  let rawItems: unknown;
+  try {
+    rawItems = JSON.parse(parsed.data.itemsJson);
+  } catch {
+    return { error: "Add at least one item." };
+  }
+  const itemsParsed = z.array(manualOrderItemSchema).min(1, "Add at least one item.").safeParse(rawItems);
+  if (!itemsParsed.success) {
+    return { error: "Add at least one item, each with a name, price, and quantity." };
+  }
+  const items = itemsParsed.data;
+
+  const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const total = subtotal + parsed.data.shippingCost + parsed.data.taxAmount;
+  const orderNumber = `SFL-${Math.floor(100000 + Math.random() * 900000)}`;
+
+  const order = await prisma.order.create({
+    data: {
+      orderNumber,
+      customerName: parsed.data.customerName,
+      email: parsed.data.email,
+      address: parsed.data.address,
+      city: parsed.data.city,
+      region: parsed.data.region || null,
+      postal: parsed.data.postal,
+      country: parsed.data.country,
+      items,
+      subtotal,
+      shippingMethod: "Manual Order",
+      shippingCost: parsed.data.shippingCost,
+      taxAmount: parsed.data.taxAmount,
+      total,
+      status: parsed.data.status,
+      paymentMethod: parsed.data.paymentMethod,
+      stripeSessionId: null,
+    },
+  });
+
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin");
+
+  try {
+    await sendOrderConfirmationEmail({
+      orderNumber: order.orderNumber,
+      email: order.email,
+      customerName: order.customerName,
+      items,
+      subtotal: order.subtotal,
+      shippingCost: order.shippingCost,
+      taxAmount: order.taxAmount,
+      total: order.total,
+    });
+  } catch (err) {
+    console.error("Failed to send order confirmation email for manual order:", err);
+  }
+
+  redirect(`/admin/orders/${order.id}`);
 }

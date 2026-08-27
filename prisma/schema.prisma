@@ -405,5 +405,11 @@ model Order {
   wholesaleAccount   WholesaleAccount? @relation(fields: [wholesaleAccountId], references: [id])
   wholesaleAccountId String?
 
+  // Set only on orders an admin created by hand (phone orders paid by bank
+  // transfer, etc.) — e.g. "Bank Transfer". Left null for real Stripe
+  // orders, where stripeSessionId already says how it was paid; the admin
+  // UI shows "Stripe Checkout" when this is null and stripeSessionId isn't.
+  paymentMethod String?
+
   stockMovements StockMovement[]
 }

@@ -61,7 +61,7 @@ export default async function AdminDashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-paper-dim text-ink">
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-ink/10 bg-ink text-paper md:flex">
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-ink/10 bg-ink text-paper md:flex print:hidden">
         <div className="px-6 py-6">
           <Link href="/admin" className="font-serif text-xl font-medium">
             Sa<span className="text-gold">Fa</span>Light
@@ -97,7 +97,7 @@ export default async function AdminDashboardLayout({
       </aside>
 
       {/* Mobile top bar — full sidebar collapses to this + a nav strip until a proper drawer is built */}
-      <div className="fixed inset-x-0 top-0 z-40 md:hidden">
+      <div className="fixed inset-x-0 top-0 z-40 md:hidden print:hidden">
         <div className="flex items-center justify-between border-b border-ink/10 bg-ink px-4 py-3 text-paper">
           <Link href="/admin" className="font-serif text-lg font-medium">
             Sa<span className="text-gold">Fa</span>Light Admin
@@ -122,7 +122,7 @@ export default async function AdminDashboardLayout({
         </nav>
       </div>
 
-      <main className="flex-1 px-6 py-8 pt-28 md:px-10 md:py-10 md:pt-10">
+      <main className="flex-1 px-6 py-8 pt-28 md:px-10 md:py-10 md:pt-10 print:p-0">
         {children}
       </main>
     </div>

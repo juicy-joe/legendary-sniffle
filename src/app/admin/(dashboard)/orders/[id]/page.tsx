@@ -61,7 +61,15 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               </p>
             )}
           </div>
-          <DeleteEntityButton id={order.id} name={order.orderNumber} action={deleteOrder} />
+          <div className="flex items-center gap-4">
+            <Link
+              href={`/admin/orders/${order.id}/invoice`}
+              className="text-xs font-medium uppercase tracking-[0.1em] text-gold-dark hover:underline"
+            >
+              Print Invoice
+            </Link>
+            <DeleteEntityButton id={order.id} name={order.orderNumber} action={deleteOrder} />
+          </div>
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-6 border-y border-ink/10 py-6 sm:grid-cols-2">
@@ -88,6 +96,9 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                 hour: "numeric",
                 minute: "2-digit",
               })}
+            </p>
+            <p className="mt-1 text-xs text-ink/60">
+              Paid via {order.paymentMethod || "Stripe Checkout"}
             </p>
           </div>
         </div>

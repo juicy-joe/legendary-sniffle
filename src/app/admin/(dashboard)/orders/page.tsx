@@ -19,16 +19,24 @@ export default async function AdminOrdersPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="font-serif text-3xl font-light text-ink">Orders</h1>
-        <p className="mt-1 text-sm text-ink/65">
-          {orders.length} total
-          {newCount > 0 && (
-            <span className="ml-2 rounded-full bg-gold/15 px-2 py-0.5 text-[11px] uppercase tracking-wide text-gold-dark">
-              {newCount} new
-            </span>
-          )}
-        </p>
+      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-3xl font-light text-ink">Orders</h1>
+          <p className="mt-1 text-sm text-ink/65">
+            {orders.length} total
+            {newCount > 0 && (
+              <span className="ml-2 rounded-full bg-gold/15 px-2 py-0.5 text-[11px] uppercase tracking-wide text-gold-dark">
+                {newCount} new
+              </span>
+            )}
+          </p>
+        </div>
+        <Link
+          href="/admin/orders/new"
+          className="rounded-[3px] border border-ink bg-ink px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.15em] text-paper transition-colors hover:bg-gold-dark hover:border-gold-dark"
+        >
+          + New Manual Order
+        </Link>
       </div>
 
       {orders.length === 0 ? (
