@@ -1,8 +1,11 @@
-import { AlertTriangle, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
+import Link from "next/link";
+import { AlertTriangle, ArrowDownToLine, ArrowUpFromLine, Printer, Tag } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/format";
+import { getStockLevels } from "@/lib/stock-levels";
 import LogStockMovementForm from "@/components/admin/LogStockMovementForm";
 import StockThresholdInput from "@/components/admin/StockThresholdInput";
+import BarcodeLookup from "@/components/admin/BarcodeLookup";
 
 export const metadata = { title: "Warehouse — Admin" };
 
@@ -13,11 +16,12 @@ function stockStatus(quantity: number, threshold: number): { label: string; clas
 }
 
 export default async function WarehousePage() {
-  const [products, movements] = await Promise.all([
+  const [products, movements, openCustomOrderCount] = await Promise.all([
     prisma.product.findMany({
       select: {
         id: true,
         name: true,
+        sku: true,
         stockQuantity: true,
         lowStockThreshold: true,
         collection: { select: { name: true } },
@@ -28,7 +32,9 @@ export default async function WarehousePage() {
       take: 50,
       include: { product: { select: { name: true } }, order: { select: { orderNumber: true } } },
     }),
+    prisma.customOrder.count({ where: { status: { notIn: ["DELIVERED"] } } }),
   ]);
+  const stockLevels = await getStockLevels();
 
   // Most-in-need-of-attention first — how far below (or above) its own
   // threshold each product sits, not just the raw quantity, since a
@@ -43,9 +49,28 @@ export default async function WarehousePage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="font-serif text-3xl font-light text-ink">Warehouse</h1>
-        <p className="mt-1 text-sm text-ink/65">Stock on hand, and every incoming or outgoing movement.</p>
+      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-3xl font-light text-ink">Warehouse</h1>
+          <p className="mt-1 text-sm text-ink/65">Stock on hand, and every incoming or outgoing movement.</p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/admin/warehouse/labels"
+            className="flex items-center gap-1.5 rounded-[3px] border border-ink/20 px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.1em] text-ink/70 transition-colors hover:border-ink hover:text-ink"
+          >
+            <Printer className="h-3.5 w-3.5" /> Print All Labels
+          </Link>
+          <Link
+            href="/admin/warehouse/custom-orders"
+            className="flex items-center gap-2 rounded-[3px] border border-ink px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.15em] text-ink transition-colors hover:bg-ink hover:text-paper"
+          >
+            Custom Orders
+            {openCustomOrderCount > 0 && (
+              <span className="rounded-full bg-gold-dark px-2 py-0.5 text-[10px] text-paper">{openCustomOrderCount} open</span>
+            )}
+          </Link>
+        </div>
       </div>
 
       {(outOfStockCount > 0 || lowStockCount > 0) && (
@@ -64,28 +89,44 @@ export default async function WarehousePage() {
       )}
 
       <div className="mb-8">
+        <BarcodeLookup />
+      </div>
+
+      <div className="mb-8">
         <LogStockMovementForm products={products.map((p) => ({ id: p.id, name: p.name }))} />
       </div>
 
       <div className="mb-10 overflow-x-auto rounded-[6px] border border-ink/10">
-        <table className="w-full min-w-[640px] text-left text-sm">
+        <table className="w-full min-w-[880px] text-left text-sm">
           <thead className="border-b border-ink/10 bg-paper-dim text-[11px] uppercase tracking-[0.1em] text-ink/60">
             <tr>
               <th className="px-4 py-3 font-medium">Product</th>
+              <th className="px-4 py-3 font-medium">SKU</th>
               <th className="px-4 py-3 font-medium">Collection</th>
-              <th className="px-4 py-3 font-medium">Stock</th>
+              <th className="px-4 py-3 font-medium">On Hand</th>
+              <th className="px-4 py-3 font-medium">Reserved</th>
+              <th className="px-4 py-3 font-medium">Available</th>
               <th className="px-4 py-3 font-medium">Low-Stock At</th>
               <th className="px-4 py-3 font-medium">Status</th>
+              <th className="px-4 py-3 font-medium">Label</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-ink/10">
             {sortedProducts.map((p) => {
               const status = stockStatus(p.stockQuantity, p.lowStockThreshold);
+              const level = stockLevels.get(p.id);
               return (
                 <tr key={p.id}>
-                  <td className="px-4 py-3 text-ink">{p.name}</td>
+                  <td className="px-4 py-3 text-ink">
+                    <Link href={`/admin/products/${p.id}/edit`} className="hover:underline">
+                      {p.name}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3 font-feature-tabular text-ink/70">{p.sku}</td>
                   <td className="px-4 py-3 text-ink/70">{p.collection.name}</td>
                   <td className="px-4 py-3 font-feature-tabular text-ink">{p.stockQuantity}</td>
+                  <td className="px-4 py-3 font-feature-tabular text-ink/70">{level?.reserved ?? 0}</td>
+                  <td className="px-4 py-3 font-feature-tabular text-ink">{level?.available ?? p.stockQuantity}</td>
                   <td className="px-4 py-3">
                     <StockThresholdInput productId={p.id} initialValue={p.lowStockThreshold} />
                   </td>
@@ -93,6 +134,15 @@ export default async function WarehousePage() {
                     <span className={`rounded-[3px] px-2.5 py-1 text-xs font-medium ${status.className}`}>
                       {status.label}
                     </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/admin/warehouse/products/${p.id}/label`}
+                      aria-label={`Print label for ${p.name}`}
+                      className="inline-flex text-ink/40 transition-colors hover:text-ink"
+                    >
+                      <Tag className="h-4 w-4" />
+                    </Link>
                   </td>
                 </tr>
               );

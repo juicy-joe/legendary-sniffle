@@ -5,6 +5,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/get-session";
 import { sendLowStockAlert } from "@/lib/email";
+import { findProductByCode } from "@/lib/sku";
 
 const movementSchema = z.object({
   productId: z.string().min(1, "Select a product."),
@@ -109,4 +110,14 @@ export async function updateLowStockThreshold(
   });
   revalidatePath("/admin/warehouse");
   return {};
+}
+
+// Used by BarcodeLookup — a scanned or typed SKU/barcode resolves straight
+// to that product's edit page (or reports "not found") rather than the
+// warehouse table, since looking a product up by code is almost always in
+// service of doing something to that specific product.
+export async function lookupProductByCode(code: string): Promise<{ productId: string } | { error: string }> {
+  const product = await findProductByCode(code);
+  if (!product) return { error: `No product found for "${code}".` };
+  return { productId: product.id };
 }
