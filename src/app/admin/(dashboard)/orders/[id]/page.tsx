@@ -28,7 +28,10 @@ function parseItems(items: unknown): OrderItem[] {
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const order = await prisma.order.findUnique({ where: { id } });
+  const order = await prisma.order.findUnique({
+    where: { id },
+    include: { wholesaleAccount: { select: { id: true, businessName: true } } },
+  });
   if (!order) notFound();
 
   const items = parseItems(order.items);
@@ -47,6 +50,16 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <a href={`mailto:${order.email}`} className="text-sm text-gold-dark hover:underline">
               {order.email}
             </a>
+            {order.wholesaleAccount && (
+              <p className="mt-2">
+                <Link
+                  href={`/admin/wholesale/${order.wholesaleAccount.id}`}
+                  className="inline-block rounded-[3px] bg-gold-dark/10 px-2.5 py-1 text-xs font-medium text-gold-dark hover:underline"
+                >
+                  Wholesale — {order.wholesaleAccount.businessName}
+                </Link>
+              </p>
+            )}
           </div>
           <DeleteEntityButton id={order.id} name={order.orderNumber} action={deleteOrder} />
         </div>

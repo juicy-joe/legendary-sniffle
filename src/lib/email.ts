@@ -203,6 +203,86 @@ ${enquiry.message}`;
   });
 }
 
+export async function sendWholesaleApplicationReceivedEmail(applicant: {
+  contactName: string;
+  businessName: string;
+  email: string;
+}): Promise<void> {
+  const html = layout(
+    "We've received your trade account application.",
+    `
+      <p style="margin:0 0 8px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:#b8935a;">Thank You</p>
+      <h1 style="margin:0 0 16px;font-size:26px;font-weight:normal;color:#141414;">Application Received</h1>
+      <p style="margin:0 0 8px;font-size:15px;line-height:1.6;color:#3a3730;">Hi ${applicant.contactName},</p>
+      <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#3a3730;">
+        Thank you for applying for a SaFaLight trade account on behalf of ${escapeHtml(applicant.businessName)}.
+        We review every application personally and will be in touch shortly.
+      </p>
+    `
+  );
+
+  const text = `Application Received
+
+Hi ${applicant.contactName},
+
+Thank you for applying for a SaFaLight trade account on behalf of ${applicant.businessName}. We review every application personally and will be in touch shortly.`;
+
+  await getResend().emails.send({
+    from: EMAIL_FROM,
+    replyTo: EMAIL_REPLY_TO,
+    to: applicant.email,
+    subject: "Your SaFaLight Trade Application",
+    html,
+    text,
+  });
+}
+
+export async function sendWholesaleApprovedEmail(account: {
+  contactName: string;
+  businessName: string;
+  email: string;
+  setPasswordUrl: string;
+}): Promise<void> {
+  const html = layout(
+    "Your SaFaLight trade account is approved — set your password to log in.",
+    `
+      <p style="margin:0 0 8px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:#b8935a;">Welcome</p>
+      <h1 style="margin:0 0 16px;font-size:26px;font-weight:normal;color:#141414;">Trade Account Approved</h1>
+      <p style="margin:0 0 8px;font-size:15px;line-height:1.6;color:#3a3730;">Hi ${account.contactName},</p>
+      <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#3a3730;">
+        ${escapeHtml(account.businessName)}&rsquo;s SaFaLight trade account is approved. Set a password below to
+        log in and see your trade pricing.
+      </p>
+      <table role="presentation" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="background-color:#141414;">
+            <a href="${account.setPasswordUrl}" style="display:inline-block;padding:14px 28px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#ffffff;text-decoration:none;">Set Your Password</a>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:16px 0 0;font-size:13px;color:#7a7568;">This link expires in 7 days.</p>
+    `
+  );
+
+  const text = `Trade Account Approved
+
+Hi ${account.contactName},
+
+${account.businessName}'s SaFaLight trade account is approved. Set your password to log in and see your trade pricing:
+${account.setPasswordUrl}
+
+This link expires in 7 days.`;
+
+  await getResend().emails.send({
+    from: EMAIL_FROM,
+    replyTo: EMAIL_REPLY_TO,
+    to: account.email,
+    subject: "Your SaFaLight Trade Account Is Approved",
+    html,
+    text,
+  });
+}
+
 // The message is customer-submitted free text embedded directly into HTML
 // — escaped so it can't break out of its container or inject markup.
 function escapeHtml(input: string): string {

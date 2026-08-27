@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 import { getShippingLabel, type ShippingSpeed } from "@/lib/shipping";
 import { sendOrderConfirmationEmail } from "@/lib/email";
+import { getApprovedWholesaleAccount, getWholesalePrice } from "@/lib/wholesale";
 
 // The only thing that's allowed to create an Order row for a Stripe-paid
 // purchase — never the browser reaching /checkout/success on its own
@@ -75,15 +76,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const slugs = items.map((i) => i.slug);
   const products = await prisma.product.findMany({
     where: { slug: { in: slugs } },
-    select: { slug: true, name: true, price: true },
+    select: { id: true, slug: true, name: true, price: true },
   });
   const bySlug = new Map(products.map((p) => [p.slug, p]));
-  const orderItems = items
-    .filter((i) => bySlug.has(i.slug))
-    .map((i) => {
-      const product = bySlug.get(i.slug)!;
-      return { slug: i.slug, name: product.name, price: product.price, qty: i.qty };
-    });
+
+  // A wholesale checkout session (see trade/portal/actions.ts) tags itself
+  // with the account it was created for — if present, the order record
+  // needs to store what was actually charged (wholesale), not retail.
+  const wholesaleAccountId = session.metadata?.wholesaleAccountId || null;
+  const wholesaleAccount = wholesaleAccountId ? await getApprovedWholesaleAccount(wholesaleAccountId) : null;
+
+  const orderItems = await Promise.all(
+    items
+      .filter((i) => bySlug.has(i.slug))
+      .map(async (i) => {
+        const product = bySlug.get(i.slug)!;
+        const price = wholesaleAccount
+          ? await getWholesalePrice(wholesaleAccount, product.id, product.price)
+          : product.price;
+        return { slug: i.slug, name: product.name, price, qty: i.qty };
+      })
+  );
 
   const address = session.collected_information?.shipping_details?.address ?? session.customer_details?.address;
   const shippingName =
@@ -123,10 +136,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         total: Math.round((session.amount_total ?? 0) / 100),
         status: "NEW",
         stripeSessionId: session.id,
+        wholesaleAccountId: wholesaleAccount?.id ?? null,
       },
     });
     revalidatePath("/admin/orders");
     revalidatePath("/admin");
+    if (wholesaleAccount) revalidatePath("/admin/wholesale");
 
     // Best-effort — the order is already safely recorded at this point;
     // an email-provider hiccup shouldn't make Stripe think the webhook

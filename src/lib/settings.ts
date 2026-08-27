@@ -14,6 +14,7 @@ const defaults = {
   euExpressShippingPrice: 50,
   nonEuRegularShippingPrice: 450,
   nonEuExpressShippingPrice: 650,
+  wholesaleDefaultDiscountPercent: 20,
 };
 
 export async function getSettings() {
@@ -27,6 +28,8 @@ export async function getSettings() {
     euExpressShippingPrice: settings?.euExpressShippingPrice ?? defaults.euExpressShippingPrice,
     nonEuRegularShippingPrice: settings?.nonEuRegularShippingPrice ?? defaults.nonEuRegularShippingPrice,
     nonEuExpressShippingPrice: settings?.nonEuExpressShippingPrice ?? defaults.nonEuExpressShippingPrice,
+    wholesaleDefaultDiscountPercent:
+      settings?.wholesaleDefaultDiscountPercent ?? defaults.wholesaleDefaultDiscountPercent,
   };
 }
 

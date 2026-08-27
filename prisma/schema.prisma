@@ -145,6 +145,8 @@ model Product {
   lowStockThreshold Int             @default(3)
   stockMovements    StockMovement[]
 
+  wholesalePrices WholesaleProductPrice[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -242,7 +244,69 @@ model Settings {
   nonEuRegularShippingPrice Int @default(450)
   nonEuExpressShippingPrice Int @default(650)
 
+  // Applied to every approved wholesale account unless that account has
+  // its own discountPercent override (see WholesaleAccount) — one site-
+  // wide default rather than having to set it per-account every time.
+  wholesaleDefaultDiscountPercent Int @default(20)
+
   updatedAt DateTime @updatedAt
+}
+
+enum WholesaleAccountStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// A trade/wholesale customer — deliberately its own model with its own
+// session system (src/lib/wholesale-session.ts), not a role bolted onto
+// AdminUser. Different kind of user (a customer, not staff), different
+// blast radius if either auth system ever had a bug.
+model WholesaleAccount {
+  id           String                 @id @default(cuid())
+  businessName String
+  contactName  String
+  email        String                 @unique
+  phone        String?
+  vatId        String?
+  notes        String? // free text from the application form
+  status       WholesaleAccountStatus @default(PENDING)
+
+  // Null until the account is approved and they've set it via the invite
+  // link — see inviteToken below. A PENDING or REJECTED account can never
+  // log in even if this somehow got set, enforced in the login action,
+  // not just by the UI hiding the form.
+  passwordHash String?
+
+  // Percent off retail, applied at checkout when no per-product override
+  // exists below. Null means "use Settings.wholesaleDefaultDiscountPercent".
+  discountPercent Int?
+
+  productPrices WholesaleProductPrice[]
+  orders        Order[]
+
+  // One-time token emailed on approval so the account holder sets their
+  // own password rather than us choosing or emailing one in plaintext.
+  inviteToken          String?   @unique
+  inviteTokenExpiresAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Per-account, per-product negotiated price — takes precedence over that
+// account's discountPercent when present, so "flat % off" and "negotiated
+// per client" can coexist: most products use the percentage, specific
+// products can still be pinned to an agreed price.
+model WholesaleProductPrice {
+  id                 String           @id @default(cuid())
+  wholesaleAccount   WholesaleAccount @relation(fields: [wholesaleAccountId], references: [id], onDelete: Cascade)
+  wholesaleAccountId String
+  product            Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId          String
+  price              Int // whole euros, matching Product.price
+
+  @@unique([wholesaleAccountId, productId])
 }
 
 model MenuItem {
@@ -305,6 +369,12 @@ model Order {
   trackingNumber     String?
   trackingUrl        String?
   shippedEmailSentAt DateTime?
+
+  // Set when this order was placed by a logged-in wholesale account (its
+  // checkout session was priced at that account's wholesale rate) — null
+  // for ordinary retail orders.
+  wholesaleAccount   WholesaleAccount? @relation(fields: [wholesaleAccountId], references: [id])
+  wholesaleAccountId String?
 
   stockMovements StockMovement[]
 }

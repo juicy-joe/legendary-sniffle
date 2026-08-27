@@ -18,6 +18,11 @@ const settingsSchema = z.object({
   euExpressShippingPrice: nonNegativeEuroPrice,
   nonEuRegularShippingPrice: nonNegativeEuroPrice,
   nonEuExpressShippingPrice: nonNegativeEuroPrice,
+  wholesaleDefaultDiscountPercent: z.coerce
+    .number({ message: "Enter a whole percentage." })
+    .int("Whole numbers only.")
+    .min(0, "Must be 0 or more.")
+    .max(100, "Can't exceed 100%."),
 });
 
 export type SettingsFormState = {
@@ -39,6 +44,7 @@ export async function updateSettings(
     euExpressShippingPrice: formData.get("euExpressShippingPrice"),
     nonEuRegularShippingPrice: formData.get("nonEuRegularShippingPrice"),
     nonEuExpressShippingPrice: formData.get("nonEuExpressShippingPrice"),
+    wholesaleDefaultDiscountPercent: formData.get("wholesaleDefaultDiscountPercent"),
   });
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};

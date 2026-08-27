@@ -13,6 +13,7 @@ type SettingsData = {
   euExpressShippingPrice: number;
   nonEuRegularShippingPrice: number;
   nonEuExpressShippingPrice: number;
+  wholesaleDefaultDiscountPercent: number;
 };
 
 export default function SettingsForm({ settings }: { settings: SettingsData }) {
@@ -121,6 +122,31 @@ export default function SettingsForm({ settings }: { settings: SettingsData }) {
             />
           </Field>
         </div>
+      </div>
+
+      <div>
+        <h2 className="mb-1 font-serif text-lg font-light text-ink">Wholesale</h2>
+        <p className="mb-4 text-xs text-ink/60">
+          Applied to every approved wholesale account that doesn&rsquo;t have its own discount set — see Admin
+          → Wholesale Accounts to override this per account.
+        </p>
+        <Field
+          label="Default Discount (%)"
+          name="wholesaleDefaultDiscountPercent"
+          error={err("wholesaleDefaultDiscountPercent")}
+        >
+          <input
+            id="wholesaleDefaultDiscountPercent"
+            name="wholesaleDefaultDiscountPercent"
+            type="number"
+            min={0}
+            max={100}
+            step={1}
+            inputMode="numeric"
+            defaultValue={settings.wholesaleDefaultDiscountPercent}
+            className={`${inputClass} max-w-[140px]`}
+          />
+        </Field>
       </div>
 
       {state.error && (
