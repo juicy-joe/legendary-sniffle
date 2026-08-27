@@ -15,6 +15,7 @@ import {
   Share2,
   ShieldCheck,
   Settings as SettingsIcon,
+  Warehouse,
 } from "lucide-react";
 import { getSession } from "@/lib/get-session";
 import { logout } from "@/app/admin/login/actions";
@@ -38,6 +39,7 @@ const baseNavItems = [
   { href: "/admin/social", label: "Social", icon: Share2 },
   { href: "/admin/enquiries", label: "Enquiries", icon: Mail },
   { href: "/admin/orders", label: "Orders", icon: Package },
+  { href: "/admin/warehouse", label: "Warehouse", icon: Warehouse },
   { href: "/admin/settings", label: "Settings", icon: SettingsIcon },
 ];
 const ownerNavItems = [{ href: "/admin/staff", label: "Staff", icon: ShieldCheck }];

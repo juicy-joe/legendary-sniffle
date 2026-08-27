@@ -137,8 +137,49 @@ model Product {
 
   images ProductImage[]
 
+  // Warehouse — current count on hand, and the level below which the
+  // warehouse dashboard flags it as low stock. stockQuantity is never
+  // edited directly; it only changes via a StockMovement (see below), so
+  // the movement log always explains how the current number was reached.
+  stockQuantity     Int             @default(0)
+  lowStockThreshold Int             @default(3)
+  stockMovements    StockMovement[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum StockMovementType {
+  IN
+  OUT
+}
+
+// One row per warehouse event — a restock, a correction, or a customer
+// shipment. product.stockQuantity is a running total derived from these;
+// the log itself is the source of truth (a recount or damage write-off is
+// just another movement with an explanatory note, not a raw edit to the
+// total).
+model StockMovement {
+  id        String            @id @default(cuid())
+  product   Product           @relation(fields: [productId], references: [id])
+  productId String
+  type      StockMovementType
+  // Always positive — direction comes from `type`, not the sign.
+  quantity  Int
+  note      String?
+  // Only meaningful for IN entries (what was restocked, and at what
+  // per-unit cost) — left null for OUT entries and auto-logged shipments.
+  supplier String?
+  unitCost Int?
+  // Set only when this OUT movement was auto-logged by an order actually
+  // shipping (see markOrderShipped) — null for anything logged by hand.
+  order   Order?  @relation(fields: [orderId], references: [id])
+  orderId String?
+  // Who logged it, from the admin session at the time — free text (not a
+  // relation) so the log entry still reads correctly even if that staff
+  // account is later removed.
+  loggedBy  String?
+  createdAt DateTime @default(now())
 }
 
 model ProductImage {
@@ -264,4 +305,6 @@ model Order {
   trackingNumber     String?
   trackingUrl        String?
   shippedEmailSentAt DateTime?
+
+  stockMovements StockMovement[]
 }

@@ -139,7 +139,14 @@ export async function updateProduct(
   return { success: true };
 }
 
-export async function deleteProduct(id: string) {
+export async function deleteProduct(id: string): Promise<{ error?: string } | void> {
+  const movementCount = await prisma.stockMovement.count({ where: { productId: id } });
+  if (movementCount > 0) {
+    return {
+      error: `Can't delete — this product has ${movementCount} warehouse movement${movementCount === 1 ? "" : "s"} on record. Its stock history would be lost.`,
+    };
+  }
+
   const deleted = await prisma.product.delete({ where: { id } });
   revalidateProductPaths(deleted.slug);
   redirect("/admin/products");

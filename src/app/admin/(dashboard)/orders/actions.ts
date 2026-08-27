@@ -6,6 +6,59 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import type { OrderStatusValue } from "@/lib/order-status";
 import { sendShippedEmail } from "@/lib/email";
+import { getSession } from "@/lib/get-session";
+
+type OrderItem = { slug: string; name: string; price: number; qty: number };
+
+function parseOrderItems(items: unknown): OrderItem[] {
+  if (!Array.isArray(items)) return [];
+  return items.filter(
+    (i): i is OrderItem =>
+      typeof i === "object" &&
+      i !== null &&
+      typeof (i as OrderItem).slug === "string" &&
+      typeof (i as OrderItem).qty === "number"
+  );
+}
+
+// Logs one OUT movement per line item and decrements stock — called only
+// on the transition INTO "SHIPPED", never on a later edit to tracking
+// info, so re-saving tracking details can't double-deduct.
+async function deductStockForShippedOrder(order: { id: string; items: unknown }): Promise<void> {
+  const items = parseOrderItems(order.items);
+  if (items.length === 0) return;
+
+  const products = await prisma.product.findMany({
+    where: { slug: { in: items.map((i) => i.slug) } },
+    select: { id: true, slug: true },
+  });
+  const productBySlug = new Map(products.map((p) => [p.slug, p]));
+  const session = await getSession();
+
+  for (const item of items) {
+    const product = productBySlug.get(item.slug);
+    // A product can be renamed/deleted after the order was placed — the
+    // order itself still records what was actually sold either way, so a
+    // missing product here just means there's nothing left to deduct from.
+    if (!product) continue;
+
+    await prisma.$transaction([
+      prisma.stockMovement.create({
+        data: {
+          productId: product.id,
+          type: "OUT",
+          quantity: item.qty,
+          orderId: order.id,
+          loggedBy: session?.name ?? null,
+        },
+      }),
+      prisma.product.update({
+        where: { id: product.id },
+        data: { stockQuantity: { decrement: item.qty } },
+      }),
+    ]);
+  }
+}
 
 export async function updateOrderStatus(id: string, status: OrderStatusValue) {
   await prisma.order.update({ where: { id }, data: { status } });
@@ -48,6 +101,7 @@ export async function markOrderShipped(
 
   const order = await prisma.order.findUnique({ where: { id } });
   if (!order) return { error: "Order not found." };
+  const wasAlreadyShipped = order.status === "SHIPPED";
 
   // shippedEmailSentAt is deliberately NOT set here — only once the send
   // below actually succeeds, so the admin UI's "Customer notified" state
@@ -60,6 +114,13 @@ export async function markOrderShipped(
       trackingUrl: parsed.data.trackingUrl,
     },
   });
+
+  // Only on the actual transition into "shipped" — re-saving tracking
+  // info (the "Edit tracking info" path) hits this same action again but
+  // shouldn't deduct stock a second time for the same order.
+  if (!wasAlreadyShipped) {
+    await deductStockForShippedOrder(updated);
+  }
 
   try {
     await sendShippedEmail({
@@ -76,6 +137,7 @@ export async function markOrderShipped(
     revalidatePath("/admin/orders");
     revalidatePath(`/admin/orders/${id}`);
     revalidatePath("/admin");
+    revalidatePath("/admin/warehouse");
     return {
       error:
         "Tracking info was saved and the order marked shipped, but the notification email failed to send. You can try resending it below.",
@@ -87,6 +149,7 @@ export async function markOrderShipped(
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${id}`);
   revalidatePath("/admin");
+  revalidatePath("/admin/warehouse");
   return { success: true };
 }
 
