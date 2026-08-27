@@ -282,8 +282,9 @@ model WholesaleAccount {
   // exists below. Null means "use Settings.wholesaleDefaultDiscountPercent".
   discountPercent Int?
 
-  productPrices WholesaleProductPrice[]
-  orders        Order[]
+  productPrices        WholesaleProductPrice[]
+  orders               Order[]
+  specialOrderRequests SpecialOrderRequest[]
 
   // One-time token emailed on approval so the account holder sets their
   // own password rather than us choosing or emailing one in plaintext.
@@ -307,6 +308,34 @@ model WholesaleProductPrice {
   price              Int // whole euros, matching Product.price
 
   @@unique([wholesaleAccountId, productId])
+}
+
+enum SpecialOrderRequestStatus {
+  NEW
+  IN_REVIEW
+  RESPONDED
+  CLOSED
+}
+
+// A trade account asking for something outside the regular catalog — a
+// custom spec, a bulk quote, a design they want quoted. Deliberately
+// separate from the general Enquiry model (used by the public Contact
+// form) so trade requests, which usually need a quote and often carry an
+// attached file, don't get mixed into the same inbox as general enquiries.
+// The actual back-and-forth happens by email/phone (the account's own
+// contact details are right there in admin) — this is a tracked inbox,
+// not an in-app messaging thread.
+model SpecialOrderRequest {
+  id                 String                    @id @default(cuid())
+  wholesaleAccount   WholesaleAccount          @relation(fields: [wholesaleAccountId], references: [id], onDelete: Cascade)
+  wholesaleAccountId String
+  subject            String
+  message            String
+  quantity           Int?
+  fileUrl            String?
+  fileName           String?
+  status             SpecialOrderRequestStatus @default(NEW)
+  createdAt          DateTime                  @default(now())
 }
 
 model MenuItem {

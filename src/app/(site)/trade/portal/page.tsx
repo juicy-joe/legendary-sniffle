@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getWholesaleSession } from "@/lib/get-wholesale-session";
@@ -59,14 +60,22 @@ export default async function TradePortalPage() {
               : "Prices below reflect your trade account."}
           </p>
         </div>
-        <form action={wholesaleLogout}>
-          <button
-            type="submit"
-            className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink/50 transition-colors hover:text-ink"
+        <div className="flex items-center gap-6">
+          <Link
+            href="/trade/portal/requests"
+            className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink/70 transition-colors hover:text-ink"
           >
-            Log Out
-          </button>
-        </form>
+            Special Order Requests
+          </Link>
+          <form action={wholesaleLogout}>
+            <button
+              type="submit"
+              className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink/50 transition-colors hover:text-ink"
+            >
+              Log Out
+            </button>
+          </form>
+        </div>
       </div>
 
       <TradePortal items={items} shippingRates={shippingRates} />

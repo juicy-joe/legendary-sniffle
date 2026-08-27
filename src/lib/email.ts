@@ -283,6 +283,61 @@ This link expires in 7 days.`;
   });
 }
 
+// Unlike every other email in this file, this one goes to the business
+// (EMAIL_REPLY_TO), not the customer — a trade account submitted something
+// that needs a human to look at, so the alert has to reach a person, not
+// sit unnoticed in the admin panel until someone happens to check it.
+export async function sendSpecialOrderRequestNotification(request: {
+  businessName: string;
+  contactName: string;
+  contactEmail: string;
+  subject: string;
+  message: string;
+  quantity: number | null;
+  hasFile: boolean;
+}): Promise<void> {
+  const html = layout(
+    `New trade request from ${request.businessName}: ${request.subject}`,
+    `
+      <p style="margin:0 0 8px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:#b8935a;">Trade Portal</p>
+      <h1 style="margin:0 0 16px;font-size:26px;font-weight:normal;color:#141414;">New Special Order Request</h1>
+      <p style="margin:0 0 4px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#7a7568;">From</p>
+      <p style="margin:0 0 20px;font-size:15px;color:#141414;">
+        ${escapeHtml(request.businessName)} — ${escapeHtml(request.contactName)}
+        (<a href="mailto:${request.contactEmail}" style="color:#141414;">${request.contactEmail}</a>)
+      </p>
+      <p style="margin:0 0 4px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#7a7568;">Subject</p>
+      <p style="margin:0 0 20px;font-size:15px;color:#141414;">${escapeHtml(request.subject)}</p>
+      ${
+        request.quantity != null
+          ? `<p style="margin:0 0 4px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#7a7568;">Quantity</p><p style="margin:0 0 20px;font-size:15px;color:#141414;">${request.quantity}</p>`
+          : ""
+      }
+      <p style="margin:0 0 4px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#7a7568;">Message</p>
+      <p style="margin:0;padding:16px;background-color:#f5f3ef;font-size:14px;line-height:1.6;color:#3a3730;white-space:pre-wrap;">${escapeHtml(request.message)}</p>
+      ${request.hasFile ? `<p style="margin:16px 0 0;font-size:13px;color:#7a7568;">A file was attached — view it in Admin → Wholesale → Requests.</p>` : ""}
+    `
+  );
+
+  const text = `New Special Order Request
+
+From: ${request.businessName} — ${request.contactName} (${request.contactEmail})
+Subject: ${request.subject}
+${request.quantity != null ? `Quantity: ${request.quantity}\n` : ""}
+Message:
+${request.message}
+${request.hasFile ? "\nA file was attached — view it in Admin -> Wholesale -> Requests." : ""}`;
+
+  await getResend().emails.send({
+    from: EMAIL_FROM,
+    replyTo: request.contactEmail,
+    to: EMAIL_REPLY_TO,
+    subject: `New Trade Request — ${request.businessName}`,
+    html,
+    text,
+  });
+}
+
 // The message is customer-submitted free text embedded directly into HTML
 // — escaped so it can't break out of its container or inject markup.
 function escapeHtml(input: string): string {

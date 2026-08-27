@@ -5,10 +5,13 @@ import WholesaleApplicationActions from "@/components/admin/WholesaleApplication
 export const metadata = { title: "Wholesale Accounts — Admin" };
 
 export default async function AdminWholesalePage() {
-  const accounts = await prisma.wholesaleAccount.findMany({
-    orderBy: [{ status: "asc" }, { createdAt: "desc" }],
-    include: { _count: { select: { orders: true } } },
-  });
+  const [accounts, newRequestCount] = await Promise.all([
+    prisma.wholesaleAccount.findMany({
+      orderBy: [{ status: "asc" }, { createdAt: "desc" }],
+      include: { _count: { select: { orders: true } } },
+    }),
+    prisma.specialOrderRequest.count({ where: { status: "NEW" } }),
+  ]);
 
   const pending = accounts.filter((a) => a.status === "PENDING");
   const approved = accounts.filter((a) => a.status === "APPROVED");
@@ -16,11 +19,22 @@ export default async function AdminWholesalePage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="font-serif text-3xl font-light text-ink">Wholesale Accounts</h1>
-        <p className="mt-1 text-sm text-ink/65">
-          {accounts.length} total &middot; {pending.length} pending review
-        </p>
+      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-3xl font-light text-ink">Wholesale Accounts</h1>
+          <p className="mt-1 text-sm text-ink/65">
+            {accounts.length} total &middot; {pending.length} pending review
+          </p>
+        </div>
+        <Link
+          href="/admin/wholesale/requests"
+          className="flex items-center gap-2 rounded-[3px] border border-ink px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.15em] text-ink transition-colors hover:bg-ink hover:text-paper"
+        >
+          Special Order Requests
+          {newRequestCount > 0 && (
+            <span className="rounded-full bg-gold-dark px-2 py-0.5 text-[10px] text-paper">{newRequestCount} new</span>
+          )}
+        </Link>
       </div>
 
       {pending.length > 0 && (
