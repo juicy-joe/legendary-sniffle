@@ -145,7 +145,17 @@ model Product {
   lowStockThreshold Int             @default(3)
   stockMovements    StockMovement[]
 
+  // Permanent product identity for the warehouse system — assigned once at
+  // creation (see generateSku in src/lib/sku.ts) and never changed or
+  // reused, even after the product is discontinued. barcode defaults to
+  // the same string as sku (rendered as a Code 128/QR label) but is a
+  // separate column on purpose: if a product later gets a real UPC/EAN
+  // code, that goes here without needing a second identifier field.
+  sku     String @unique
+  barcode String @unique
+
   wholesalePrices WholesaleProductPrice[]
+  customOrders    CustomOrder[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -177,11 +187,68 @@ model StockMovement {
   // shipping (see markOrderShipped) — null for anything logged by hand.
   order   Order?  @relation(fields: [orderId], references: [id])
   orderId String?
+  // Set only when this IN movement is surplus stock released from a
+  // completed custom production run (see releaseSurplusToStock) — null
+  // for everything else. SetNull on delete: if the CustomOrder record is
+  // later removed, the movement itself (the actual stock change) still
+  // stands on its own, same principle as orderId above.
+  customOrder   CustomOrder? @relation(fields: [customOrderId], references: [id], onDelete: SetNull)
+  customOrderId String?
   // Who logged it, from the admin session at the time — free text (not a
   // relation) so the log entry still reads correctly even if that staff
   // account is later removed.
   loggedBy  String?
   createdAt DateTime @default(now())
+}
+
+// Per-prefix counter backing generateSku() (src/lib/sku.ts) — a persistent
+// row per category prefix (e.g. "GLAS") rather than deriving the next
+// number from existing Product rows, so a number is never reused even
+// after every product carrying it has been deleted.
+model SkuSequence {
+  prefix    String @id
+  nextValue Int    @default(1)
+}
+
+enum CustomOrderStatus {
+  QUOTED
+  CONFIRMED
+  IN_PRODUCTION
+  COMPLETED
+  DELIVERED
+}
+
+// A commissioned production run of a design for a specific customer —
+// deliberately separate from Order/StockMovement: this represents work not
+// yet done (or in progress), not stock already on the shelf. When a run
+// also yields surplus units for general retail stock, that surplus is
+// released via a normal StockMovement (type IN, noted as coming from this
+// custom order) rather than a second quantity field here — quantity above
+// always means "how many were commissioned," full stop.
+model CustomOrder {
+  id            String            @id @default(cuid())
+  product       Product           @relation(fields: [productId], references: [id])
+  productId     String
+  quantity      Int
+  customerName  String
+  customerEmail String
+  status        CustomOrderStatus @default(QUOTED)
+  targetCompletionDate DateTime?
+  notes         String?
+
+  // Set once this run is fulfilled as a real, shippable order — links the
+  // production record to the actual Order for full traceability. Left
+  // null for the QUOTED/CONFIRMED/IN_PRODUCTION stages.
+  order   Order?  @relation(fields: [orderId], references: [id])
+  orderId String?
+
+  // Surplus units from this run that were released into general retail
+  // stock — see releaseSurplusToStock. Usually zero or one entries; not
+  // capped at one so a run can release stock in more than one batch.
+  releasedToStock StockMovement[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ProductImage {
@@ -412,4 +479,5 @@ model Order {
   paymentMethod String?
 
   stockMovements StockMovement[]
+  customOrders   CustomOrder[]
 }

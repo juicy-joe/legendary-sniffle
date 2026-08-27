@@ -338,6 +338,46 @@ ${request.hasFile ? "\nA file was attached — view it in Admin -> Wholesale -> 
   });
 }
 
+// Also business-facing, like the trade request notification above — fires
+// when a stock movement drops a product to or below its own low-stock
+// threshold, so restocking doesn't depend on someone happening to open the
+// Warehouse dashboard. Callers are responsible for only calling this on the
+// crossing (see wasAboveThreshold checks at each call site) so a run of
+// several sales while already low doesn't send a duplicate email each time.
+export async function sendLowStockAlert(product: {
+  name: string;
+  sku: string;
+  stockQuantity: number;
+  lowStockThreshold: number;
+}): Promise<void> {
+  const outOfStock = product.stockQuantity <= 0;
+  const html = layout(
+    `${outOfStock ? "Out of stock" : "Low stock"}: ${product.name}`,
+    `
+      <p style="margin:0 0 8px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:#b8935a;">Warehouse</p>
+      <h1 style="margin:0 0 16px;font-size:26px;font-weight:normal;color:#141414;">${outOfStock ? "Out of Stock" : "Low Stock"}</h1>
+      <p style="margin:0 0 4px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#7a7568;">Product</p>
+      <p style="margin:0 0 20px;font-size:15px;color:#141414;">${escapeHtml(product.name)} (${escapeHtml(product.sku)})</p>
+      <p style="margin:0 0 4px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#7a7568;">On Hand</p>
+      <p style="margin:0 0 20px;font-size:15px;color:#141414;">${product.stockQuantity} — threshold is ${product.lowStockThreshold}</p>
+      <p style="margin:0;font-size:14px;color:#3a3730;">Review it in Admin &rarr; Warehouse.</p>
+    `
+  );
+
+  const text = `${outOfStock ? "Out of Stock" : "Low Stock"}: ${product.name} (${product.sku})
+
+On hand: ${product.stockQuantity} — threshold is ${product.lowStockThreshold}
+Review it in Admin -> Warehouse.`;
+
+  await getResend().emails.send({
+    from: EMAIL_FROM,
+    to: EMAIL_REPLY_TO,
+    subject: `${outOfStock ? "Out of Stock" : "Low Stock"} — ${product.name}`,
+    html,
+    text,
+  });
+}
+
 // The message is customer-submitted free text embedded directly into HTML
 // — escaped so it can't break out of its container or inject markup.
 function escapeHtml(input: string): string {

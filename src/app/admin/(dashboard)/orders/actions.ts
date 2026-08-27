@@ -6,7 +6,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import type { OrderStatusValue } from "@/lib/order-status";
 import { orderStatuses } from "@/lib/order-status";
-import { sendShippedEmail, sendOrderConfirmationEmail } from "@/lib/email";
+import { sendShippedEmail, sendOrderConfirmationEmail, sendLowStockAlert } from "@/lib/email";
 import { getSession } from "@/lib/get-session";
 
 type OrderItem = { slug: string; name: string; price: number; qty: number };
@@ -31,7 +31,7 @@ async function deductStockForShippedOrder(order: { id: string; items: unknown })
 
   const products = await prisma.product.findMany({
     where: { slug: { in: items.map((i) => i.slug) } },
-    select: { id: true, slug: true },
+    select: { id: true, slug: true, name: true, sku: true, stockQuantity: true, lowStockThreshold: true },
   });
   const productBySlug = new Map(products.map((p) => [p.slug, p]));
   const session = await getSession();
@@ -58,6 +58,17 @@ async function deductStockForShippedOrder(order: { id: string; items: unknown })
         data: { stockQuantity: { decrement: item.qty } },
       }),
     ]);
+
+    // Same crossing check as logStockMovement — only alert the sale that
+    // actually pushes stock to/below the threshold, not every sale after.
+    const after = product.stockQuantity - item.qty;
+    if (after <= product.lowStockThreshold && product.stockQuantity > product.lowStockThreshold) {
+      try {
+        await sendLowStockAlert({ ...product, stockQuantity: after });
+      } catch (err) {
+        console.error("Failed to send low-stock alert:", err);
+      }
+    }
   }
 }
 

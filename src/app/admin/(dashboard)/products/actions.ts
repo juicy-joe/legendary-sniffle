@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { generateSku } from "@/lib/sku";
 
 const productSchema = z.object({
   name: z.string().min(1, "Required"),
@@ -94,8 +95,9 @@ export async function createProduct(
     };
   }
 
+  const { sku, barcode } = await generateSku(parsed.data.categoryId);
   const product = await prisma.product.create({
-    data: { ...parsed.data, featured, limited },
+    data: { ...parsed.data, featured, limited, sku, barcode },
   });
 
   revalidateProductPaths(product.slug);

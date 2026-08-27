@@ -21,6 +21,21 @@ const DIACRITICS_RE = new RegExp(
   "g"
 );
 
+// Same atomic per-prefix counter as src/lib/sku.ts's generateSku() — not
+// imported directly because this script runs with its own standalone
+// PrismaClient rather than the app's singleton (see adapter/prisma above).
+async function generateSku(categoryName: string): Promise<{ sku: string; barcode: string }> {
+  const prefix = categoryName.slice(0, 4).toUpperCase();
+  const rows = await prisma.$queryRaw<{ seq: number }[]>`
+    INSERT INTO "SkuSequence" ("prefix", "nextValue")
+    VALUES (${prefix}, 2)
+    ON CONFLICT ("prefix") DO UPDATE SET "nextValue" = "SkuSequence"."nextValue" + 1
+    RETURNING "nextValue" - 1 AS seq
+  `;
+  const code = `${prefix}-${String(rows[0].seq).padStart(4, "0")}`;
+  return { sku: code, barcode: code };
+}
+
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -77,6 +92,15 @@ async function main() {
       throw new Error(`Missing relation for product ${p.slug}`);
     }
 
+    // Only burn a SKU sequence number for products that don't exist yet —
+    // upsert's create branch is the only one that needs it, and calling
+    // generateSku() unconditionally on every re-run would waste a number
+    // per already-seeded product each time this script runs.
+    const alreadyExists = await prisma.product.findUnique({ where: { slug: p.slug }, select: { id: true } });
+    const { sku, barcode } = alreadyExists
+      ? { sku: undefined, barcode: undefined }
+      : await generateSku(p.category);
+
     await prisma.product.upsert({
       where: { slug: p.slug },
       update: {},
@@ -93,6 +117,11 @@ async function main() {
         palette: p.palette,
         shade: p.shade,
         base: p.base,
+        // Non-null assertions are safe here: Prisma only evaluates this
+        // `create` object when the row doesn't exist yet, which is exactly
+        // when alreadyExists is false and sku/barcode are real strings.
+        sku: sku!,
+        barcode: barcode!,
         designerId,
         collectionId,
         categoryId,

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/get-session";
+import { sendLowStockAlert } from "@/lib/email";
 
 const movementSchema = z.object({
   productId: z.string().min(1, "Select a product."),
@@ -45,6 +46,15 @@ export async function logStockMovement(
   const { productId, type, quantity, note, supplier, unitCost } = parsed.data;
   const session = await getSession();
 
+  // Fetched before the transaction so we can tell whether this movement is
+  // what pushed the product to/below its threshold ("crossing" it) versus
+  // it already being low — only the crossing should trigger an email, or a
+  // string of small sales while already low would send one every time.
+  const before = await prisma.product.findUniqueOrThrow({
+    where: { id: productId },
+    select: { name: true, sku: true, stockQuantity: true, lowStockThreshold: true },
+  });
+
   await prisma.$transaction([
     prisma.stockMovement.create({
       data: {
@@ -65,6 +75,17 @@ export async function logStockMovement(
       data: { stockQuantity: { increment: type === "IN" ? quantity : -quantity } },
     }),
   ]);
+
+  if (type === "OUT") {
+    const after = before.stockQuantity - quantity;
+    if (after <= before.lowStockThreshold && before.stockQuantity > before.lowStockThreshold) {
+      try {
+        await sendLowStockAlert({ ...before, stockQuantity: after });
+      } catch (err) {
+        console.error("Failed to send low-stock alert:", err);
+      }
+    }
+  }
 
   revalidatePath("/admin/warehouse");
   return { success: true };
