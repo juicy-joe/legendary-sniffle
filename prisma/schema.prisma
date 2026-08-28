@@ -123,6 +123,15 @@ model Product {
   metaTitle       String?
   metaDescription String?
 
+  // Whether this product shows up anywhere on the public storefront —
+  // grid, homepage, sitemap, and its own detail page (a hidden product's
+  // URL 404s rather than staying reachable by direct link). Defaults true
+  // so every existing product stays visible when this column is added.
+  // Admin screens (the products list, edit form) always show every
+  // product regardless of this flag — it only gates src/lib/catalog.ts,
+  // the read path the public site actually renders from.
+  visible Boolean @default(true)
+
   // Fallback SVG illustration params — used when no ProductImage rows exist.
   palette LampPalette
   shade   LampShade

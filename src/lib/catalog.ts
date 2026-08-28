@@ -41,7 +41,11 @@ const include = {
 } as const;
 
 async function fetchRows() {
-  return prisma.product.findMany({ include, orderBy: { createdAt: "asc" as const } });
+  return prisma.product.findMany({
+    where: { visible: true },
+    include,
+    orderBy: { createdAt: "asc" as const },
+  });
 }
 
 type ProductRow = Awaited<ReturnType<typeof fetchRows>>[number];
@@ -80,7 +84,11 @@ export async function getCatalog(): Promise<CatalogProduct[]> {
 }
 
 export async function getProductBySlug(slug: string): Promise<CatalogProduct | null> {
-  const row = await prisma.product.findUnique({ where: { slug }, include });
+  // findFirst, not findUnique — findUnique's `where` can only take unique
+  // fields, and visible isn't one. A hidden product's direct URL 404s
+  // (this returning null is what makes the [slug] page call notFound()),
+  // same as a slug that never existed.
+  const row = await prisma.product.findFirst({ where: { slug, visible: true }, include });
   return row ? toCatalogProduct(row) : null;
 }
 

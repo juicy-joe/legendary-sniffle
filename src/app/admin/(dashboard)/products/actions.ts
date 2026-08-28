@@ -141,6 +141,15 @@ export async function updateProduct(
   return { success: true };
 }
 
+// Hide/show a product on the public storefront without touching anything
+// else about it — the admin list, edit form, warehouse, and orders all
+// keep working with it exactly as before either way (see the doc comment
+// on Product.visible in schema.prisma for what this actually gates).
+export async function setProductVisibility(id: string, visible: boolean): Promise<void> {
+  const product = await prisma.product.update({ where: { id }, data: { visible } });
+  revalidateProductPaths(product.slug);
+}
+
 export async function deleteProduct(id: string): Promise<{ error?: string } | void> {
   const movementCount = await prisma.stockMovement.count({ where: { productId: id } });
   if (movementCount > 0) {

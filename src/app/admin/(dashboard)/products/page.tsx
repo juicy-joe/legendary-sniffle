@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Plus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import DeleteProductButton from "@/components/admin/DeleteProductButton";
+import ToggleProductVisibilityButton from "@/components/admin/ToggleProductVisibilityButton";
 import { formatPrice } from "@/lib/format";
 
 export const metadata = { title: "Products — Admin" };
@@ -70,6 +71,11 @@ export default async function AdminProductsPage() {
                   <td className="px-4 py-3 text-ink/70">{formatPrice(p.price)}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1.5">
+                      {!p.visible && (
+                        <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-red-800">
+                          Hidden
+                        </span>
+                      )}
                       {p.featured && (
                         <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[10px] uppercase tracking-wide text-gold-dark">
                           Featured
@@ -84,6 +90,7 @@ export default async function AdminProductsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-4">
+                      <ToggleProductVisibilityButton id={p.id} visible={p.visible} />
                       <Link href={`/admin/products/${p.id}/edit`} className="text-xs text-ink/65 hover:text-ink">
                         Edit
                       </Link>
