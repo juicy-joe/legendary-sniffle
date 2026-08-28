@@ -129,9 +129,17 @@ export async function markOrderShipped(
 
   // Only on the actual transition into "shipped" — re-saving tracking
   // info (the "Edit tracking info" path) hits this same action again but
-  // shouldn't deduct stock a second time for the same order.
+  // shouldn't deduct stock a second time for the same order. Wrapped in
+  // its own try/catch, separate from the email's: a warehouse-side
+  // problem here (or any future one) must never take down the rest of
+  // this action with it — the order is already marked shipped above, and
+  // the customer still needs their notification either way.
   if (!wasAlreadyShipped) {
-    await deductStockForShippedOrder(updated);
+    try {
+      await deductStockForShippedOrder(updated);
+    } catch (err) {
+      console.error("Failed to deduct stock for shipped order:", err);
+    }
   }
 
   try {

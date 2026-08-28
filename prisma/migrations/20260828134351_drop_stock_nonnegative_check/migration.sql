@@ -1,0 +1,12 @@
+-- The Phase A warehouse-upgrade migration added a CHECK constraint
+-- ("stockQuantity >= 0") intended as pure defense-in-depth. In practice it
+-- broke this app's existing, intentional behavior: a live order shipping
+-- when recorded stock is already 0 is expected to drive stockQuantity
+-- negative, as a real "oversold" signal for reconciliation — not an error
+-- condition. With the CHECK in place, that decrement was rejected outright
+-- by Postgres, which crashed deductStockForShippedOrder's transaction with
+-- an unhandled exception and, because it wasn't wrapped in a try/catch,
+-- took the rest of markOrderShipped down with it — including the shipped
+-- notification email, which never even got a chance to run. Dropping it
+-- restores the original, correct behavior.
+ALTER TABLE "Product" DROP CONSTRAINT "Product_stockQuantity_nonnegative";
