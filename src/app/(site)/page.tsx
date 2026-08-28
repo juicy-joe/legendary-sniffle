@@ -10,10 +10,10 @@ import Newsletter from "@/components/Newsletter";
 import LampIllustration from "@/components/LampIllustration";
 import HeroSlideshow from "@/components/HeroSlideshow";
 import { getCatalog } from "@/lib/catalog";
-import { getHomeContent } from "@/lib/content";
+import { getHomeContent, getHeroImages } from "@/lib/content";
 
 export default async function Home() {
-  const [products, content] = await Promise.all([getCatalog(), getHomeContent()]);
+  const [products, content, heroImages] = await Promise.all([getCatalog(), getHomeContent(), getHeroImages()]);
   const bySlug = new Map(products.map((p) => [p.slug, p]));
 
   const featured = products.filter((p) => p.featured);
@@ -31,14 +31,27 @@ export default async function Home() {
   // full-bleed viewport width, that difference is the whole "why does the
   // hero look soft" story). Falls back to any product with photos, then to
   // any product at all, so the hero never breaks if this one is ever
-  // renamed or removed via the admin panel.
+  // renamed or removed via the admin panel. Only used when there are no
+  // admin-uploaded HeroImage rows at all — see heroSlides below.
   const heroProduct =
     bySlug.get("moss") ??
     products.find((p) => p.images?.length) ??
     products[0];
 
-  if (!heroProduct) {
-    // No products at all — genuinely nothing to render the hero around.
+  // Admin-managed hero images (Admin -> Content -> Home) take priority
+  // over any product's own photos — that's what lets the hero rotate
+  // through dedicated lifestyle/brand shots instead of being tied to
+  // whatever one product happens to be hardcoded above.
+  const heroSlides = heroImages.length
+    ? heroImages.map((img) => ({ src: img.url, alt: img.alt }))
+    : (heroProduct?.images ?? []).map((img) => ({
+        src: img.src,
+        alt: heroProduct ? `${heroProduct.name} by ${heroProduct.designer} — ${img.label}` : img.label,
+      }));
+
+  if (!heroProduct && heroSlides.length === 0) {
+    // No hero images and no products at all — genuinely nothing to render
+    // the hero around.
     return null;
   }
 
@@ -48,15 +61,10 @@ export default async function Home() {
           No split layout, no stat counters, no decorative eyebrow icon —
           the image is the argument. */}
       <section className="relative h-[100svh] min-h-[560px] w-full overflow-hidden bg-ink text-paper">
-        {heroProduct.images?.length ? (
-          <HeroSlideshow
-            images={heroProduct.images.map((img) => ({
-              src: img.src,
-              alt: `${heroProduct.name} by ${heroProduct.designer} — ${img.label}`,
-            }))}
-          />
+        {heroSlides.length ? (
+          <HeroSlideshow images={heroSlides} />
         ) : (
-          <LampIllustration product={heroProduct} className="h-full w-full" />
+          heroProduct && <LampIllustration product={heroProduct} className="h-full w-full" />
         )}
         <div
           aria-hidden="true"
@@ -83,9 +91,15 @@ export default async function Home() {
           </div>
         </div>
 
-        <p className="absolute bottom-14 right-6 hidden text-[11px] uppercase tracking-[0.16em] text-paper/60 md:right-14 md:block">
-          {heroProduct.name} &middot; {heroProduct.collection}
-        </p>
+        {/* Only meaningful when the hero is actually showing this specific
+            product's own photos (the fallback path) — admin-uploaded hero
+            images aren't tied to any one product, so there's nothing
+            accurate to caption them with. */}
+        {heroImages.length === 0 && heroProduct && (
+          <p className="absolute bottom-14 right-6 hidden text-[11px] uppercase tracking-[0.16em] text-paper/60 md:right-14 md:block">
+            {heroProduct.name} &middot; {heroProduct.collection}
+          </p>
+        )}
       </section>
 
       <Marquee

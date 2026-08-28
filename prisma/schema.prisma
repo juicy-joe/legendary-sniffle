@@ -272,6 +272,21 @@ model ProductImage {
   createdAt DateTime @default(now())
 }
 
+// The homepage hero's rotating background — admin-managed and independent
+// of any Product, since hero shots (atelier/lifestyle photography, brand
+// imagery) don't necessarily belong to a sellable product the way
+// ProductImage rows do. Ordered by sortOrder, same reorder-in-place
+// pattern as ProductImage. If this table is empty, the homepage falls
+// back to a product's own photos (see src/app/(site)/page.tsx) rather
+// than showing nothing.
+model HeroImage {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
 // Singleton content tables — always exactly one row, fixed id, upserted from
 // the admin content editors rather than created/deleted like normal records.
 model HomeContent {

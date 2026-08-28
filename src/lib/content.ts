@@ -38,6 +38,13 @@ export async function getHomeContent() {
   return content ?? homeDefaults;
 }
 
+/** Admin-managed homepage hero rotation, in display order. Empty until the
+ * first one is uploaded — the homepage falls back to a product's own
+ * photos when this comes back empty (see src/app/(site)/page.tsx). */
+export async function getHeroImages() {
+  return prisma.heroImage.findMany({ orderBy: { sortOrder: "asc" } });
+}
+
 export async function getAboutContent() {
   const content = await prisma.aboutContent.findUnique({ where: { id: "about" } });
   return content ?? aboutDefaults;
