@@ -55,8 +55,10 @@ export default async function PrivacyPage() {
               <dd className="mt-1">
                 When you place an order at checkout, we store your name, email address, shipping
                 address, the items and quantities you ordered, and the delivery method you chose.
-                Orders are reviewed and confirmed manually by our team — we do not process card
-                payments directly through this website.
+                Orders are reviewed and confirmed manually by our team. Card payments are
+                processed securely via Stripe Checkout. We also use Resend for transactional
+                emails and secure password storage for wholesale accounts. We do not store your
+                payment details on our servers.
               </dd>
             </div>
           </dl>

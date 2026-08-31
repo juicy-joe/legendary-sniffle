@@ -15,7 +15,7 @@ const offerings = [
   {
     icon: PenTool,
     title: "Bespoke Design",
-    body: "A fixture designed around your space, not the other way around — from a single hero piece to a full lighting concept.",
+    body: "A fixture designed around your space, not the other way around, from a single hero piece made of optical crystalline glass to a full lighting concept.",
   },
   {
     icon: Compass,

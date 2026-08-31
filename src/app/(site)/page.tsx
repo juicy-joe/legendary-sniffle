@@ -104,12 +104,12 @@ export default async function Home() {
 
       <Marquee
         items={[
-          "Étienne Voss",
-          "Nadia Kessler",
-          "Otto Reyne",
-          "Marchetti & Lin",
-          "Hand-Finished",
-          "Individually Numbered",
+          "Crystalline Glass",
+          "Mouth-Blown in Europe",
+          "Hand-Polished",
+          "Unique Chromatic Depth",
+          "Edition of 100",
+          "Generational Durability",
         ]}
       />
 

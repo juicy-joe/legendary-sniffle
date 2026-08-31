@@ -17,12 +17,12 @@ const values = [
   {
     icon: Hammer,
     title: "Made by Hand",
-    body: "Mouth-blown by master artisans — every piece individually shaped by hand.",
+    body: "Mouth-blown by master artisans, each sphere individually shaped and hand-polished.",
   },
   {
     icon: Gem,
     title: "Premium Raw Materials",
-    body: "Our proprietary glass composition yields a lead-free crystal, prized for its exceptional strength and a brilliant, luminous shine.",
+    body: "Our proprietary, lead-free optical crystalline glass composition guarantees exceptional hardness, brilliant light refraction, and a luminous, jewel-like sheen, developed specifically for sculptural lighting.",
   },
   {
     icon: Leaf,
@@ -96,7 +96,7 @@ export default async function AboutPage() {
             What We Stand For
           </p>
           <h2 className="font-serif text-4xl font-light text-ink md:text-5xl">
-            Values We Don&rsquo;t Compromise On
+            Values We Do Not Compromise On
           </h2>
         </RevealOnScroll>
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">

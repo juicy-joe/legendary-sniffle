@@ -35,12 +35,15 @@ export default async function Footer() {
             <Link href="/" className="font-serif text-3xl font-medium">
               Sa<span className="text-gold">Fa</span>Light
             </Link>
-            <p className="mt-5 max-w-sm text-sm leading-relaxed text-paper/55">
-              Designer table lamps, hand-finished by independent studios.
+            <p className="mt-5 max-w-md text-sm leading-relaxed text-paper/55">
+              Hand-finished designer table lamps, mouth-blown from lead-free optical crystalline glass in a
+              traditional European glassworks. Each piece is individually polished and inspected for flawless
+              surface quality and exceptional light refraction, produced in small-batch runs that preserve unique
+              chromatic depth, heirloom-grade durability, crafted to outlast generations.
             </p>
             <div className="mt-8">
               <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-paper/60">
-                Join the Atelier List
+                Join the Retailer List
               </p>
               <Newsletter dark />
             </div>

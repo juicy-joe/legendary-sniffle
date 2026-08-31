@@ -9,7 +9,7 @@ import { slugify } from "@/lib/slugify";
 export const metadata: Metadata = {
   title: "Designer Table Lamps",
   description:
-    "Browse SaFaLight's full collection of luxury designer table lamps in marble, brass, alabaster, crystal, ceramic and glass — each hand-finished and individually numbered.",
+    "Discover the full collection of luxury, hand-blown designer table lamps made from lead-free optical crystalline glass. Each NatureSphere piece is a unique original, color variations are a natural signature of the handcrafting process. These ambient mood lights are designed to transform your space with atmosphere and character, not just illumination. Available in NatureSphere and MoodMAX collections.",
   alternates: { canonical: "/products" },
 };
 
@@ -56,9 +56,12 @@ export default async function ProductsPage() {
           Designer Table Lamps
         </h1>
         <p className="mt-5 text-base leading-relaxed text-ink/60">
-          Every piece below is hand-finished to order by one of our resident
-          designers. Filter by material, or sort to find a piece that fits
-          your space and your patience for waiting well.
+          Every piece is mouth-blown from high-clarity crystalline glass and hand-finished to order. Within our
+          NatureSphere collection, each sphere is individually shaped, so natural variations in color patterns
+          occur, your lamp will be a unique original, distinct from the online image. Our MoodMAX collection offers
+          a complementary aesthetic with its own character. Filter by color or finish to find the piece that fits
+          your space. These are ambient lights, crafted to create mood and character, not merely to illuminate a
+          room.
         </p>
       </RevealOnScroll>
 
