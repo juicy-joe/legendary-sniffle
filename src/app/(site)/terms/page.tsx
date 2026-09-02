@@ -55,9 +55,9 @@ export default async function TermsPage() {
           <p>
             Welcome to Safalight.com (the &ldquo;Website&rdquo;), operated by{" "}
             <Placeholder>Insert Full Legal Company Name</Placeholder>, a company registered in
-            Spain with registered address at{" "}
-            <Placeholder>Insert Registered Address</Placeholder>, Tax ID / NIF-CIF:{" "}
-            <Placeholder>Insert Tax ID</Placeholder> (hereinafter &ldquo;Safalight,&rdquo;
+            Spain with registered address at Pol&iacute;gono 5, Parcela 34, Pla&ccedil;a
+            Diseminados Res, 280, 46850 L&rsquo;Olleria, Valencia, Espa&ntilde;a, Tax ID /
+            NIF-CIF: <Placeholder>Insert Tax ID</Placeholder> (hereinafter &ldquo;Safalight,&rdquo;
             &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;).
           </p>
           <p className="mt-3">
@@ -308,7 +308,9 @@ export default async function TermsPage() {
           <p className="mt-3">
             Safalight
             <br />
-            L&rsquo;Olleria, Spain
+            Pol&iacute;gono 5, Parcela 34, Pla&ccedil;a Diseminados Res, 280
+            <br />
+            46850 L&rsquo;Olleria, Valencia, Espa&ntilde;a
             <br />
             Email:{" "}
             <a href={`mailto:${contact.email}`} className="text-gold-dark underline underline-offset-2 hover:text-ink">
