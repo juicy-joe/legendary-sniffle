@@ -43,6 +43,10 @@ export default function AmbienceConfigurator() {
       dimensions: "",
       description: "",
       story: "",
+      sku: "",
+      metaTitle: null,
+      metaDescription: null,
+      updatedAt: new Date(),
     }),
     [palette, shade]
   );

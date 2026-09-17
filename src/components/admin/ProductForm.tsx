@@ -266,6 +266,11 @@ export default function ProductForm({
 
       <section className="space-y-6">
         <h2 className="font-serif text-xl font-light text-ink">SEO (optional)</h2>
+        <p className="-mt-3 text-xs text-ink/60">
+          Every product already gets a search title, description, social preview image, structured data, and a
+          sitemap entry automatically from its name, designer, materials, and photos — nothing else to do. Only
+          fill these in if you want to hand-write different wording for search results.
+        </p>
         <Field label="Meta Title" name="metaTitle">
           <input id="metaTitle" name="metaTitle" defaultValue={product?.metaTitle ?? ""} className={inputClass} />
         </Field>

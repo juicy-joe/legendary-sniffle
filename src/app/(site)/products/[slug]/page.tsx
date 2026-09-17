@@ -11,6 +11,7 @@ import { siteUrl } from "@/lib/site";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { formatPrice } from "@/lib/format";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { productSeoTitle, productSeoDescription, productOgImage, productJsonLd, productPhotoAlt } from "@/lib/seo";
 
 export async function generateStaticParams() {
   // Only slugs are needed here, and getLocale() (the no-arg default) reads
@@ -28,15 +29,26 @@ export async function generateMetadata({
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) return {};
+
+  const title = productSeoTitle(product);
+  const description = productSeoDescription(product);
+  const ogImage = productOgImage(product);
+
   return {
-    title: `${product.name} by ${product.designer}`,
-    description: product.description,
+    title,
+    description,
     alternates: { canonical: `/products/${product.slug}` },
     openGraph: {
       title: `${product.name} | SaFaLight`,
-      description: product.description,
+      description,
       type: "website",
-      images: ["/opengraph-image"],
+      images: [ogImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${product.name} | SaFaLight`,
+      description,
+      images: [ogImage.url],
     },
   };
 }
@@ -72,22 +84,7 @@ export default async function ProductPage({
           ],
         })}
       />
-      <script
-        type="application/ld+json"
-        {...jsonLdScriptProps({
-          "@context": "https://schema.org",
-          "@type": "Product",
-          name: product.name,
-          description: product.description,
-          brand: { "@type": "Brand", name: "SaFaLight" },
-          offers: {
-            "@type": "Offer",
-            price: product.price,
-            priceCurrency: "EUR",
-            availability: "https://schema.org/InStock",
-          },
-        })}
-      />
+      <script type="application/ld+json" {...jsonLdScriptProps(productJsonLd(product))} />
 
       <nav aria-label="Breadcrumb" className="mb-10 flex items-center gap-2 text-xs text-ink/65">
         <Link href="/" className="hover:text-ink">{t(dict, "breadcrumb.home", "Home")}</Link>
@@ -111,7 +108,7 @@ export default async function ProductPage({
             {product.images?.length ? (
               <ProductPhoto
                 images={product.images}
-                alt={`${product.name} by ${product.designer}`}
+                alt={productPhotoAlt(product)}
                 priority
               />
             ) : (

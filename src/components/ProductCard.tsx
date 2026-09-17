@@ -12,6 +12,7 @@ import { formatPrice } from "@/lib/format";
 import LampIllustration from "./LampIllustration";
 import ProductPhoto from "./ProductPhoto";
 import { useTranslations } from "./TranslationsProvider";
+import { productPhotoAlt } from "@/lib/seo";
 
 export default function ProductCard({
   product,
@@ -77,7 +78,7 @@ export default function ProductCard({
           {product.images?.length ? (
             <ProductPhoto
               images={product.images}
-              alt={`${product.name} by ${product.designer}`}
+              alt={productPhotoAlt(product)}
               showSelector={false}
             />
           ) : (

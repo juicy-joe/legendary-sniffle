@@ -33,6 +33,14 @@ export type CatalogProduct = {
   limited?: boolean;
   /** Real photography, when available. Falls back to the SVG study when absent. */
   images?: ProductPhoto[];
+  /** Warehouse-assigned identifier — doubles as schema.org Product.sku. */
+  sku: string;
+  /** Manual SEO overrides from the admin "SEO (optional)" fields — null
+   * unless someone deliberately typed something; see src/lib/seo.ts for the
+   * automatic fallback used everywhere else. */
+  metaTitle: string | null;
+  metaDescription: string | null;
+  updatedAt: Date;
 };
 
 const include = {
@@ -76,6 +84,10 @@ function toCatalogProduct(p: ProductRow, translations?: Record<string, string>):
     images: p.images.length
       ? p.images.map((img) => ({ src: img.url, label: img.label, swatch: img.swatch }))
       : undefined,
+    sku: p.sku,
+    metaTitle: p.metaTitle,
+    metaDescription: p.metaDescription,
+    updatedAt: p.updatedAt,
   };
 }
 
