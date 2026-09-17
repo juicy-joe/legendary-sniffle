@@ -5,7 +5,6 @@ import RevealOnScroll from "@/components/RevealOnScroll";
 import Marquee from "@/components/Marquee";
 import ProductCard from "@/components/ProductCard";
 import StatCounter from "@/components/StatCounter";
-import Testimonials from "@/components/Testimonials";
 import Newsletter from "@/components/Newsletter";
 import LampIllustration from "@/components/LampIllustration";
 import HeroSlideshow from "@/components/HeroSlideshow";
@@ -180,7 +179,7 @@ export default async function Home() {
             </p>
             <div className="mt-10 grid grid-cols-2 gap-8">
               <StatCounter value={100} suffix="%" label="Hand-Finished" />
-              <StatCounter value={8} suffix=" wks" label="Avg. Lead Time" />
+              <StatCounter value={3} suffix=" days" label="Avg. Dispatch Time" />
             </div>
           </RevealOnScroll>
           <RevealOnScroll delay={0.1} className="grid grid-cols-2 gap-6">
@@ -200,13 +199,6 @@ export default async function Home() {
           for now — not deleted, just not wired in. Re-add by restoring this
           block (see git history) once it's ready to ship; the component
           itself is untouched at @/components/AmbienceConfigurator. */}
-
-      {/* Testimonials */}
-      <section className="bg-ink py-24 text-paper md:py-32">
-        <RevealOnScroll className="px-6">
-          <Testimonials />
-        </RevealOnScroll>
-      </section>
 
       {/* CTA / Newsletter */}
       <section className="mx-auto max-w-5xl px-6 py-24 text-center md:px-10 md:py-32">

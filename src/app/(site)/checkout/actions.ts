@@ -105,8 +105,8 @@ export async function createCheckoutSession(
             display_name: getShippingLabel(shippingSpeed),
             delivery_estimate:
               shippingSpeed === "express"
-                ? { minimum: { unit: "week", value: 1 }, maximum: { unit: "week", value: 3 } }
-                : { minimum: { unit: "week", value: 2 }, maximum: { unit: "week", value: 12 } },
+                ? { minimum: { unit: "business_day", value: 1 }, maximum: { unit: "business_day", value: 2 } }
+                : { minimum: { unit: "business_day", value: 3 }, maximum: { unit: "business_day", value: 7 } },
           },
         },
       ],

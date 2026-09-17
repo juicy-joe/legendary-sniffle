@@ -159,8 +159,7 @@ export default async function ProductPage({
           </div>
 
           <p className="mt-6 text-xs leading-relaxed text-ink/65">
-            Made to order &middot; Average lead time 6&ndash;10 weeks &middot;
-            White-glove delivery included &middot; Prefer to talk first?{" "}
+            Quick delivery &middot; White-glove delivery included &middot; Prefer to talk first?{" "}
             <Link href="/contact" className="text-ink/60 underline underline-offset-2 hover:text-gold-dark">
               Enquire with our design team
             </Link>

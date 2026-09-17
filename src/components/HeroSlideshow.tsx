@@ -1,10 +1,9 @@
 "use client";
 
-// Same crossfade/pause-friendly pattern as Testimonials.tsx and
-// CollectionSlideshow.tsx, plus a slow continuous "Ken Burns" zoom on each
-// slide for a more cinematic full-bleed hero — the zoom is the one thing
-// unique to this component, so it isn't just CollectionSlideshow reused
-// with different sizing.
+// Same crossfade/pause-friendly pattern as CollectionSlideshow.tsx, plus a
+// slow continuous "Ken Burns" zoom on each slide for a more cinematic
+// full-bleed hero — the zoom is the one thing unique to this component, so
+// it isn't just CollectionSlideshow reused with different sizing.
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";

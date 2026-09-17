@@ -1,7 +1,7 @@
 "use client";
 
-// Same auto-advance/crossfade/pause-on-hover pattern as Testimonials.tsx,
-// applied to product photography instead of quotes — kept consistent
+// Same auto-advance/crossfade/pause-on-hover pattern used elsewhere on the
+// site, applied to product photography instead of quotes — kept consistent
 // rather than inventing a second carousel mechanism for the site.
 import { useEffect, useState } from "react";
 import Image from "next/image";
