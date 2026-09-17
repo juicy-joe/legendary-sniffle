@@ -11,6 +11,7 @@ import { DURATION, EASE } from "@/lib/motion";
 import { formatPrice } from "@/lib/format";
 import LampIllustration from "./LampIllustration";
 import ProductPhoto from "./ProductPhoto";
+import { useTranslations } from "./TranslationsProvider";
 
 export default function ProductCard({
   product,
@@ -21,6 +22,7 @@ export default function ProductCard({
 }) {
   const { isSaved, toggle } = useWishlist();
   const { addItem } = useCart();
+  const { t } = useTranslations();
   const saved = isSaved(product.slug);
 
   return (
@@ -35,7 +37,7 @@ export default function ProductCard({
         <div className="corner-ticks relative aspect-[3/4] overflow-hidden rounded-[2px] border border-ink/10 bg-paper-dim">
           {product.limited && (
             <span className="absolute left-4 top-4 z-10 border border-paper/40 bg-ink/90 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-paper backdrop-blur-sm">
-              Limited Edition
+              {t("product.limitedEdition", "Limited Edition")}
             </span>
           )}
           {/* Icons stay hidden until hover/focus on pointer devices — Theme C
@@ -48,7 +50,7 @@ export default function ProductCard({
                 e.preventDefault();
                 toggle(product.slug);
               }}
-              aria-label={saved ? "Remove from wishlist" : "Add to wishlist"}
+              aria-label={saved ? t("product.removeFromWishlist", "Remove from wishlist") : t("product.addToWishlist", "Add to wishlist")}
               aria-pressed={saved}
               className="flex h-9 w-9 items-center justify-center rounded-full bg-paper/85 backdrop-blur transition-colors"
             >
@@ -65,7 +67,7 @@ export default function ProductCard({
                 e.preventDefault();
                 addItem(product.slug);
               }}
-              aria-label={`Add ${product.name} to cart`}
+              aria-label={`${t("product.addToCart", "Add")} ${product.name} ${t("product.toCart", "to cart")}`}
               className="flex h-9 w-9 items-center justify-center rounded-full bg-paper/85 backdrop-blur transition-colors"
             >
               <ShoppingBag className="h-4 w-4 text-ink/60" />

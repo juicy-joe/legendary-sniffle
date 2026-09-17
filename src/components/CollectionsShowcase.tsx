@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import RevealOnScroll from "./RevealOnScroll";
 import CollectionSlideshow from "./CollectionSlideshow";
+import { t } from "@/lib/i18n";
 
 export type CollectionSummary = {
   name: string;
@@ -14,7 +15,13 @@ export type CollectionSummary = {
 // A plain (server) wrapper — only the slideshow inside each card needs to
 // be a Client Component. Sits above the grouped product grid on /products;
 // each card links down to that collection's own section via #slug.
-export default function CollectionsShowcase({ collections }: { collections: CollectionSummary[] }) {
+export default function CollectionsShowcase({
+  collections,
+  dict = {},
+}: {
+  collections: CollectionSummary[];
+  dict?: Record<string, string>;
+}) {
   if (collections.length === 0) return null;
 
   return (
@@ -32,11 +39,13 @@ export default function CollectionsShowcase({ collections }: { collections: Coll
                   </p>
                 )}
                 <p className="mt-2 text-xs uppercase tracking-[0.16em] text-ink/50">
-                  {collection.count} {collection.count === 1 ? "piece" : "pieces"}
+                  {collection.count}{" "}
+                  {collection.count === 1 ? t(dict, "products.piece", "piece") : t(dict, "products.pieces", "pieces")}
                 </p>
               </div>
               <span className="mt-1 flex shrink-0 items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-ink/70 transition-colors group-hover:text-gold-dark">
-                View <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                {t(dict, "products.view", "View")}{" "}
+                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
               </span>
             </div>
           </Link>

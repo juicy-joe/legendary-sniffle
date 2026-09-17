@@ -9,6 +9,8 @@ import { Menu, ShoppingBag, Truck, X } from "lucide-react";
 import clsx from "clsx";
 import { useCart } from "@/context/CartContext";
 import { EASE } from "@/lib/motion";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useTranslations } from "@/components/TranslationsProvider";
 
 // Theme C ("Monochrome Atelier") header: logo, nav links, cart — nothing
 // else. The wishlist icon and "Book a Consultation" button that used to
@@ -19,6 +21,7 @@ import { EASE } from "@/lib/motion";
 export default function Navbar({ links }: { links: { href: string; label: string }[] }) {
   const pathname = usePathname();
   const { count: cartCount, openCart } = useCart();
+  const { t } = useTranslations();
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
@@ -92,7 +95,7 @@ export default function Navbar({ links }: { links: { href: string; label: string
     >
       <div className="flex items-center justify-center gap-2 bg-ink px-4 py-2 text-center text-[11px] font-medium uppercase tracking-[0.14em] text-paper">
         <Truck className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
-        Free Shipping within the EU
+        {t("nav.freeShipping", "Free Shipping within the EU")}
       </div>
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-10">
         <Link href="/" className="shrink-0">
@@ -136,10 +139,14 @@ export default function Navbar({ links }: { links: { href: string; label: string
         </ul>
 
         <div className="flex items-center gap-5">
+          <div className="hidden md:block">
+            <LanguageSwitcher />
+          </div>
+
           <button
             type="button"
             onClick={openCart}
-            aria-label={`Cart, ${cartCount} items`}
+            aria-label={t("nav.cartAria", "Cart") + `, ${cartCount} items`}
             className="relative text-ink/70 transition-colors hover:text-gold-dark"
           >
             <ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.5} />
@@ -160,7 +167,7 @@ export default function Navbar({ links }: { links: { href: string; label: string
 
           <button
             type="button"
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? t("nav.closeMenu", "Close menu") : t("nav.openMenu", "Open menu")}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
             className="text-ink md:hidden"
@@ -210,14 +217,15 @@ export default function Navbar({ links }: { links: { href: string; label: string
                 </motion.li>
               ))}
             </ul>
-            <div className="border-t border-ink/10 px-8 py-6">
+            <div className="flex items-center justify-between border-t border-ink/10 px-8 py-6">
               <button
                 type="button"
                 onClick={openCart}
                 className="flex items-center gap-2 text-sm text-ink/70"
               >
-                <ShoppingBag className="h-4 w-4" /> Cart ({cartCount})
+                <ShoppingBag className="h-4 w-4" /> {t("nav.cart", "Cart")} ({cartCount})
               </button>
+              <LanguageSwitcher />
             </div>
           </motion.div>
         )}

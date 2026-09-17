@@ -6,7 +6,7 @@ import { blobConfigured } from "@/lib/blob";
 export const metadata = { title: "Homepage Content — Admin" };
 
 export default async function AdminHomeContentPage() {
-  const [content, heroImages] = await Promise.all([getHomeContent(), getHeroImages()]);
+  const [content, heroImages] = await Promise.all([getHomeContent("en"), getHeroImages()]);
 
   return (
     <div>

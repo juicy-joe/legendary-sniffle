@@ -3,6 +3,7 @@ import Link from "next/link";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import { getContactInfo } from "@/lib/content";
 import { getSettings } from "@/lib/settings";
+import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -13,21 +14,36 @@ export const metadata: Metadata = {
 const lastUpdated = "August 12, 2026";
 
 export default async function PrivacyPage() {
-  const [contact, settings] = await Promise.all([getContactInfo(), getSettings()]);
+  const locale = await getLocale();
+  const [contact, settings, dict] = await Promise.all([getContactInfo(), getSettings(), getUiTranslations(locale)]);
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-20 md:px-10 md:py-28">
       <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 text-xs text-ink/65">
-        <Link href="/" className="hover:text-ink">Home</Link>
+        <Link href="/" className="hover:text-ink">{t(dict, "breadcrumb.home", "Home")}</Link>
         <span aria-hidden="true">/</span>
-        <span className="text-ink/70">Privacy Policy</span>
+        <span className="text-ink/70">{t(dict, "legal.privacyPolicy", "Privacy Policy")}</span>
       </nav>
 
       <RevealOnScroll>
-        <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">Legal</p>
-        <h1 className="font-serif text-4xl font-light text-ink md:text-5xl">Privacy Policy</h1>
-        <p className="mt-4 text-sm text-ink/65">Last updated: {lastUpdated}</p>
+        <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">{t(dict, "legal.legal", "Legal")}</p>
+        <h1 className="font-serif text-4xl font-light text-ink md:text-5xl">
+          {t(dict, "legal.privacyPolicy", "Privacy Policy")}
+        </h1>
+        <p className="mt-4 text-sm text-ink/65">
+          {t(dict, "legal.lastUpdated", "Last updated:")} {lastUpdated}
+        </p>
       </RevealOnScroll>
+
+      {locale !== "en" && (
+        <RevealOnScroll className="mt-8 rounded-[6px] border border-gold/25 bg-gold/5 p-5 text-xs leading-relaxed text-ink/70">
+          {t(
+            dict,
+            "legal.notYetTranslatedNotice",
+            "This legal document is currently only available in English. Contact us if you'd like it explained in your language before you rely on it."
+          )}
+        </RevealOnScroll>
+      )}
 
       <div className="mt-12 space-y-10 text-sm leading-relaxed text-ink/75">
         <RevealOnScroll>

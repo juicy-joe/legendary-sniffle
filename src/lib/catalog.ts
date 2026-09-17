@@ -5,6 +5,7 @@
 // next time a page is requested (Next.js revalidation permitting).
 import "server-only";
 import { prisma } from "./prisma";
+import { getContentFields, getContentFieldsForModel, getLocale, type Locale } from "./i18n";
 
 export type LampPalette = "gold" | "ivory" | "onyx" | "bronze" | "smoke";
 export type LampShade = "dome" | "drum" | "cone" | "sphere" | "pleated";
@@ -13,6 +14,7 @@ export type LampBase = "urn" | "column" | "sculpted" | "orb" | "disc";
 export type ProductPhoto = { src: string; label: string; swatch: string };
 
 export type CatalogProduct = {
+  id: string;
   slug: string;
   name: string;
   designer: string;
@@ -50,8 +52,9 @@ async function fetchRows() {
 
 type ProductRow = Awaited<ReturnType<typeof fetchRows>>[number];
 
-function toCatalogProduct(p: ProductRow): CatalogProduct {
+function toCatalogProduct(p: ProductRow, translations?: Record<string, string>): CatalogProduct {
   return {
+    id: p.id,
     slug: p.slug,
     name: p.name,
     // Product-facing pages show the designer's short form (e.g. "J. J.
@@ -64,10 +67,10 @@ function toCatalogProduct(p: ProductRow): CatalogProduct {
     palette: p.palette,
     shade: p.shade,
     base: p.base,
-    materials: p.materials,
+    materials: translations?.materials ?? p.materials,
     dimensions: p.dimensions,
-    description: p.description,
-    story: p.story,
+    description: translations?.description ?? p.description,
+    story: translations?.story ?? p.story,
     featured: p.featured,
     limited: p.limited,
     images: p.images.length
@@ -77,19 +80,27 @@ function toCatalogProduct(p: ProductRow): CatalogProduct {
 }
 
 /** The full catalog, in creation order. Small enough (dozens of pieces) to
- * fetch whole and filter/sort in memory rather than adding a query per view. */
-export async function getCatalog(): Promise<CatalogProduct[]> {
+ * fetch whole and filter/sort in memory rather than adding a query per view.
+ * `locale` is optional and meant for admin/internal callers (invoices, admin
+ * product lookups) that must see the canonical English columns regardless
+ * of the NEXT_LOCALE cookie in the admin's own browser — pass "en" there. */
+export async function getCatalog(locale?: Locale): Promise<CatalogProduct[]> {
   const rows = await fetchRows();
-  return rows.map(toCatalogProduct);
+  const resolvedLocale = locale ?? (await getLocale());
+  const translations = await getContentFieldsForModel(resolvedLocale, "Product", rows.map((r) => r.id));
+  return rows.map((r) => toCatalogProduct(r, translations[r.id]));
 }
 
-export async function getProductBySlug(slug: string): Promise<CatalogProduct | null> {
+export async function getProductBySlug(slug: string, locale?: Locale): Promise<CatalogProduct | null> {
   // findFirst, not findUnique — findUnique's `where` can only take unique
   // fields, and visible isn't one. A hidden product's direct URL 404s
   // (this returning null is what makes the [slug] page call notFound()),
   // same as a slug that never existed.
   const row = await prisma.product.findFirst({ where: { slug, visible: true }, include });
-  return row ? toCatalogProduct(row) : null;
+  if (!row) return null;
+  const resolvedLocale = locale ?? (await getLocale());
+  const translations = await getContentFields(resolvedLocale, "Product", row.id);
+  return toCatalogProduct(row, translations);
 }
 
 export function getRelatedProducts(
@@ -110,10 +121,20 @@ export function getCategories(catalog: CatalogProduct[]) {
   return Array.from(new Set(catalog.map((p) => p.category)));
 }
 
-export async function getDesigners() {
-  return prisma.designer.findMany({ orderBy: [{ sortOrder: "asc" }, { name: "asc" }] });
+// bio is translated; name/shortName/origin are proper nouns/places and stay
+// as-authored in every locale.
+export async function getDesigners(locale?: Locale) {
+  const rows = await prisma.designer.findMany({ orderBy: [{ sortOrder: "asc" }, { name: "asc" }] });
+  const resolvedLocale = locale ?? (await getLocale());
+  const translations = await getContentFieldsForModel(resolvedLocale, "Designer", rows.map((r) => r.id));
+  return rows.map((r) => ({ ...r, bio: translations[r.id]?.bio ?? r.bio }));
 }
 
-export async function getCollections() {
-  return prisma.collection.findMany({ orderBy: { name: "asc" } });
+// description is translated; name (the collection name, excluded by design
+// from translation) is not.
+export async function getCollections(locale?: Locale) {
+  const rows = await prisma.collection.findMany({ orderBy: { name: "asc" } });
+  const resolvedLocale = locale ?? (await getLocale());
+  const translations = await getContentFieldsForModel(resolvedLocale, "Collection", rows.map((r) => r.id));
+  return rows.map((r) => ({ ...r, description: translations[r.id]?.description ?? r.description }));
 }

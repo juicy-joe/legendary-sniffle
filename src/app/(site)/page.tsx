@@ -10,9 +10,16 @@ import LampIllustration from "@/components/LampIllustration";
 import HeroSlideshow from "@/components/HeroSlideshow";
 import { getCatalog } from "@/lib/catalog";
 import { getHomeContent, getHeroImages } from "@/lib/content";
+import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 export default async function Home() {
-  const [products, content, heroImages] = await Promise.all([getCatalog(), getHomeContent(), getHeroImages()]);
+  const locale = await getLocale();
+  const [products, content, heroImages, dict] = await Promise.all([
+    getCatalog(),
+    getHomeContent(),
+    getHeroImages(),
+    getUiTranslations(locale),
+  ]);
   const bySlug = new Map(products.map((p) => [p.slug, p]));
 
   const featured = products.filter((p) => p.featured);
@@ -85,7 +92,7 @@ export default async function Home() {
               href="/products"
               className="mt-8 inline-flex items-center gap-2 border-b border-paper/40 pb-1 text-[11px] font-medium uppercase tracking-[0.16em] text-paper transition-colors hover:border-paper"
             >
-              Explore the Collection <ArrowRight className="h-3.5 w-3.5" />
+              {t(dict, "home.exploreCollection", "Explore the Collection")} <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </div>
@@ -103,12 +110,12 @@ export default async function Home() {
 
       <Marquee
         items={[
-          "Crystalline Glass",
-          "Mouth-Blown in Europe",
-          "Hand-Polished",
-          "Unique Chromatic Depth",
-          "Edition of 100",
-          "Generational Durability",
+          t(dict, "home.marquee.crystallineGlass", "Crystalline Glass"),
+          t(dict, "home.marquee.mouthBlown", "Mouth-Blown in Europe"),
+          t(dict, "home.marquee.handPolished", "Hand-Polished"),
+          t(dict, "home.marquee.chromaticDepth", "Unique Chromatic Depth"),
+          t(dict, "home.marquee.edition", "Edition of 100"),
+          t(dict, "home.marquee.durability", "Generational Durability"),
         ]}
       />
 
@@ -117,13 +124,13 @@ export default async function Home() {
         <RevealOnScroll className="mb-14 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
-              The Selection
+              {t(dict, "home.theSelection", "The Selection")}
             </p>
             <h2 className="font-serif text-4xl text-ink md:text-5xl">
-              Featured Pieces
+              {t(dict, "home.featuredPieces", "Featured Pieces")}
             </h2>
           </div>
-          <TextLink href="/products">View Full Collection</TextLink>
+          <TextLink href="/products">{t(dict, "home.viewFullCollection", "View Full Collection")}</TextLink>
         </RevealOnScroll>
 
         <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
@@ -143,7 +150,7 @@ export default async function Home() {
             <RevealOnScroll className="mb-14 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
               <div>
                 <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
-                  New &mdash; NatureSphere&rsquo;s
+                  {t(dict, "home.new", "New")} &mdash; NatureSphere&rsquo;s
                 </p>
                 <h2 className="max-w-xl font-serif text-4xl leading-tight text-ink md:text-5xl">
                   {content.chromaHeadline}
@@ -152,7 +159,7 @@ export default async function Home() {
                   {content.chromaSubtext}
                 </p>
               </div>
-              <TextLink href="/products">Shop NatureSphere&rsquo;s</TextLink>
+              <TextLink href="/products">{t(dict, "home.shop", "Shop")} NatureSphere&rsquo;s</TextLink>
             </RevealOnScroll>
 
             <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
@@ -169,7 +176,7 @@ export default async function Home() {
         <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 px-6 md:grid-cols-2 md:px-10">
           <RevealOnScroll>
             <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
-              The Craft
+              {t(dict, "home.theCraft", "The Craft")}
             </p>
             <h2 className="font-serif text-4xl leading-tight text-ink md:text-5xl">
               {content.craftHeadline}
@@ -178,8 +185,8 @@ export default async function Home() {
               {content.craftSubtext}
             </p>
             <div className="mt-10 grid grid-cols-2 gap-8">
-              <StatCounter value={100} suffix="%" label="Hand-Finished" />
-              <StatCounter value={3} suffix=" days" label="Avg. Dispatch Time" />
+              <StatCounter value={100} suffix="%" label={t(dict, "home.handFinished", "Hand-Finished")} />
+              <StatCounter value={3} suffix=" days" label={t(dict, "home.avgDispatchTime", "Avg. Dispatch Time")} />
             </div>
           </RevealOnScroll>
           <RevealOnScroll delay={0.1} className="grid grid-cols-2 gap-6">
@@ -204,14 +211,17 @@ export default async function Home() {
       <section className="mx-auto max-w-5xl px-6 py-24 text-center md:px-10 md:py-32">
         <RevealOnScroll>
           <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
-            Stay Illuminated
+            {t(dict, "home.stayIlluminated", "Stay Illuminated")}
           </p>
           <h2 className="font-serif text-4xl text-ink md:text-5xl">
-            Join the Atelier List
+            {t(dict, "home.joinAtelierList", "Join the Atelier List")}
           </h2>
           <p className="mx-auto mt-4 max-w-md text-ink/60">
-            New releases, limited editions, and designer studio visits &mdash;
-            delivered rarely, and only when it matters.
+            {t(
+              dict,
+              "home.newsletterBlurb",
+              "New releases, limited editions, and designer studio visits — delivered rarely, and only when it matters."
+            )}
           </p>
           <div className="mt-8 flex justify-center">
             <Newsletter dark={false} />

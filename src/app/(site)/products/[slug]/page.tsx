@@ -10,9 +10,13 @@ import { getCatalog, getProductBySlug, getRelatedProducts } from "@/lib/catalog"
 import { siteUrl } from "@/lib/site";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { formatPrice } from "@/lib/format";
+import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 export async function generateStaticParams() {
-  const products = await getCatalog();
+  // Only slugs are needed here, and getLocale() (the no-arg default) reads
+  // cookies(), which isn't available at build time — pass a fixed locale to
+  // skip that lookup entirely.
+  const products = await getCatalog("en");
   return products.map((p) => ({ slug: p.slug }));
 }
 
@@ -43,7 +47,12 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [product, catalog] = await Promise.all([getProductBySlug(slug), getCatalog()]);
+  const locale = await getLocale();
+  const [product, catalog, dict] = await Promise.all([
+    getProductBySlug(slug),
+    getCatalog(),
+    getUiTranslations(locale),
+  ]);
   if (!product) notFound();
 
   const related = getRelatedProducts(catalog, product);
@@ -81,9 +90,9 @@ export default async function ProductPage({
       />
 
       <nav aria-label="Breadcrumb" className="mb-10 flex items-center gap-2 text-xs text-ink/65">
-        <Link href="/" className="hover:text-ink">Home</Link>
+        <Link href="/" className="hover:text-ink">{t(dict, "breadcrumb.home", "Home")}</Link>
         <span aria-hidden="true">/</span>
-        <Link href="/products" className="hover:text-ink">Products</Link>
+        <Link href="/products" className="hover:text-ink">{t(dict, "breadcrumb.products", "Products")}</Link>
         <span aria-hidden="true">/</span>
         <span className="text-ink/70">{product.name}</span>
       </nav>
@@ -93,11 +102,11 @@ export default async function ProductPage({
           <div className="relative aspect-[3/4] rounded-[6px] border border-ink/10 bg-paper-dim">
             {product.limited && (
               <span className="absolute left-6 top-6 z-10 border border-paper/40 bg-ink/90 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-paper backdrop-blur-sm">
-                Limited Edition
+                {t(dict, "product.limitedEdition", "Limited Edition")}
               </span>
             )}
             <span className="absolute right-6 top-6 z-10 text-xs uppercase tracking-[0.14em] text-ink/65">
-              No. {editionNo}
+              {t(dict, "product.no", "No.")} {editionNo}
             </span>
             {product.images?.length ? (
               <ProductPhoto
@@ -121,7 +130,7 @@ export default async function ProductPage({
             {product.name}
           </h1>
           <p className="mt-3 text-base text-ink/60">
-            Designed by{" "}
+            {t(dict, "product.designedBy", "Designed by")}{" "}
             <span className="font-medium text-ink">{product.designer}</span>
           </p>
 
@@ -136,13 +145,13 @@ export default async function ProductPage({
           <dl className="mt-8 grid grid-cols-2 gap-6 border-y border-ink/10 py-6">
             <div>
               <dt className="text-xs uppercase tracking-[0.15em] text-ink/65">
-                Materials
+                {t(dict, "product.materials", "Materials")}
               </dt>
               <dd className="mt-1 text-sm text-ink/75">{product.materials}</dd>
             </div>
             <div>
               <dt className="text-xs uppercase tracking-[0.15em] text-ink/65">
-                Dimensions
+                {t(dict, "product.dimensions", "Dimensions")}
               </dt>
               <dd className="mt-1 text-sm text-ink/75 font-feature-tabular">
                 {product.dimensions}
@@ -159,9 +168,11 @@ export default async function ProductPage({
           </div>
 
           <p className="mt-6 text-xs leading-relaxed text-ink/65">
-            Quick delivery &middot; White-glove delivery included &middot; Prefer to talk first?{" "}
+            {t(dict, "product.quickDelivery", "Quick delivery")} &middot;{" "}
+            {t(dict, "product.whiteGlove", "White-glove delivery included")} &middot;{" "}
+            {t(dict, "product.preferToTalk", "Prefer to talk first?")}{" "}
             <Link href="/contact" className="text-ink/60 underline underline-offset-2 hover:text-gold-dark">
-              Enquire with our design team
+              {t(dict, "product.enquireWithTeam", "Enquire with our design team")}
             </Link>
             .
           </p>
@@ -172,10 +183,10 @@ export default async function ProductPage({
         <section className="mt-28 border-t border-ink/10 pt-16">
           <RevealOnScroll className="mb-10">
             <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
-              You May Also Admire
+              {t(dict, "product.alsoAdmire", "You May Also Admire")}
             </p>
             <h2 className="font-serif text-3xl text-ink">
-              More from {product.designer}
+              {t(dict, "product.moreFrom", "More from")} {product.designer}
             </h2>
           </RevealOnScroll>
           <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">

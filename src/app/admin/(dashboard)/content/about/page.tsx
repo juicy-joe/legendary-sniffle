@@ -4,7 +4,7 @@ import { getAboutContent } from "@/lib/content";
 export const metadata = { title: "About Page Content — Admin" };
 
 export default async function AdminAboutContentPage() {
-  const content = await getAboutContent();
+  const content = await getAboutContent("en");
 
   return (
     <div>

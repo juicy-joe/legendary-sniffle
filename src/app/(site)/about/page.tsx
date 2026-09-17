@@ -5,6 +5,7 @@ import RevealOnScroll from "@/components/RevealOnScroll";
 import MagneticButton from "@/components/MagneticButton";
 import { getDesigners } from "@/lib/catalog";
 import { getAboutContent } from "@/lib/content";
+import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -15,21 +16,25 @@ export const metadata: Metadata = {
 
 const values = [
   {
+    key: "madeByHand",
     icon: Hammer,
     title: "Made by Hand",
     body: "Mouth-blown by master artisans, each sphere individually shaped and hand-polished.",
   },
   {
+    key: "premiumMaterials",
     icon: Gem,
     title: "Premium Raw Materials",
     body: "Our proprietary, lead-free optical crystalline glass composition guarantees exceptional hardness, brilliant light refraction, and a luminous, jewel-like sheen, developed specifically for sculptural lighting.",
   },
   {
+    key: "madeToLast",
     icon: Leaf,
     title: "Made to Last",
     body: "Every lamp is designed to be repaired, rewired, and passed down — not replaced.",
   },
   {
+    key: "limitedEditions",
     icon: Sparkles,
     title: "Limited Editions",
     body: "Produced in small series with meticulous attention to detail — no design is ever made more than 100 times.",
@@ -37,20 +42,25 @@ const values = [
 ];
 
 export default async function AboutPage() {
-  const [designers, content] = await Promise.all([getDesigners(), getAboutContent()]);
+  const locale = await getLocale();
+  const [designers, content, dict] = await Promise.all([
+    getDesigners(),
+    getAboutContent(),
+    getUiTranslations(locale),
+  ]);
 
   return (
     <div>
       <section className="bg-ink py-28 text-paper">
         <div className="mx-auto max-w-4xl px-6 text-center md:px-10">
           <nav aria-label="Breadcrumb" className="mb-8 flex items-center justify-center gap-2 text-xs text-paper/60">
-            <Link href="/" className="hover:text-paper">Home</Link>
+            <Link href="/" className="hover:text-paper">{t(dict, "breadcrumb.home", "Home")}</Link>
             <span aria-hidden="true">/</span>
-            <span className="text-paper/70">About Us</span>
+            <span className="text-paper/70">{t(dict, "breadcrumb.about", "About Us")}</span>
           </nav>
           <RevealOnScroll>
             <p className="mb-4 text-xs uppercase tracking-[0.2em] text-gold">
-              Our Story
+              {t(dict, "about.ourStory", "Our Story")}
             </p>
             <h1 className="font-serif text-5xl font-light leading-tight md:text-6xl">
               {content.heroHeadline}
@@ -65,10 +75,10 @@ export default async function AboutPage() {
       <section className="mx-auto max-w-7xl px-6 py-24 md:px-10">
         <RevealOnScroll className="mb-14 text-center">
           <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
-            The Atelier
+            {t(dict, "about.theAtelier", "The Atelier")}
           </p>
           <h2 className="font-serif text-4xl font-light text-ink md:text-5xl">
-            Our Resident Designers
+            {t(dict, "about.residentDesigners", "Our Resident Designers")}
           </h2>
         </RevealOnScroll>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -93,21 +103,21 @@ export default async function AboutPage() {
       <section className="mx-auto max-w-7xl px-6 py-24 md:px-10">
         <RevealOnScroll className="mb-14 text-center">
           <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
-            What We Stand For
+            {t(dict, "about.whatWeStandFor", "What We Stand For")}
           </p>
           <h2 className="font-serif text-4xl font-light text-ink md:text-5xl">
-            Values We Do Not Compromise On
+            {t(dict, "about.valuesHeading", "Values We Do Not Compromise On")}
           </h2>
         </RevealOnScroll>
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {values.map((v, i) => (
-            <RevealOnScroll key={v.title} delay={i * 0.06} className="text-center">
+            <RevealOnScroll key={v.key} delay={i * 0.06} className="text-center">
               <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full border border-gold-dark/40 text-gold-dark">
                 <v.icon className="h-5 w-5" strokeWidth={1.5} />
               </div>
-              <h3 className="font-serif text-xl text-ink">{v.title}</h3>
+              <h3 className="font-serif text-xl text-ink">{t(dict, `about.value.${v.key}.title`, v.title)}</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink/60">
-                {v.body}
+                {t(dict, `about.value.${v.key}.body`, v.body)}
               </p>
             </RevealOnScroll>
           ))}
@@ -117,15 +127,18 @@ export default async function AboutPage() {
       <section className="bg-ink py-24 text-center text-paper">
         <RevealOnScroll className="mx-auto max-w-2xl px-6">
           <h2 className="font-serif text-4xl font-light md:text-5xl">
-            Ready to Find Your Piece?
+            {t(dict, "about.readyToFind", "Ready to Find Your Piece?")}
           </h2>
           <p className="mt-4 text-paper/60">
-            Speak with our design team about a commission, a specific finish,
-            or a piece for a space you love.
+            {t(
+              dict,
+              "about.ctaBlurb",
+              "Speak with our design team about a commission, a specific finish, or a piece for a space you love."
+            )}
           </p>
           <div className="mt-8 flex justify-center">
             <MagneticButton href="/contact" variant="paper">
-              Book a Consultation <ArrowRight className="h-3.5 w-3.5" />
+              {t(dict, "about.bookConsultation", "Book a Consultation")} <ArrowRight className="h-3.5 w-3.5" />
             </MagneticButton>
           </div>
         </RevealOnScroll>

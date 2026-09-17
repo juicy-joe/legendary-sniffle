@@ -10,10 +10,12 @@ import { EASE } from "@/lib/motion";
 import { formatPrice } from "@/lib/format";
 import LampIllustration from "./LampIllustration";
 import ProductPhoto from "./ProductPhoto";
+import { useTranslations } from "./TranslationsProvider";
 
 export default function CartDrawer() {
   const { lines, isOpen, closeCart, setQty, removeItem, subtotal } = useCart();
   const { getProduct } = useCatalog();
+  const { t } = useTranslations();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -65,19 +67,19 @@ export default function CartDrawer() {
             transition={{ duration: 0.45, ease: EASE }}
             role="dialog"
             aria-modal="true"
-            aria-label="Shopping cart"
+            aria-label={t("cart.aria", "Shopping cart")}
             className="fixed right-0 top-0 z-[80] flex h-full w-full max-w-md flex-col bg-paper shadow-2xl"
           >
             <div className="flex items-center justify-between border-b border-ink/10 px-6 py-5">
               <h2 className="flex items-center gap-2.5 font-serif text-2xl font-light text-ink">
                 <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
-                Your Selection
+                {t("cart.yourSelection", "Your Selection")}
               </h2>
               <button
                 ref={closeBtnRef}
                 type="button"
                 onClick={closeCart}
-                aria-label="Close cart"
+                aria-label={t("cart.close", "Close cart")}
                 className="text-ink/60 transition-colors hover:text-ink"
               >
                 <X className="h-5 w-5" />
@@ -87,13 +89,13 @@ export default function CartDrawer() {
             {lines.length === 0 ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
                 <ShoppingBag className="h-10 w-10 text-ink/20" strokeWidth={1} />
-                <p className="text-ink/65">Your selection is empty.</p>
+                <p className="text-ink/65">{t("cart.empty", "Your selection is empty.")}</p>
                 <Link
                   href="/products"
                   onClick={closeCart}
                   className="rounded-[3px] bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.16em] text-paper transition-colors hover:bg-gold-dark"
                 >
-                  Browse the Collection
+                  {t("cart.browseCollection", "Browse the Collection")}
                 </Link>
               </div>
             ) : (
@@ -146,7 +148,7 @@ export default function CartDrawer() {
                               <button
                                 type="button"
                                 onClick={() => removeItem(line.slug)}
-                                aria-label={`Remove ${product.name} from cart`}
+                                aria-label={`${t("cart.remove", "Remove")} ${product.name} ${t("cart.fromCart", "from cart")}`}
                                 className="text-ink/65 transition-colors hover:text-ink"
                               >
                                 <X className="h-4 w-4" />
@@ -157,7 +159,7 @@ export default function CartDrawer() {
                                 <button
                                   type="button"
                                   onClick={() => setQty(line.slug, line.qty - 1)}
-                                  aria-label="Decrease quantity"
+                                  aria-label={t("cart.decreaseQty", "Decrease quantity")}
                                   className="text-ink/60 transition-colors hover:text-ink"
                                 >
                                   <Minus className="h-3.5 w-3.5" />
@@ -168,7 +170,7 @@ export default function CartDrawer() {
                                 <button
                                   type="button"
                                   onClick={() => setQty(line.slug, line.qty + 1)}
-                                  aria-label="Increase quantity"
+                                  aria-label={t("cart.increaseQty", "Increase quantity")}
                                   className="text-ink/60 transition-colors hover:text-ink"
                                 >
                                   <Plus className="h-3.5 w-3.5" />
@@ -187,20 +189,20 @@ export default function CartDrawer() {
 
                 <div className="border-t border-ink/10 px-6 py-6">
                   <div className="mb-4 flex items-center justify-between text-sm text-ink/60">
-                    <span>Subtotal</span>
+                    <span>{t("cart.subtotal", "Subtotal")}</span>
                     <span className="font-serif text-lg text-ink font-feature-tabular">
                       {formatPrice(subtotal)}
                     </span>
                   </div>
                   <p className="mb-4 text-xs text-ink/65">
-                    Shipping &amp; white-glove delivery calculated at checkout.
+                    {t("cart.shippingNote", "Shipping & white-glove delivery calculated at checkout.")}
                   </p>
                   <Link
                     href="/checkout"
                     onClick={closeCart}
                     className="block w-full rounded-[3px] border border-ink bg-ink py-4 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-paper transition-colors duration-300 hover:bg-gold-dark hover:border-gold-dark"
                   >
-                    Proceed to Checkout
+                    {t("cart.proceedToCheckout", "Proceed to Checkout")}
                   </Link>
                 </div>
               </>

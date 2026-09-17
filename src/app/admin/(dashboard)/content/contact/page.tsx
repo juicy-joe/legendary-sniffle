@@ -4,7 +4,7 @@ import { getContactInfo } from "@/lib/content";
 export const metadata = { title: "Contact Info — Admin" };
 
 export default async function AdminContactInfoPage() {
-  const content = await getContactInfo();
+  const content = await getContactInfo("en");
 
   return (
     <div>

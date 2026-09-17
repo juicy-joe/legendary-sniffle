@@ -6,11 +6,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "./ProductCard";
 import { useCatalog } from "@/context/CatalogContext";
 import { slugify } from "@/lib/slugify";
+import { useTranslations } from "./TranslationsProvider";
 
 type Sort = "featured" | "price-asc" | "price-desc";
 
 function ExplorerInner({ collectionOrder }: { collectionOrder: string[] }) {
   const { products, categories } = useCatalog();
+  const { t } = useTranslations();
   const params = useSearchParams();
   const initialCategory = params.get("category");
 
@@ -61,14 +63,14 @@ function ExplorerInner({ collectionOrder }: { collectionOrder: string[] }) {
                   : "border-ink/20 text-ink/60 hover:border-ink"
               }`}
             >
-              {c}
+              {c === "All" ? t("products.filterAll", "All") : c}
             </button>
           ))}
         </div>
 
         <div className="flex items-center gap-3">
           <label htmlFor="sort" className="text-[11px] uppercase tracking-[0.15em] text-ink/65">
-            Sort
+            {t("products.sort", "Sort")}
           </label>
           <select
             id="sort"
@@ -76,15 +78,15 @@ function ExplorerInner({ collectionOrder }: { collectionOrder: string[] }) {
             onChange={(e) => setSort(e.target.value as Sort)}
             className="rounded-[3px] border border-ink/20 bg-transparent px-3.5 py-2 text-[11px] uppercase tracking-[0.08em] text-ink outline-none"
           >
-            <option value="featured">Featured</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
+            <option value="featured">{t("products.sortFeatured", "Featured")}</option>
+            <option value="price-asc">{t("products.sortPriceAsc", "Price: Low to High")}</option>
+            <option value="price-desc">{t("products.sortPriceDesc", "Price: High to Low")}</option>
           </select>
         </div>
       </div>
 
       <p className="mb-14 text-xs uppercase tracking-[0.2em] text-ink/65" aria-live="polite">
-        {filtered.length} {filtered.length === 1 ? "piece" : "pieces"}
+        {filtered.length} {filtered.length === 1 ? t("products.piece", "piece") : t("products.pieces", "pieces")}
       </p>
 
       <AnimatePresence mode="popLayout">
@@ -99,7 +101,8 @@ function ExplorerInner({ collectionOrder }: { collectionOrder: string[] }) {
               <div className="mb-8 flex items-baseline justify-between gap-4 border-b border-ink/10 pb-4">
                 <h2 className="font-serif text-2xl text-ink md:text-3xl">{group.name}</h2>
                 <span className="shrink-0 text-xs uppercase tracking-[0.16em] text-ink/50">
-                  {group.items.length} {group.items.length === 1 ? "piece" : "pieces"}
+                  {group.items.length}{" "}
+                  {group.items.length === 1 ? t("products.piece", "piece") : t("products.pieces", "pieces")}
                 </span>
               </div>
               <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">

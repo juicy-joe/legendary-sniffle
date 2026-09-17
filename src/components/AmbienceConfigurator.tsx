@@ -29,6 +29,7 @@ export default function AmbienceConfigurator() {
 
   const previewProduct: CatalogProduct = useMemo(
     () => ({
+      id: "atelier-preview",
       slug: "atelier-preview",
       name: "Your Design",
       designer: "SaFaLight Atelier",

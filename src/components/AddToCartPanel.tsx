@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, Minus, Plus, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import WishlistButton from "./WishlistButton";
+import { useTranslations } from "./TranslationsProvider";
 
 export default function AddToCartPanel({
   slug,
@@ -14,6 +15,7 @@ export default function AddToCartPanel({
   name: string;
 }) {
   const { addItem } = useCart();
+  const { t } = useTranslations();
   const [qty, setQty] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
 
@@ -30,7 +32,7 @@ export default function AddToCartPanel({
           <button
             type="button"
             onClick={() => setQty((q) => Math.max(1, q - 1))}
-            aria-label="Decrease quantity"
+            aria-label={t("cart.decreaseQty", "Decrease quantity")}
             className="text-ink/60 transition-colors hover:text-ink"
           >
             <Minus className="h-3.5 w-3.5" />
@@ -39,7 +41,7 @@ export default function AddToCartPanel({
           <button
             type="button"
             onClick={() => setQty((q) => Math.min(9, q + 1))}
-            aria-label="Increase quantity"
+            aria-label={t("cart.increaseQty", "Increase quantity")}
             className="text-ink/60 transition-colors hover:text-ink"
           >
             <Plus className="h-3.5 w-3.5" />
@@ -60,7 +62,7 @@ export default function AddToCartPanel({
                 exit={{ opacity: 0, y: -6 }}
                 className="inline-flex items-center gap-2"
               >
-                <Check className="h-3.5 w-3.5" /> Added to Cart
+                <Check className="h-3.5 w-3.5" /> {t("product.addedToCart", "Added to Cart")}
               </motion.span>
             ) : (
               <motion.span
@@ -70,7 +72,7 @@ export default function AddToCartPanel({
                 exit={{ opacity: 0, y: -6 }}
                 className="inline-flex items-center gap-2"
               >
-                <ShoppingBag className="h-3.5 w-3.5" /> Add to Cart
+                <ShoppingBag className="h-3.5 w-3.5" /> {t("product.addToCartButton", "Add to Cart")}
               </motion.span>
             )}
           </AnimatePresence>
@@ -79,7 +81,7 @@ export default function AddToCartPanel({
         <WishlistButton slug={slug} />
       </div>
       <p className="sr-only" aria-live="polite">
-        {justAdded ? `${name} added to cart` : ""}
+        {justAdded ? `${name} ${t("product.addedToCartSr", "added to cart")}` : ""}
       </p>
     </div>
   );

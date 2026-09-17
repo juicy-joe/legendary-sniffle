@@ -505,3 +505,46 @@ model Order {
   stockMovements StockMovement[]
   customOrders   CustomOrder[]
 }
+
+// --- Internationalization ------------------------------------------------
+// English is never stored here — it's the language every existing hardcoded
+// string and database column is already written in, and stays the
+// fallback whenever a translation below is missing. These two tables only
+// hold overrides for the *other* supported locales.
+
+// One row per translatable UI string (nav labels, buttons, headings, legal
+// copy, etc.), keyed by a stable dotted key (e.g. "nav.home") the code
+// looks up at render time — see src/lib/i18n.ts. Missing key -> the
+// English text already hardcoded at that call site is shown instead.
+model UiTranslation {
+  id     String @id @default(cuid())
+  locale String
+  key    String
+  value  String @db.Text
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([locale, key])
+  @@index([locale])
+}
+
+// One row per translated field on a dynamic (database-backed) record —
+// a product's description/story, a designer's bio, HomeContent's
+// heroSubtext, etc. Deliberately generic (model + recordId + field) rather
+// than adding a column per language per table, which doesn't scale past a
+// couple of locales. Product.name and Category/Collection.name are
+// intentionally never looked up here — those stay in their original
+// language in every locale (see getContentField call sites).
+model ContentTranslation {
+  id       String @id @default(cuid())
+  locale   String
+  model    String
+  recordId String
+  field    String
+  value    String @db.Text
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([locale, model, recordId, field])
+  @@index([locale, model])
+}

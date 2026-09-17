@@ -12,6 +12,8 @@ import { getMenuItems, getSocialLinks } from "@/lib/menus";
 import { getSettings } from "@/lib/settings";
 import { siteUrl } from "@/lib/site";
 import { jsonLdScriptProps } from "@/lib/json-ld";
+import { getLocale, getUiTranslations } from "@/lib/i18n";
+import TranslationsProvider from "@/components/TranslationsProvider";
 import "../globals.css";
 
 // Theme C ("Monochrome Atelier") uses one typeface family for everything —
@@ -95,11 +97,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [catalog, navLinks, socialLinks, settings] = await Promise.all([
+  const locale = await getLocale();
+  const [catalog, navLinks, socialLinks, settings, dict] = await Promise.all([
     getCatalog(),
     getMenuItems("navbar"),
     getSocialLinks(),
     getSettings(),
+    getUiTranslations(locale),
   ]);
   // Placeholder "#" URLs (not yet configured in admin) shouldn't be
   // advertised to search engines as the brand's real social profiles.
@@ -107,7 +111,7 @@ export default async function RootLayout({
 
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${archivoDisplay.variable} ${archivoText.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-paper text-ink font-sans">
@@ -122,26 +126,28 @@ export default async function RootLayout({
             sameAs,
           })}
         />
-        <CatalogProvider products={catalog}>
-          <WishlistProvider>
-            <CartProvider>
-              <div className="grain-overlay" aria-hidden="true" />
-              <CursorGlow />
-              <a
-                href="#main-content"
-                className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-sm focus:bg-ink focus:px-5 focus:py-2 focus:text-sm focus:text-paper"
-              >
-                Skip to content
-              </a>
-              <Navbar links={navLinks} />
-              <main id="main-content" className="flex-1">
-                {children}
-              </main>
-              <Footer />
-              <CartDrawer />
-            </CartProvider>
-          </WishlistProvider>
-        </CatalogProvider>
+        <TranslationsProvider locale={locale} dict={dict}>
+          <CatalogProvider products={catalog}>
+            <WishlistProvider>
+              <CartProvider>
+                <div className="grain-overlay" aria-hidden="true" />
+                <CursorGlow />
+                <a
+                  href="#main-content"
+                  className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-sm focus:bg-ink focus:px-5 focus:py-2 focus:text-sm focus:text-paper"
+                >
+                  Skip to content
+                </a>
+                <Navbar links={navLinks} />
+                <main id="main-content" className="flex-1">
+                  {children}
+                </main>
+                <Footer />
+                <CartDrawer />
+              </CartProvider>
+            </WishlistProvider>
+          </CatalogProvider>
+        </TranslationsProvider>
       </body>
     </html>
   );

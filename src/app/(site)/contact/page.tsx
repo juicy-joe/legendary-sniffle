@@ -4,6 +4,7 @@ import { Mail, MapPin, Phone, Clock } from "lucide-react";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import ContactForm from "@/components/ContactForm";
 import { getContactInfo } from "@/lib/content";
+import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Contact Us",
@@ -13,18 +14,19 @@ export const metadata: Metadata = {
 };
 
 export default async function ContactPage() {
-  const content = await getContactInfo();
+  const locale = await getLocale();
+  const [content, dict] = await Promise.all([getContactInfo(), getUiTranslations(locale)]);
 
   const details = [
     {
       icon: Mail,
-      label: "Email",
+      label: t(dict, "contact.email", "Email"),
       value: content.email,
       href: `mailto:${content.email}`,
     },
     {
       icon: Phone,
-      label: "Phone",
+      label: t(dict, "contact.phone", "Phone"),
       value: content.phone,
       // Keeps only digits and a leading + so a human-friendly "+1 (555)
       // 018-2043" still produces a dialable tel: link.
@@ -32,13 +34,13 @@ export default async function ContactPage() {
     },
     {
       icon: MapPin,
-      label: "Showroom",
+      label: t(dict, "contact.showroom", "Showroom"),
       value: content.address,
       href: undefined,
     },
     {
       icon: Clock,
-      label: "Hours",
+      label: t(dict, "contact.hours", "Hours"),
       value: content.hours,
       href: undefined,
     },
@@ -49,21 +51,23 @@ export default async function ContactPage() {
       <section className="bg-ink py-24 text-paper md:py-28">
         <div className="mx-auto max-w-4xl px-6 text-center md:px-10">
           <nav aria-label="Breadcrumb" className="mb-8 flex items-center justify-center gap-2 text-xs text-paper/60">
-            <Link href="/" className="hover:text-paper">Home</Link>
+            <Link href="/" className="hover:text-paper">{t(dict, "breadcrumb.home", "Home")}</Link>
             <span aria-hidden="true">/</span>
-            <span className="text-paper/70">Contact</span>
+            <span className="text-paper/70">{t(dict, "breadcrumb.contact", "Contact")}</span>
           </nav>
           <RevealOnScroll>
             <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold">
-              Get in Touch
+              {t(dict, "contact.getInTouch", "Get in Touch")}
             </p>
             <h1 className="font-serif text-5xl font-light leading-tight md:text-6xl">
-              Let&rsquo;s Talk About Light
+              {t(dict, "contact.heroHeadline", "Let's Talk About Light")}
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-paper/60">
-              Whether you&rsquo;re commissioning a single piece or lighting an
-              entire project, our design team replies personally &mdash; no
-              chatbots, no forms into the void.
+              {t(
+                dict,
+                "contact.heroSubtext",
+                "Whether you're commissioning a single piece or lighting an entire project, our design team replies personally — no chatbots, no forms into the void."
+              )}
             </p>
           </RevealOnScroll>
         </div>
@@ -73,7 +77,7 @@ export default async function ContactPage() {
         <div className="grid grid-cols-1 gap-16 md:grid-cols-5">
           <RevealOnScroll className="md:col-span-3">
             <h2 className="mb-8 font-serif text-3xl font-light text-ink">
-              Send Us a Message
+              {t(dict, "contact.sendMessage", "Send Us a Message")}
             </h2>
             <ContactForm />
           </RevealOnScroll>
@@ -81,7 +85,7 @@ export default async function ContactPage() {
           <RevealOnScroll delay={0.1} className="md:col-span-2">
             <div className="rounded-[6px] border border-ink/10 bg-paper-dim p-8">
               <h3 className="mb-6 font-serif text-2xl font-light text-ink">
-                Visit or Reach Us
+                {t(dict, "contact.visitOrReach", "Visit or Reach Us")}
               </h3>
               <ul className="space-y-6">
                 {details.map((d) => (
@@ -143,7 +147,7 @@ export default async function ContactPage() {
                 />
               </svg>
               <div className="absolute bottom-4 left-4 text-xs uppercase tracking-[0.15em] text-paper/60">
-                Private showroom &middot; by appointment
+                {t(dict, "contact.showroomByAppointment", "Private showroom · by appointment")}
               </div>
             </div>
           </RevealOnScroll>
@@ -154,7 +158,7 @@ export default async function ContactPage() {
             href="/terms"
             className="text-sm text-ink/60 underline underline-offset-2 transition-colors hover:text-ink"
           >
-            Terms and Conditions
+            {t(dict, "footer.termsAndConditions", "Terms and Conditions")}
           </Link>
         </div>
       </section>

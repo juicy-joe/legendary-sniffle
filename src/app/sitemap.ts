@@ -3,7 +3,9 @@ import { getCatalog } from "@/lib/catalog";
 import { siteUrl } from "@/lib/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const products = await getCatalog();
+  // Only slugs are needed here — pass a fixed locale to skip getLocale()'s
+  // cookies() lookup, which isn't available if this ever runs at build time.
+  const products = await getCatalog("en");
 
   const staticRoutes = ["", "/products", "/about", "/contact"].map((path) => ({
     url: `${siteUrl}${path}`,

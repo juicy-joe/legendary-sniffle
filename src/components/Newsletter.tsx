@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
+import { useTranslations } from "./TranslationsProvider";
 
 export default function Newsletter({ dark = true }: { dark?: boolean }) {
+  const { t } = useTranslations();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "done">("idle");
 
@@ -27,8 +29,8 @@ export default function Newsletter({ dark = true }: { dark?: boolean }) {
               dark ? "text-gold" : "text-gold-dark"
             }`}
           >
-            <Check className="h-4 w-4" /> You&rsquo;re on the list — welcome to
-            SaFaLight.
+            <Check className="h-4 w-4" />{" "}
+            {t("newsletter.success", "You're on the list — welcome to SaFaLight.")}
           </motion.div>
         ) : (
           <motion.form
@@ -46,14 +48,14 @@ export default function Newsletter({ dark = true }: { dark?: boolean }) {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Your email address"
+              placeholder={t("newsletter.placeholder", "Your email address")}
               className={`w-full bg-transparent text-sm outline-none placeholder:opacity-50 ${
                 dark ? "text-paper placeholder:text-paper" : "text-ink placeholder:text-ink"
               }`}
             />
             <button
               type="submit"
-              aria-label="Subscribe"
+              aria-label={t("newsletter.subscribe", "Subscribe")}
               className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-[2px] transition-colors duration-300 ${
                 dark
                   ? "bg-paper text-ink hover:bg-gold-dark hover:text-paper"

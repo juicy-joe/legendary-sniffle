@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { InstagramIcon, FacebookIcon, LinkedinIcon } from "./SocialIcons";
 import Newsletter from "./Newsletter";
+import LanguageSwitcher from "./LanguageSwitcher";
 import { getContactInfo } from "@/lib/content";
 import { getMenuItems, getSocialLinks } from "@/lib/menus";
+import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 const socialIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   instagram: InstagramIcon,
@@ -11,16 +13,18 @@ const socialIcons: Record<string, React.ComponentType<{ className?: string }>> =
 };
 
 export default async function Footer() {
-  const [contact, explore, collections, socials] = await Promise.all([
+  const locale = await getLocale();
+  const [contact, explore, collections, socials, dict] = await Promise.all([
     getContactInfo(),
     getMenuItems("footer-explore"),
     getMenuItems("footer-collections"),
     getSocialLinks(),
+    getUiTranslations(locale),
   ]);
 
   const columns = [
-    { title: "Explore", links: explore },
-    { title: "Collections", links: collections },
+    { title: t(dict, "footer.explore", "Explore"), links: explore },
+    { title: t(dict, "footer.collections", "Collections"), links: collections },
   ].filter((c) => c.links.length > 0);
 
   // A social row still without a real URL (the "#" placeholder) reads as
@@ -36,16 +40,20 @@ export default async function Footer() {
               Sa<span className="text-gold">Fa</span>Light
             </Link>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-paper/55">
-              Hand-finished designer table lamps, mouth-blown from lead-free optical crystalline glass in a
-              traditional European glassworks. Each piece is individually polished and inspected for flawless
-              surface quality and exceptional light refraction, produced in small-batch runs that preserve unique
-              chromatic depth, heirloom-grade durability, crafted to outlast generations.
+              {t(
+                dict,
+                "footer.tagline",
+                "Hand-finished designer table lamps, mouth-blown from lead-free optical crystalline glass in a traditional European glassworks. Each piece is individually polished and inspected for flawless surface quality and exceptional light refraction, produced in small-batch runs that preserve unique chromatic depth, heirloom-grade durability, crafted to outlast generations."
+              )}
             </p>
             <div className="mt-8">
               <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-paper/60">
-                Join the Retailer List
+                {t(dict, "footer.newsletterHeading", "Join the Retailer List")}
               </p>
               <Newsletter dark />
+            </div>
+            <div className="mt-8">
+              <LanguageSwitcher dark />
             </div>
           </div>
 
@@ -71,7 +79,7 @@ export default async function Footer() {
 
           <div>
             <p className="mb-5 text-[11px] uppercase tracking-[0.2em] text-paper/60">
-              Contact
+              {t(dict, "footer.contact", "Contact")}
             </p>
             <ul className="space-y-3.5 text-sm text-paper/65">
               <li>
@@ -94,14 +102,16 @@ export default async function Footer() {
 
         <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-paper/10 pt-8 md:flex-row">
           <p className="flex flex-wrap items-center gap-x-2 text-xs text-paper/60">
-            <span>&copy; {new Date().getFullYear()} SaFaLight. All rights reserved.</span>
+            <span>
+              &copy; {new Date().getFullYear()} SaFaLight. {t(dict, "footer.rightsReserved", "All rights reserved.")}
+            </span>
             <span aria-hidden="true">&middot;</span>
             <Link href="/privacy" className="underline-offset-2 transition-colors hover:text-gold hover:underline">
-              Privacy Policy
+              {t(dict, "footer.privacyPolicy", "Privacy Policy")}
             </Link>
             <span aria-hidden="true">&middot;</span>
             <Link href="/terms" className="underline-offset-2 transition-colors hover:text-gold hover:underline">
-              Terms and Conditions
+              {t(dict, "footer.termsAndConditions", "Terms and Conditions")}
             </Link>
           </p>
           {activeSocials.length > 0 && (

@@ -3,9 +3,11 @@
 import { Heart } from "lucide-react";
 import clsx from "clsx";
 import { useWishlist } from "@/context/WishlistContext";
+import { useTranslations } from "./TranslationsProvider";
 
 export default function WishlistButton({ slug }: { slug: string }) {
   const { isSaved, toggle } = useWishlist();
+  const { t } = useTranslations();
   const saved = isSaved(slug);
 
   return (
@@ -21,7 +23,7 @@ export default function WishlistButton({ slug }: { slug: string }) {
       )}
     >
       <Heart className={clsx("h-3.5 w-3.5", saved && "fill-gold-dark")} />
-      {saved ? "Saved" : "Add to Wishlist"}
+      {saved ? t("product.saved", "Saved") : t("product.addToWishlistButton", "Add to Wishlist")}
     </button>
   );
 }

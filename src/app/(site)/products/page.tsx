@@ -5,6 +5,7 @@ import ProductsExplorer from "@/components/ProductsExplorer";
 import CollectionsShowcase, { type CollectionSummary } from "@/components/CollectionsShowcase";
 import { getCatalog, getCollections } from "@/lib/catalog";
 import { slugify } from "@/lib/slugify";
+import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Designer Table Lamps",
@@ -14,7 +15,8 @@ export const metadata: Metadata = {
 };
 
 export default async function ProductsPage() {
-  const [catalog, collectionRows] = await Promise.all([getCatalog(), getCollections()]);
+  const locale = await getLocale();
+  const [catalog, collectionRows, dict] = await Promise.all([getCatalog(), getCollections(), getUiTranslations(locale)]);
 
   // Canonical collection order (alphabetical, from the admin-managed
   // Collection table) — passed to ProductsExplorer too so the showcase
@@ -44,28 +46,27 @@ export default async function ProductsPage() {
   return (
     <div className="mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-28">
       <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 text-xs text-ink/65">
-        <Link href="/" className="hover:text-ink">Home</Link>
+        <Link href="/" className="hover:text-ink">{t(dict, "breadcrumb.home", "Home")}</Link>
         <span aria-hidden="true">/</span>
-        <span className="text-ink/70">Products</span>
+        <span className="text-ink/70">{t(dict, "breadcrumb.products", "Products")}</span>
       </nav>
       <RevealOnScroll className="mb-14 max-w-2xl">
         <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
-          The Collection
+          {t(dict, "products.theCollection", "The Collection")}
         </p>
         <h1 className="font-serif text-5xl text-ink md:text-6xl">
-          Designer Table Lamps
+          {t(dict, "products.designerTableLamps", "Designer Table Lamps")}
         </h1>
         <p className="mt-5 text-base leading-relaxed text-ink/60">
-          Every piece is mouth-blown from high-clarity crystalline glass and hand-finished to order. Within our
-          NatureSphere collection, each sphere is individually shaped, so natural variations in color patterns
-          occur, your lamp will be a unique original, distinct from the online image. Our MoodMAX collection offers
-          a complementary aesthetic with its own character. Filter by color or finish to find the piece that fits
-          your space. These are ambient lights, crafted to create mood and character, not merely to illuminate a
-          room.
+          {t(
+            dict,
+            "products.intro",
+            "Every piece is mouth-blown from high-clarity crystalline glass and hand-finished to order. Within our NatureSphere collection, each sphere is individually shaped, so natural variations in color patterns occur, your lamp will be a unique original, distinct from the online image. Our MoodMAX collection offers a complementary aesthetic with its own character. Filter by color or finish to find the piece that fits your space. These are ambient lights, crafted to create mood and character, not merely to illuminate a room."
+          )}
         </p>
       </RevealOnScroll>
 
-      <CollectionsShowcase collections={showcaseCollections} />
+      <CollectionsShowcase collections={showcaseCollections} dict={dict} />
 
       <ProductsExplorer collectionOrder={collectionOrder} />
     </div>

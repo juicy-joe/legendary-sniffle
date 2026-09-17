@@ -17,6 +17,7 @@ import {
   Settings as SettingsIcon,
   Warehouse,
   Handshake,
+  Languages,
 } from "lucide-react";
 import { getSession } from "@/lib/get-session";
 import { logout } from "@/app/admin/login/actions";
@@ -36,6 +37,7 @@ const baseNavItems = [
   { href: "/admin/categories", label: "Categories", icon: Tag },
   { href: "/admin/designers", label: "Designers", icon: Users },
   { href: "/admin/content", label: "Content", icon: FileText },
+  { href: "/admin/translations", label: "Translations", icon: Languages },
   { href: "/admin/menus", label: "Menus", icon: Menu },
   { href: "/admin/social", label: "Social", icon: Share2 },
   { href: "/admin/enquiries", label: "Enquiries", icon: Mail },

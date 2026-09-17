@@ -5,6 +5,19 @@
 // fresh database that hasn't been seeded yet) so these pages never 500.
 import "server-only";
 import { prisma } from "./prisma";
+import { getContentFields, getLocale, type Locale } from "./i18n";
+
+/** Overlays translated fields onto a content-singleton's English defaults —
+ * only keys that already exist on `base` are ever overridden, so a stray
+ * ContentTranslation row for a since-removed field is silently ignored
+ * rather than leaking an unexpected key onto the object. */
+function withTranslations<T extends Record<string, unknown>>(base: T, overrides: Record<string, string>): T {
+  const result = { ...base };
+  for (const key of Object.keys(overrides)) {
+    if (key in base) (result as Record<string, unknown>)[key] = overrides[key];
+  }
+  return result;
+}
 
 const homeDefaults = {
   heroEyebrow: "Est. for Collectors of Light",
@@ -33,9 +46,17 @@ const contactDefaults = {
   hours: "Tue-Sat, 11am-6pm, by appointment",
 };
 
-export async function getHomeContent() {
+// `locale` is optional and meant for the admin editors, which must always
+// read/write the canonical English columns regardless of what NEXT_LOCALE
+// happens to be set to in the admin's own browser (they share cookies with
+// the storefront) — pass "en" explicitly there. The public storefront omits
+// it and gets the request's resolved locale via getLocale().
+export async function getHomeContent(locale?: Locale) {
   const content = await prisma.homeContent.findUnique({ where: { id: "home" } });
-  return content ?? homeDefaults;
+  const base = content ?? homeDefaults;
+  const resolvedLocale = locale ?? (await getLocale());
+  const overrides = await getContentFields(resolvedLocale, "HomeContent", "home");
+  return withTranslations(base, overrides);
 }
 
 /** Admin-managed homepage hero rotation, in display order. Empty until the
@@ -45,12 +66,20 @@ export async function getHeroImages() {
   return prisma.heroImage.findMany({ orderBy: { sortOrder: "asc" } });
 }
 
-export async function getAboutContent() {
+export async function getAboutContent(locale?: Locale) {
   const content = await prisma.aboutContent.findUnique({ where: { id: "about" } });
-  return content ?? aboutDefaults;
+  const base = content ?? aboutDefaults;
+  const resolvedLocale = locale ?? (await getLocale());
+  const overrides = await getContentFields(resolvedLocale, "AboutContent", "about");
+  return withTranslations(base, overrides);
 }
 
-export async function getContactInfo() {
+// email/phone/address are literal contact data, not language-bearing copy,
+// so only `hours` (e.g. "Tue-Sat, 11am-6pm, by appointment") is translated.
+export async function getContactInfo(locale?: Locale) {
   const content = await prisma.contactInfo.findUnique({ where: { id: "contact" } });
-  return content ?? contactDefaults;
+  const base = content ?? contactDefaults;
+  const resolvedLocale = locale ?? (await getLocale());
+  const overrides = await getContentFields(resolvedLocale, "ContactInfo", "contact");
+  return overrides.hours ? { ...base, hours: overrides.hours } : base;
 }

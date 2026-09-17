@@ -15,6 +15,7 @@ import {
 } from "@/lib/shipping";
 import LampIllustration from "./LampIllustration";
 import ProductPhoto from "./ProductPhoto";
+import { useTranslations } from "./TranslationsProvider";
 
 const sortedCountries = [...SHIPPABLE_COUNTRIES].sort((a, b) => a.name.localeCompare(b.name));
 
@@ -29,6 +30,7 @@ const sortedCountries = [...SHIPPABLE_COUNTRIES].sort((a, b) => a.name.localeCom
 export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
   const { lines, subtotal } = useCart();
   const { getProduct } = useCatalog();
+  const { t } = useTranslations();
   const [country, setCountry] = useState("");
   const [shippingSpeed, setShippingSpeed] = useState<ShippingSpeed>("regular");
   const [starting, setStarting] = useState(false);
@@ -46,12 +48,12 @@ export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
     return (
       <div className="flex flex-col items-center gap-4 py-24 text-center">
         <ShoppingBag className="h-10 w-10 text-ink/20" strokeWidth={1} />
-        <p className="text-ink/60">Your cart is empty.</p>
+        <p className="text-ink/60">{t("checkout.cartEmpty", "Your cart is empty.")}</p>
         <Link
           href="/products"
           className="rounded-[3px] bg-ink px-6 py-3.5 text-[11px] uppercase tracking-[0.16em] text-paper transition-colors hover:bg-gold-dark"
         >
-          Browse the Collection
+          {t("cart.browseCollection", "Browse the Collection")}
         </Link>
       </div>
     );
@@ -61,7 +63,7 @@ export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
 
   const handleContinue = async () => {
     if (!country) {
-      setError("Please select your country before continuing.");
+      setError(t("checkout.selectCountryError", "Please select your country before continuing."));
       return;
     }
     setStarting(true);
@@ -83,7 +85,7 @@ export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
     <div className="mx-auto max-w-xl">
       <div className="rounded-[6px] border border-ink/10 bg-paper-dim p-6">
         <h2 className="mb-5 font-serif text-xl font-light text-ink">
-          Order Summary
+          {t("checkout.orderSummary", "Order Summary")}
         </h2>
         <ul className="space-y-4">
           {lineItems.map(({ line, product }) => (
@@ -99,7 +101,7 @@ export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
               </div>
               <div className="flex-1">
                 <p className="text-sm text-ink">{product!.name}</p>
-                <p className="text-xs text-ink/65">Qty {line.qty}</p>
+                <p className="text-xs text-ink/65">{t("checkout.qty", "Qty")} {line.qty}</p>
               </div>
               <p className="text-sm text-ink/70 font-feature-tabular">
                 {formatPrice(product!.price * line.qty)}
@@ -110,25 +112,27 @@ export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
 
         <div className="mt-6 space-y-2 border-t border-ink/10 pt-4 text-sm">
           <div className="flex justify-between text-ink/60">
-            <span>Subtotal</span>
+            <span>{t("checkout.subtotal", "Subtotal")}</span>
             <span className="font-feature-tabular">{formatPrice(subtotal)}</span>
           </div>
           {shippingCost !== null && (
             <div className="flex justify-between text-ink/60">
-              <span>Shipping</span>
+              <span>{t("checkout.shipping", "Shipping")}</span>
               <span className="font-feature-tabular">
-                {shippingCost === 0 ? "Free" : formatPrice(shippingCost)}
+                {shippingCost === 0 ? t("checkout.free", "Free") : formatPrice(shippingCost)}
               </span>
             </div>
           )}
-          <p className="text-xs text-ink/50">Tax is calculated on the next step, based on your delivery address.</p>
+          <p className="text-xs text-ink/50">
+            {t("checkout.taxNote", "Tax is calculated on the next step, based on your delivery address.")}
+          </p>
         </div>
       </div>
 
       <div className="mt-6 space-y-5 rounded-[6px] border border-ink/10 bg-paper-dim p-6">
         <div>
           <label htmlFor="checkout-country" className="mb-2 block text-[11px] uppercase tracking-[0.15em] text-ink/65">
-            Country
+            {t("checkout.country", "Country")}
           </label>
           <select
             id="checkout-country"
@@ -136,7 +140,7 @@ export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
             onChange={(e) => setCountry(e.target.value)}
             className="w-full rounded-[3px] border border-ink/20 bg-paper px-3 py-2.5 text-sm text-ink focus:border-ink focus:outline-none"
           >
-            <option value="">Select your country&hellip;</option>
+            <option value="">{t("checkout.selectCountry", "Select your country…")}</option>
             {sortedCountries.map((c) => (
               <option key={c.code} value={c.code}>
                 {c.name}
@@ -146,7 +150,9 @@ export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
         </div>
 
         <div>
-          <p className="mb-2 text-[11px] uppercase tracking-[0.15em] text-ink/65">Shipping Speed</p>
+          <p className="mb-2 text-[11px] uppercase tracking-[0.15em] text-ink/65">
+            {t("checkout.shippingSpeed", "Shipping Speed")}
+          </p>
           <div className="space-y-2">
             {(["regular", "express"] as const).map((speed) => {
               const price = country ? getShippingPrice(rates, country, speed) : null;
@@ -166,10 +172,14 @@ export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
                       onChange={() => setShippingSpeed(speed)}
                       className="accent-ink"
                     />
-                    <span className="text-ink">{speed === "express" ? "Express Shipping" : "Regular Shipping"}</span>
+                    <span className="text-ink">
+                      {speed === "express"
+                        ? t("checkout.expressShipping", "Express Shipping")
+                        : t("checkout.regularShipping", "Regular Shipping")}
+                    </span>
                   </span>
                   <span className="text-ink/60 font-feature-tabular">
-                    {price === null ? "—" : price === 0 ? "Free" : formatPrice(price)}
+                    {price === null ? "—" : price === 0 ? t("checkout.free", "Free") : formatPrice(price)}
                   </span>
                 </label>
               );
@@ -190,10 +200,15 @@ export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
         disabled={starting}
         className="mt-6 w-full rounded-[3px] border border-ink bg-ink px-9 py-4 text-[11px] font-medium uppercase tracking-[0.18em] text-paper transition-colors duration-300 hover:bg-gold-dark hover:border-gold-dark disabled:opacity-60"
       >
-        {starting ? "Redirecting to Payment..." : "Continue to Payment"}
+        {starting
+          ? t("checkout.redirecting", "Redirecting to Payment...")
+          : t("checkout.continueToPayment", "Continue to Payment")}
       </button>
       <p className="mt-3 text-center text-xs text-ink/50">
-        You&rsquo;ll enter your full address and pay securely on Stripe&rsquo;s checkout page.
+        {t(
+          "checkout.stripeNote",
+          "You'll enter your full address and pay securely on Stripe's checkout page."
+        )}
       </p>
     </div>
   );
