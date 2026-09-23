@@ -98,15 +98,18 @@ export default function Navbar({ links }: { links: { href: string; label: string
         {t("nav.freeShipping", "Free Shipping within the EU")}
       </div>
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-10">
-        <Link href="/" className="shrink-0">
+        <Link href="/" className="flex shrink-0 items-center gap-2">
           <Image
-            src="/logo.svg"
-            alt="Ollerialight"
-            width={1600}
-            height={260}
+            src="/logo-icon.png"
+            alt=""
+            width={922}
+            height={852}
             priority
-            className="h-6 w-auto md:h-7"
+            className="h-7 w-auto md:h-8"
           />
+          <span className="font-serif text-sm uppercase tracking-[0.2em] text-ink md:text-base">
+            Olleria Light
+          </span>
         </Link>
 
         <ul className="hidden items-center gap-9 md:flex">
