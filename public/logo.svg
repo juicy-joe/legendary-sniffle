@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 260" role="img" aria-label="Ollerialight">
+  <!-- Plain serif wordmark placeholder for the rebrand — deliberately not
+       attempting to recreate the old mark's lamp-shaped "T", which needs a
+       real designer's eye. textLength forces an exact, overflow-safe fit
+       inside the viewBox regardless of the viewer's installed serif font. -->
+  <text
+    x="0"
+    y="185"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="150"
+    letter-spacing="6"
+    textLength="1600"
+    lengthAdjust="spacingAndGlyphs"
+    fill="#121212"
+  >OLLERIALIGHT</text>
+</svg>
