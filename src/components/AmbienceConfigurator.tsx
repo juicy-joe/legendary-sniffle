@@ -32,7 +32,7 @@ export default function AmbienceConfigurator() {
       id: "atelier-preview",
       slug: "atelier-preview",
       name: "Your Design",
-      designer: "SaFaLight Atelier",
+      designer: "Ollerialight Atelier",
       collection: "Configurator Preview",
       price: 0,
       category: "Brass",
@@ -127,7 +127,7 @@ export default function AmbienceConfigurator() {
         </div>
 
         <p className="text-sm leading-relaxed text-ink/65">
-          Every SaFaLight piece is made to order &mdash; and this isn&rsquo;t
+          Every Ollerialight piece is made to order &mdash; and this isn&rsquo;t
           just a preview toy. Our glass and metal ateliers genuinely take
           custom commissions: configure a starting point here, then bring it
           to our design team to refine into a real piece.

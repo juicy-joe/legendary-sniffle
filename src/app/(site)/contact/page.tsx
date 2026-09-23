@@ -9,7 +9,7 @@ import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 export const metadata: Metadata = {
   title: "Contact Us",
   description:
-    "Get in touch with SaFaLight to commission a piece, ask about a finish, or book a private consultation with our design team.",
+    "Get in touch with Ollerialight to commission a piece, ask about a finish, or book a private consultation with our design team.",
   alternates: { canonical: "/contact" },
 };
 

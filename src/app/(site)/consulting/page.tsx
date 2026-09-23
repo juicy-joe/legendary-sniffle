@@ -8,7 +8,7 @@ import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 export const metadata: Metadata = {
   title: "Consulting & Projects",
   description:
-    "SaFaLight designs and specifies bespoke lighting for hotels, offices, villas, and other large-scale projects — from first sketch to final installation.",
+    "Ollerialight designs and specifies bespoke lighting for hotels, offices, villas, and other large-scale projects — from first sketch to final installation.",
   alternates: { canonical: "/consulting" },
 };
 

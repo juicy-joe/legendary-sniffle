@@ -246,7 +246,7 @@ export const uiKeySections: UiKeySection[] = [
       {
         key: "trade.heroSubtext",
         fallback:
-          "A trade account gives you SaFaLight's full collection at wholesale pricing, direct access to our team for special orders, and a home for larger project requests.",
+          "A trade account gives you Ollerialight's full collection at wholesale pricing, direct access to our team for special orders, and a home for larger project requests.",
       },
       { key: "trade.applyButton", fallback: "Apply for a Trade Account" },
       { key: "trade.alreadyHaveAccount", fallback: "Already have an account? Log in" },
@@ -306,7 +306,7 @@ export const uiKeySections: UiKeySection[] = [
   {
     section: "Newsletter",
     keys: [
-      { key: "newsletter.success", fallback: "You're on the list — welcome to SaFaLight." },
+      { key: "newsletter.success", fallback: "You're on the list — welcome to Ollerialight." },
       { key: "newsletter.placeholder", fallback: "Your email address" },
       { key: "newsletter.subscribe", fallback: "Subscribe" },
     ],

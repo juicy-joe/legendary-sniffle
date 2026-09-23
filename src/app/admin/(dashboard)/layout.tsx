@@ -23,7 +23,7 @@ import { getSession } from "@/lib/get-session";
 import { logout } from "@/app/admin/login/actions";
 
 export const metadata: Metadata = {
-  title: { default: "Admin", template: "%s | SaFaLight Admin" },
+  title: { default: "Admin", template: "%s | Ollerialight Admin" },
   robots: { index: false, follow: false },
 };
 

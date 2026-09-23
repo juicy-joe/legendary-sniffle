@@ -12,6 +12,7 @@ import { jsonLdScriptProps } from "@/lib/json-ld";
 import { formatPrice } from "@/lib/format";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 import { productSeoTitle, productSeoDescription, productOgImage, productJsonLd, productPhotoAlt } from "@/lib/seo";
+import { getSettings } from "@/lib/settings";
 
 export async function generateStaticParams() {
   // Only slugs are needed here, and getLocale() (the no-arg default) reads
@@ -27,26 +28,26 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const [product, settings] = await Promise.all([getProductBySlug(slug), getSettings()]);
   if (!product) return {};
 
   const title = productSeoTitle(product);
-  const description = productSeoDescription(product);
-  const ogImage = productOgImage(product);
+  const description = productSeoDescription(product, settings.siteName);
+  const ogImage = productOgImage(product, settings.siteName);
 
   return {
     title,
     description,
     alternates: { canonical: `/products/${product.slug}` },
     openGraph: {
-      title: `${product.name} | SaFaLight`,
+      title: `${product.name} | ${settings.siteName}`,
       description,
       type: "website",
       images: [ogImage],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${product.name} | SaFaLight`,
+      title: `${product.name} | ${settings.siteName}`,
       description,
       images: [ogImage.url],
     },
@@ -60,10 +61,11 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
   const locale = await getLocale();
-  const [product, catalog, dict] = await Promise.all([
+  const [product, catalog, dict, settings] = await Promise.all([
     getProductBySlug(slug),
     getCatalog(),
     getUiTranslations(locale),
+    getSettings(),
   ]);
   if (!product) notFound();
 
@@ -84,7 +86,7 @@ export default async function ProductPage({
           ],
         })}
       />
-      <script type="application/ld+json" {...jsonLdScriptProps(productJsonLd(product))} />
+      <script type="application/ld+json" {...jsonLdScriptProps(productJsonLd(product, settings.siteName))} />
 
       <nav aria-label="Breadcrumb" className="mb-10 flex items-center gap-2 text-xs text-ink/65">
         <Link href="/" className="hover:text-ink">{t(dict, "breadcrumb.home", "Home")}</Link>

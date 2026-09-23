@@ -26,7 +26,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: { default: "SaFaLight Admin", template: "%s | SaFaLight Admin" },
+  title: { default: "Ollerialight Admin", template: "%s | Ollerialight Admin" },
   robots: { index: false, follow: false },
 };
 

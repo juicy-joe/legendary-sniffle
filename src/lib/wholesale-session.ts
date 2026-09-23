@@ -5,7 +5,7 @@
 // (jose only, no bcrypt) so this is safe to import from proxy.ts.
 import { SignJWT, jwtVerify } from "jose";
 
-export const WHOLESALE_SESSION_COOKIE = "safalight_wholesale_session";
+export const WHOLESALE_SESSION_COOKIE = "ollerialight_wholesale_session";
 const SESSION_DURATION_SECONDS = 60 * 60 * 24 * 30; // 30 days — trade accounts are expected to stay logged in across repeat ordering, not re-auth every week like an admin
 
 function getSecretKey() {

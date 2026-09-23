@@ -23,7 +23,7 @@ function layout(preheader: string, bodyHtml: string): string {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background-color:#ffffff;border:1px solid #e5e1d8;">
             <tr>
               <td style="background-color:#141414;padding:28px 32px;">
-                <span style="font-family:Georgia,serif;font-size:20px;letter-spacing:0.08em;color:#ffffff;">SAFALIGHT</span>
+                <span style="font-family:Georgia,serif;font-size:20px;letter-spacing:0.08em;color:#ffffff;">OLLERIALIGHT</span>
               </td>
             </tr>
             <tr>
@@ -33,7 +33,7 @@ function layout(preheader: string, bodyHtml: string): string {
             </tr>
             <tr>
               <td style="padding:24px 32px;border-top:1px solid #e5e1d8;font-size:12px;color:#7a7568;">
-                SaFaLight &middot; <a href="${siteUrl}" style="color:#7a7568;">${siteUrl.replace(/^https?:\/\//, "")}</a><br />
+                Ollerialight &middot; <a href="${siteUrl}" style="color:#7a7568;">${siteUrl.replace(/^https?:\/\//, "")}</a><br />
                 Questions? Reply to this email or write to
                 <a href="mailto:${EMAIL_REPLY_TO}" style="color:#7a7568;">${EMAIL_REPLY_TO}</a>.
               </td>
@@ -177,7 +177,7 @@ export async function sendEnquiryAutoReplyEmail(enquiry: {
       <h1 style="margin:0 0 16px;font-size:26px;font-weight:normal;color:#141414;">We&rsquo;ve Received Your Message</h1>
       <p style="margin:0 0 8px;font-size:15px;line-height:1.6;color:#3a3730;">Hi ${enquiry.name},</p>
       <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#3a3730;">
-        Thank you for reaching out to SaFaLight. We&rsquo;ve received your message and will get back to you within 1&ndash;2 business days.
+        Thank you for reaching out to Ollerialight. We&rsquo;ve received your message and will get back to you within 1&ndash;2 business days.
       </p>
       <p style="margin:0 0 4px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#7a7568;">Your Message</p>
       <p style="margin:0;padding:16px;background-color:#f5f3ef;font-size:14px;line-height:1.6;color:#3a3730;white-space:pre-wrap;">${escapeHtml(enquiry.message)}</p>
@@ -188,7 +188,7 @@ export async function sendEnquiryAutoReplyEmail(enquiry: {
 
 Hi ${enquiry.name},
 
-Thank you for reaching out to SaFaLight. We've received your message and will get back to you within 1-2 business days.
+Thank you for reaching out to Ollerialight. We've received your message and will get back to you within 1-2 business days.
 
 Your message:
 ${enquiry.message}`;
@@ -197,7 +197,7 @@ ${enquiry.message}`;
     from: EMAIL_FROM,
     replyTo: EMAIL_REPLY_TO,
     to: enquiry.email,
-    subject: "We've Received Your Message — SaFaLight",
+    subject: "We've Received Your Message — Ollerialight",
     html,
     text,
   });
@@ -215,7 +215,7 @@ export async function sendWholesaleApplicationReceivedEmail(applicant: {
       <h1 style="margin:0 0 16px;font-size:26px;font-weight:normal;color:#141414;">Application Received</h1>
       <p style="margin:0 0 8px;font-size:15px;line-height:1.6;color:#3a3730;">Hi ${applicant.contactName},</p>
       <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#3a3730;">
-        Thank you for applying for a SaFaLight trade account on behalf of ${escapeHtml(applicant.businessName)}.
+        Thank you for applying for an Ollerialight trade account on behalf of ${escapeHtml(applicant.businessName)}.
         We review every application personally and will be in touch shortly.
       </p>
     `
@@ -225,13 +225,13 @@ export async function sendWholesaleApplicationReceivedEmail(applicant: {
 
 Hi ${applicant.contactName},
 
-Thank you for applying for a SaFaLight trade account on behalf of ${applicant.businessName}. We review every application personally and will be in touch shortly.`;
+Thank you for applying for an Ollerialight trade account on behalf of ${applicant.businessName}. We review every application personally and will be in touch shortly.`;
 
   await getResend().emails.send({
     from: EMAIL_FROM,
     replyTo: EMAIL_REPLY_TO,
     to: applicant.email,
-    subject: "Your SaFaLight Trade Application",
+    subject: "Your Ollerialight Trade Application",
     html,
     text,
   });
@@ -244,13 +244,13 @@ export async function sendWholesaleApprovedEmail(account: {
   setPasswordUrl: string;
 }): Promise<void> {
   const html = layout(
-    "Your SaFaLight trade account is approved — set your password to log in.",
+    "Your Ollerialight trade account is approved — set your password to log in.",
     `
       <p style="margin:0 0 8px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:#b8935a;">Welcome</p>
       <h1 style="margin:0 0 16px;font-size:26px;font-weight:normal;color:#141414;">Trade Account Approved</h1>
       <p style="margin:0 0 8px;font-size:15px;line-height:1.6;color:#3a3730;">Hi ${account.contactName},</p>
       <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#3a3730;">
-        ${escapeHtml(account.businessName)}&rsquo;s SaFaLight trade account is approved. Set a password below to
+        ${escapeHtml(account.businessName)}&rsquo;s Ollerialight trade account is approved. Set a password below to
         log in and see your trade pricing.
       </p>
       <table role="presentation" cellpadding="0" cellspacing="0">
@@ -268,7 +268,7 @@ export async function sendWholesaleApprovedEmail(account: {
 
 Hi ${account.contactName},
 
-${account.businessName}'s SaFaLight trade account is approved. Set your password to log in and see your trade pricing:
+${account.businessName}'s Ollerialight trade account is approved. Set your password to log in and see your trade pricing:
 ${account.setPasswordUrl}
 
 This link expires in 7 days.`;
@@ -277,7 +277,7 @@ This link expires in 7 days.`;
     from: EMAIL_FROM,
     replyTo: EMAIL_REPLY_TO,
     to: account.email,
-    subject: "Your SaFaLight Trade Account Is Approved",
+    subject: "Your Ollerialight Trade Account Is Approved",
     html,
     text,
   });

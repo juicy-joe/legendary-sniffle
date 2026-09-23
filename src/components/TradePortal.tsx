@@ -23,7 +23,7 @@ type Item = {
 
 type CartLine = { slug: string; qty: number };
 
-const STORAGE_KEY = "safalight:trade-cart";
+const STORAGE_KEY = "ollerialight:trade-cart";
 const sortedCountries = [...SHIPPABLE_COUNTRIES].sort((a, b) => a.name.localeCompare(b.name));
 
 // Deliberately its own self-contained cart, not the storefront's CartContext

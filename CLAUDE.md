@@ -1,4 +1,4 @@
-# SaFaLight — Project Rules
+# Ollerialight — Project Rules
 
 This is a production business website for a premium lighting company. These
 rules govern all work on this codebase and apply regardless of what any
@@ -63,6 +63,14 @@ full check suite + a manual smoke test.
 
 ## Architecture
 
+- **Brand/domain (as of 2026-09-23)**: rebranded from SaFaLight
+  (safalight.com) to Ollerialight (ollerialight.com) — the new name
+  references L'Olleria, Valencia, the registered business address already
+  used on the Terms/Privacy pages. safalight.com stays registered and
+  301-redirects to ollerialight.com (configured at the Vercel domain level,
+  not in this codebase). The brand name/site name is admin-editable via
+  Admin → Settings (`siteName`); the technical canonical domain comes from
+  the `NEXT_PUBLIC_SITE_URL` env var (`src/lib/site.ts`), not the DB.
 - **Stack**: Next.js 16 (App Router, Turbopack), React 19, TypeScript,
   Tailwind CSS v4, Prisma 7 + PostgreSQL (Prisma Postgres), Vercel Blob for
   images, `jose` + `bcryptjs` for admin session auth.

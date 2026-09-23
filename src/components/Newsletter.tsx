@@ -30,7 +30,7 @@ export default function Newsletter({ dark = true }: { dark?: boolean }) {
             }`}
           >
             <Check className="h-4 w-4" />{" "}
-            {t("newsletter.success", "You're on the list — welcome to SaFaLight.")}
+            {t("newsletter.success", "You're on the list — welcome to Ollerialight.")}
           </motion.div>
         ) : (
           <motion.form

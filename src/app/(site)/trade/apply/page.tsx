@@ -5,7 +5,7 @@ import WholesaleApplyForm from "@/components/WholesaleApplyForm";
 
 export const metadata: Metadata = {
   title: "Apply for a Trade Account",
-  description: "Apply for a SaFaLight trade account to access wholesale pricing and place bulk orders.",
+  description: "Apply for an Ollerialight trade account to access wholesale pricing and place bulk orders.",
   alternates: { canonical: "/trade/apply" },
   robots: { index: false, follow: false },
 };

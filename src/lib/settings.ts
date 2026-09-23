@@ -5,11 +5,11 @@ import "server-only";
 import { prisma } from "./prisma";
 
 const defaults = {
-  siteName: "SaFaLight",
-  siteUrl: "https://www.safalight.com",
-  defaultMetaTitle: "SaFaLight | Luxury Designer Table Lamps",
+  siteName: "Ollerialight",
+  siteUrl: "https://www.ollerialight.com",
+  defaultMetaTitle: "Ollerialight | Luxury Designer Table Lamps",
   defaultMetaDesc:
-    "SaFaLight curates rare, museum-quality designer table lamps from the world's most celebrated lighting artisans — hand-finished, individually numbered, made to be inherited.",
+    "Ollerialight curates rare, museum-quality designer table lamps from the world's most celebrated lighting artisans — hand-finished, individually numbered, made to be inherited.",
   euRegularShippingPrice: 0,
   euExpressShippingPrice: 50,
   nonEuRegularShippingPrice: 450,

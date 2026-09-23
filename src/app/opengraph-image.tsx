@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "SaFaLight — Luxury Designer Table Lamps";
+export const alt = "Ollerialight — Luxury Designer Table Lamps";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -23,13 +23,13 @@ export default function OpengraphImage() {
             display: "flex",
             alignItems: "center",
             gap: 4,
-            fontSize: 108,
+            fontSize: 92,
             fontWeight: 600,
             color: "#ffffff",
             letterSpacing: "-0.02em",
           }}
         >
-          <span>SaFaLight</span>
+          <span>Ollerialight</span>
         </div>
         <div
           style={{

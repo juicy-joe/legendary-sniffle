@@ -16,9 +16,9 @@ export function getResend(): Resend {
   return client;
 }
 
-// Sent from safalight.com (verified as a Resend sending domain), but with
-// reply-to pointed at the real inbox the business actually monitors — a
-// customer hitting "reply" shouldn't land on an unmonitored address just
+// Sent from ollerialight.com (verified as a Resend sending domain), but
+// with reply-to pointed at the real inbox the business actually monitors —
+// a customer hitting "reply" shouldn't land on an unmonitored address just
 // because the storefront's domain and the business's email domain differ.
-export const EMAIL_FROM = "SaFaLight <orders@safalight.com>";
+export const EMAIL_FROM = "Ollerialight <orders@ollerialight.com>";
 export const EMAIL_REPLY_TO = "info@finnbogasondesign.com";

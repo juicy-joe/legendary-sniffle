@@ -37,7 +37,7 @@ export default async function Footer() {
         <div className="grid grid-cols-1 gap-14 md:grid-cols-4 md:gap-10">
           <div className="md:col-span-2">
             <Link href="/" className="font-serif text-3xl font-medium">
-              Sa<span className="text-gold">Fa</span>Light
+              Olleria<span className="text-gold">Light</span>
             </Link>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-paper/55">
               {t(
@@ -103,7 +103,7 @@ export default async function Footer() {
         <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-paper/10 pt-8 md:flex-row">
           <p className="flex flex-wrap items-center gap-x-2 text-xs text-paper/60">
             <span>
-              &copy; {new Date().getFullYear()} SaFaLight. {t(dict, "footer.rightsReserved", "All rights reserved.")}
+              &copy; {new Date().getFullYear()} Ollerialight. {t(dict, "footer.rightsReserved", "All rights reserved.")}
             </span>
             <span aria-hidden="true">&middot;</span>
             <Link href="/privacy" className="underline-offset-2 transition-colors hover:text-gold hover:underline">
@@ -124,7 +124,7 @@ export default async function Footer() {
                     href={s.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`SaFaLight on ${s.platform.charAt(0).toUpperCase() + s.platform.slice(1)}`}
+                    aria-label={`Ollerialight on ${s.platform.charAt(0).toUpperCase() + s.platform.slice(1)}`}
                     className="text-paper/60 transition-colors hover:text-gold"
                   >
                     <Icon className="h-4 w-4" />

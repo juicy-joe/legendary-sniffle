@@ -34,7 +34,7 @@ function truncate(text: string, max: number): string {
   return `${lastSpace > 40 ? cut.slice(0, lastSpace) : cut}…`;
 }
 
-/** <title> text for the product page — wrapped in " | SaFaLight" by the
+/** <title> text for the product page — wrapped in " | <site name>" by the
  * root layout's title template, so this only needs the product-specific
  * part. Kept under ~60 chars where possible so it doesn't get truncated in
  * search results once the brand suffix is added. */
@@ -46,21 +46,23 @@ export function productSeoTitle(product: SeoProduct): string {
 
 /** Meta description — distinct from the on-page description shown to
  * customers, this is a search-result-length (~155 char) summary built from
- * the product's designer, materials, and collection. */
-export function productSeoDescription(product: SeoProduct): string {
+ * the product's designer, materials, and collection. `siteName` comes from
+ * the admin-editable Settings singleton so a rebrand never leaves a stale
+ * brand name baked into generated descriptions. */
+export function productSeoDescription(product: SeoProduct, siteName: string): string {
   const manual = product.metaDescription?.trim();
   if (manual) return truncate(manual, 160);
-  const summary = `${product.name} by ${product.designer} — ${product.materials}. Hand-finished, part of SaFaLight's ${product.collection} collection.`;
+  const summary = `${product.name} by ${product.designer} — ${product.materials}. Hand-finished, part of ${siteName}'s ${product.collection} collection.`;
   return truncate(summary, 160);
 }
 
 /** The product's own first photo, when one exists — a real product shot
  * makes a far better social-share preview than the generic branded image,
  * which is used as the fallback for products with no photography yet. */
-export function productOgImage(product: SeoProduct): { url: string; alt: string } {
+export function productOgImage(product: SeoProduct, siteName: string): { url: string; alt: string } {
   const first = product.images?.[0];
   if (first) return { url: first.src, alt: `${product.name} by ${product.designer}` };
-  return { url: `${siteUrl}/opengraph-image`, alt: "SaFaLight — Luxury Designer Table Lamps" };
+  return { url: `${siteUrl}/opengraph-image`, alt: `${siteName} — Luxury Designer Table Lamps` };
 }
 
 /** Shared base alt text for a product's photo gallery — ProductPhoto
@@ -75,7 +77,7 @@ export function productPhotoAlt(product: Pick<CatalogProduct, "name" | "designer
 /** schema.org Product structured data — includes real photos (falling back
  * to the branded OG image when a product has none yet), the warehouse SKU,
  * and an absolute canonical URL, all derived without any manual input. */
-export function productJsonLd(product: SeoProduct) {
+export function productJsonLd(product: SeoProduct, siteName: string) {
   const url = `${siteUrl}/products/${product.slug}`;
   const images = product.images?.length
     ? product.images.map((img) => img.src)
@@ -91,7 +93,7 @@ export function productJsonLd(product: SeoProduct) {
     material: product.materials,
     image: images,
     url,
-    brand: { "@type": "Brand", name: "SaFaLight" },
+    brand: { "@type": "Brand", name: siteName },
     offers: {
       "@type": "Offer",
       url,

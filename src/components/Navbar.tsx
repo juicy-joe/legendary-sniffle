@@ -100,10 +100,10 @@ export default function Navbar({ links }: { links: { href: string; label: string
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-10">
         <Link href="/" className="shrink-0">
           <Image
-            src="/logo.webp"
-            alt="SaFaLight"
+            src="/logo.svg"
+            alt="Ollerialight"
             width={1600}
-            height={307}
+            height={260}
             priority
             className="h-6 w-auto md:h-7"
           />

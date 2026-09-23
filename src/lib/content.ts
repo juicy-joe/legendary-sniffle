@@ -24,7 +24,7 @@ const homeDefaults = {
   heroHeadline: "Light, Crafted Like",
   heroHeadlineAccent: "Sculpture",
   heroSubtext:
-    "SaFaLight curates rare, museum-quality table lamps from the world's most celebrated lighting artisans — hand-finished, individually numbered, made to be inherited.",
+    "Ollerialight curates rare, museum-quality table lamps from the world's most celebrated lighting artisans — hand-finished, individually numbered, made to be inherited.",
   chromaHeadline: "Hand-Blown in Poland, One Sphere at a Time",
   chromaSubtext:
     "Four glass spheres from our partner atelier in Poland — each colourway cast entirely by hand, no two ever quite alike. Custom colourways are genuinely available on this line; ask our design team about commissioning your own.",
@@ -36,7 +36,7 @@ const homeDefaults = {
 const aboutDefaults = {
   heroHeadline: "We believe light deserves to be treated like sculpture.",
   heroSubtext:
-    "SaFaLight exists to give a small circle of master designers the time, materials, and patience their work deserves — and to bring the result into homes that will keep it for generations.",
+    "Ollerialight exists to give a small circle of master designers the time, materials, and patience their work deserves — and to bring the result into homes that will keep it for generations.",
 };
 
 const contactDefaults = {

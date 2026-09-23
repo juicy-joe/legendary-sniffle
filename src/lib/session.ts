@@ -3,7 +3,7 @@
 // middleware.ts, which runs on the Edge runtime.
 import { SignJWT, jwtVerify } from "jose";
 
-export const SESSION_COOKIE = "safalight_admin_session";
+export const SESSION_COOKIE = "ollerialight_admin_session";
 const SESSION_DURATION_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
 function getSecretKey() {

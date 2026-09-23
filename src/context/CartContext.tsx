@@ -26,7 +26,7 @@ type CartContextValue = {
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
-const STORAGE_KEY = "safalight:cart";
+const STORAGE_KEY = "ollerialight:cart";
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const { getProduct } = useCatalog();

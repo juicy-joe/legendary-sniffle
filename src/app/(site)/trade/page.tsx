@@ -8,7 +8,7 @@ import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Trade Accounts",
-  description: "SaFaLight trade accounts for retailers, designers, and hospitality buyers — wholesale pricing on the full collection.",
+  description: "Ollerialight trade accounts for retailers, designers, and hospitality buyers — wholesale pricing on the full collection.",
   alternates: { canonical: "/trade" },
 };
 
@@ -69,7 +69,7 @@ export default async function TradePage() {
               {t(
                 dict,
                 "trade.heroSubtext",
-                "A trade account gives you SaFaLight's full collection at wholesale pricing, direct access to our team for special orders, and a home for larger project requests."
+                "A trade account gives you Ollerialight's full collection at wholesale pricing, direct access to our team for special orders, and a home for larger project requests."
               )}
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">

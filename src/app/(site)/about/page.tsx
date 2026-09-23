@@ -10,7 +10,7 @@ import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "SaFaLight was founded to give master lighting designers a home. Learn our story, meet our resident designers, and see how every lamp is made.",
+    "Ollerialight was founded to give master lighting designers a home. Learn our story, meet our resident designers, and see how every lamp is made.",
   alternates: { canonical: "/about" },
 };
 

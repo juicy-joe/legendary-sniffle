@@ -7,7 +7,7 @@ import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How SaFaLight collects, uses, and protects your personal information.",
+  description: "How Ollerialight collects, uses, and protects your personal information.",
   alternates: { canonical: "/privacy" },
 };
 

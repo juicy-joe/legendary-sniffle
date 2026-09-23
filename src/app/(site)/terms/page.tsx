@@ -6,7 +6,7 @@ import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Terms and Conditions",
-  description: "The terms and conditions governing purchases made on SaFaLight.",
+  description: "The terms and conditions governing purchases made on Ollerialight.",
   alternates: { canonical: "/terms" },
 };
 
@@ -69,11 +69,11 @@ export default async function TermsPage() {
         <RevealOnScroll>
           <h2 className="mb-3 font-serif text-2xl font-light text-ink">1. Introduction</h2>
           <p>
-            Welcome to Safalight.com (the &ldquo;Website&rdquo;), operated by{" "}
+            Welcome to Ollerialight.com (the &ldquo;Website&rdquo;), operated by{" "}
             <Placeholder>Insert Full Legal Company Name</Placeholder>, a company registered in
             Spain with registered address at Pol&iacute;gono 5, Parcela 34, Pla&ccedil;a
             Diseminados Res, 280, 46850 L&rsquo;Olleria, Valencia, Espa&ntilde;a, Tax ID /
-            NIF-CIF: <Placeholder>Insert Tax ID</Placeholder> (hereinafter &ldquo;Safalight,&rdquo;
+            NIF-CIF: <Placeholder>Insert Tax ID</Placeholder> (hereinafter &ldquo;Ollerialight,&rdquo;
             &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;).
           </p>
           <p className="mt-3">
@@ -103,7 +103,7 @@ export default async function TermsPage() {
         <RevealOnScroll>
           <h2 className="mb-3 font-serif text-2xl font-light text-ink">3. Products and Pricing</h2>
           <p>
-            3.1. Safalight sells lighting products and related accessories as described on the
+            3.1. Ollerialight sells lighting products and related accessories as described on the
             Website. Product descriptions, images, and specifications are provided for
             informational purposes and, while we make reasonable efforts to ensure accuracy, minor
             variations between images and actual products may occur (e.g., due to screen display
@@ -119,7 +119,7 @@ export default async function TermsPage() {
             be the price displayed at the time your order is confirmed.
           </p>
           <p className="mt-3">
-            3.4. In the event of an obvious pricing or typographical error, Safalight reserves the
+            3.4. In the event of an obvious pricing or typographical error, Ollerialight reserves the
             right to cancel the order, notify you, and issue a full refund.
           </p>
         </RevealOnScroll>
@@ -150,7 +150,7 @@ export default async function TermsPage() {
             indicated on the Website.
           </p>
           <p className="mt-3">
-            5.2. All payments are processed through secure third-party payment providers. Safalight
+            5.2. All payments are processed through secure third-party payment providers. Ollerialight
             does not store full payment card details on its own servers.
           </p>
         </RevealOnScroll>
@@ -168,7 +168,7 @@ export default async function TermsPage() {
             address provided at checkout.
           </p>
           <p className="mt-3">
-            6.3. Safalight is not liable for delays caused by circumstances beyond its reasonable
+            6.3. Ollerialight is not liable for delays caused by circumstances beyond its reasonable
             control, including customs processing, courier delays, or force majeure events.
           </p>
         </RevealOnScroll>
@@ -233,7 +233,7 @@ export default async function TermsPage() {
           <h2 className="mb-3 font-serif text-2xl font-light text-ink">9. Intellectual Property</h2>
           <p>
             All content on the Website — including text, graphics, logos, product images, and
-            design — is the property of Safalight or its licensors and is protected by applicable
+            design — is the property of Ollerialight or its licensors and is protected by applicable
             intellectual property laws. You may not reproduce, distribute, or use this content
             without our prior written consent.
           </p>
@@ -244,7 +244,7 @@ export default async function TermsPage() {
             10. Limitation of Liability
           </h2>
           <p>
-            10.1. To the fullest extent permitted by law, Safalight shall not be liable for any
+            10.1. To the fullest extent permitted by law, Ollerialight shall not be liable for any
             indirect, incidental, or consequential damages arising from the use of the Website or
             products purchased through it.
           </p>
@@ -258,7 +258,7 @@ export default async function TermsPage() {
         <RevealOnScroll>
           <h2 className="mb-3 font-serif text-2xl font-light text-ink">11. Data Protection</h2>
           <p>
-            Safalight processes limited personal data necessary to process and deliver orders (such
+            Ollerialight processes limited personal data necessary to process and deliver orders (such
             as shipping address and contact details) in accordance with the GDPR and Spanish data
             protection law (LOPDGDD). Full details on how we collect, use, and protect personal
             data are set out in our separate{" "}
@@ -312,7 +312,7 @@ export default async function TermsPage() {
             14. Changes to These Terms
           </h2>
           <p>
-            Safalight reserves the right to update or modify these Terms at any time. Changes will
+            Ollerialight reserves the right to update or modify these Terms at any time. Changes will
             be posted on this page with an updated &ldquo;Last updated&rdquo; date. Continued use
             of the Website after changes constitutes acceptance of the revised Terms.
           </p>
@@ -322,7 +322,7 @@ export default async function TermsPage() {
           <h2 className="mb-3 font-serif text-2xl font-light text-ink">15. Contact Information</h2>
           <p>For any questions regarding these Terms, please contact us at:</p>
           <p className="mt-3">
-            Safalight
+            Ollerialight
             <br />
             Pol&iacute;gono 5, Parcela 34, Pla&ccedil;a Diseminados Res, 280
             <br />
