@@ -6,7 +6,7 @@ import { prisma } from "./prisma";
 
 const defaults = {
   siteName: "Ollerialight",
-  siteUrl: "https://www.ollerialight.com",
+  siteUrl: "https://ollerialight.com",
   defaultMetaTitle: "Ollerialight | Luxury Designer Table Lamps",
   defaultMetaDesc:
     "Ollerialight curates rare, museum-quality designer table lamps from the world's most celebrated lighting artisans — hand-finished, individually numbered, made to be inherited.",
