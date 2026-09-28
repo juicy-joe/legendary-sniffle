@@ -66,7 +66,6 @@ export const uiKeySections: UiKeySection[] = [
       { key: "home.handFinished", fallback: "Hand-Finished" },
       { key: "home.avgDispatchTime", fallback: "Avg. Dispatch Time" },
       { key: "home.stayIlluminated", fallback: "Stay Illuminated" },
-      { key: "home.joinAtelierList", fallback: "Join the Atelier List" },
       {
         key: "home.newsletterBlurb",
         fallback:

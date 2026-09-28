@@ -213,9 +213,6 @@ export default async function Home() {
           <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
             {t(dict, "home.stayIlluminated", "Stay Illuminated")}
           </p>
-          <h2 className="font-serif text-4xl text-ink md:text-5xl">
-            {t(dict, "home.joinAtelierList", "Join the Atelier List")}
-          </h2>
           <p className="mx-auto mt-4 max-w-md text-ink/60">
             {t(
               dict,
