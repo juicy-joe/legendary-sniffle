@@ -40,7 +40,7 @@ const aboutDefaults = {
 };
 
 const contactDefaults = {
-  email: "johannj@finnbogasondesign.com",
+  email: "J.J.F@ollerialight.com",
   phone: "+1 (555) 018-2043",
   address: "24 Ateljé Row, New York, NY",
   hours: "Tue-Sat, 11am-6pm, by appointment",
