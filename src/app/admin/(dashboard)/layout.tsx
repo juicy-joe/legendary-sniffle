@@ -23,7 +23,7 @@ import { getSession } from "@/lib/get-session";
 import { logout } from "@/app/admin/login/actions";
 
 export const metadata: Metadata = {
-  title: { default: "Admin", template: "%s | Ollerialight Admin" },
+  title: { default: "Admin", template: "%s | Olleria Light Admin" },
   robots: { index: false, follow: false },
 };
 
@@ -66,7 +66,7 @@ export default async function AdminDashboardLayout({
       <aside className="hidden w-60 shrink-0 flex-col border-r border-ink/10 bg-ink text-paper md:flex print:hidden">
         <div className="px-6 py-6">
           <Link href="/admin" className="font-serif text-xl font-medium">
-            Sa<span className="text-gold">Fa</span>Light
+            Olleria <span className="text-gold">Light</span>
           </Link>
           <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-paper/45">
             Admin
@@ -102,7 +102,7 @@ export default async function AdminDashboardLayout({
       <div className="fixed inset-x-0 top-0 z-40 md:hidden print:hidden">
         <div className="flex items-center justify-between border-b border-ink/10 bg-ink px-4 py-3 text-paper">
           <Link href="/admin" className="font-serif text-lg font-medium">
-            Sa<span className="text-gold">Fa</span>Light Admin
+            Olleria <span className="text-gold">Light</span> Admin
           </Link>
           <form action={logout}>
             <button type="submit" aria-label="Log out" className="text-paper/70">

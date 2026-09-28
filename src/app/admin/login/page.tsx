@@ -17,7 +17,7 @@ export default async function AdminLoginPage({
     <div className="flex min-h-screen items-center justify-center bg-ink px-6 text-paper">
       <div className="w-full max-w-sm">
         <p className="mb-2 text-center font-serif text-2xl font-medium">
-          Sa<span className="text-gold">Fa</span>Light
+          Olleria <span className="text-gold">Light</span>
         </p>
         <p className="mb-10 text-center text-[11px] uppercase tracking-[0.2em] text-paper/50">
           Admin

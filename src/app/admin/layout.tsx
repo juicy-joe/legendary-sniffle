@@ -26,7 +26,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: { default: "Ollerialight Admin", template: "%s | Ollerialight Admin" },
+  title: { default: "Olleria Light Admin", template: "%s | Olleria Light Admin" },
   robots: { index: false, follow: false },
 };
 
