@@ -158,9 +158,11 @@ export default async function ProductPage({
             </div>
           </dl>
 
-          <blockquote className="mt-8 border-l border-gold pl-5 font-serif text-lg font-light leading-relaxed text-ink/70">
-            &ldquo;{product.story}&rdquo;
-          </blockquote>
+          {product.story && (
+            <blockquote className="mt-8 border-l border-gold pl-5 font-serif text-lg font-light leading-relaxed text-ink/70">
+              &ldquo;{product.story}&rdquo;
+            </blockquote>
+          )}
 
           <div className="mt-10">
             <AddToCartPanel slug={product.slug} name={product.name} />
