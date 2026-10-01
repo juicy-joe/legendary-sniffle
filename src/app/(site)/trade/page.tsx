@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ArrowRight, Percent, ShieldCheck, Users } from "lucide-react";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import MagneticButton from "@/components/MagneticButton";
-import { getSettings } from "@/lib/settings";
 import { getTradeContent } from "@/lib/content";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
@@ -15,11 +14,7 @@ export const metadata: Metadata = {
 
 export default async function TradePage() {
   const locale = await getLocale();
-  const [settings, content, dict] = await Promise.all([
-    getSettings(),
-    getTradeContent(),
-    getUiTranslations(locale),
-  ]);
+  const [content, dict] = await Promise.all([getTradeContent(), getUiTranslations(locale)]);
 
   const perks = [
     {
@@ -29,8 +24,8 @@ export default async function TradePage() {
       body: t(
         dict,
         "trade.perk.tradePricing.body",
-        "{percent}% off retail by default, with negotiated pricing available for regular volume."
-      ).replace("{percent}", String(settings.wholesaleDefaultDiscountPercent)),
+        "Log in to view our exclusive retailer prices. For larger quantities or customised projects, individual pricing and special conditions may be available upon request."
+      ),
     },
     {
       key: "dedicatedContact",

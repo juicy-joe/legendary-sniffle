@@ -231,7 +231,8 @@ export const uiKeySections: UiKeySection[] = [
       { key: "trade.perk.tradePricing.title", fallback: "Trade Pricing" },
       {
         key: "trade.perk.tradePricing.body",
-        fallback: "{percent}% off retail by default, with negotiated pricing available for regular volume.",
+        fallback:
+          "Log in to view our exclusive retailer prices. For larger quantities or customised projects, individual pricing and special conditions may be available upon request.",
       },
       { key: "trade.perk.dedicatedContact.title", fallback: "A Dedicated Contact" },
       {
