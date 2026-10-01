@@ -137,7 +137,7 @@ export default async function ProductPage({
             {formatPrice(product.price)}
           </p>
 
-          <p className="mt-6 max-w-lg text-base leading-relaxed text-ink/70">
+          <p className="mt-6 max-w-lg whitespace-pre-line text-base leading-relaxed text-ink/70">
             {product.description}
           </p>
 
