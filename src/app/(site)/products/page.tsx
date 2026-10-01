@@ -4,19 +4,25 @@ import RevealOnScroll from "@/components/RevealOnScroll";
 import ProductsExplorer from "@/components/ProductsExplorer";
 import CollectionsShowcase, { type CollectionSummary } from "@/components/CollectionsShowcase";
 import { getCatalog, getCollections } from "@/lib/catalog";
+import { getProductsContent } from "@/lib/content";
 import { slugify } from "@/lib/slugify";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Designer Table Lamps",
   description:
-    "Discover the full collection of luxury, hand-blown designer table lamps made from lead-free optical crystalline glass. Each NatureSphere piece is a unique original, color variations are a natural signature of the handcrafting process. These ambient mood lights are designed to transform your space with atmosphere and character, not just illumination. Available in NatureSphere and MoodMAX collections.",
+    "Discover the full collection of luxury, hand-blown designer table lamps made from lead-free optical crystalline glass. Each NatureSPHERE piece is a unique original, color variations are a natural signature of the handcrafting process. These ambient mood lights are designed to transform your space with atmosphere and character, not just illumination. Available in NatureSPHERE and MoodMAX collections.",
   alternates: { canonical: "/products" },
 };
 
 export default async function ProductsPage() {
   const locale = await getLocale();
-  const [catalog, collectionRows, dict] = await Promise.all([getCatalog(), getCollections(), getUiTranslations(locale)]);
+  const [catalog, collectionRows, content, dict] = await Promise.all([
+    getCatalog(),
+    getCollections(),
+    getProductsContent(),
+    getUiTranslations(locale),
+  ]);
 
   // Canonical collection order (alphabetical, from the admin-managed
   // Collection table) — passed to ProductsExplorer too so the showcase
@@ -52,17 +58,13 @@ export default async function ProductsPage() {
       </nav>
       <RevealOnScroll className="mb-14 max-w-2xl">
         <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
-          {t(dict, "products.theCollection", "The Collection")}
+          {content.heroEyebrow}
         </p>
         <h1 className="font-serif text-5xl text-ink md:text-6xl">
-          {t(dict, "products.designerTableLamps", "Designer Table Lamps")}
+          {content.heroHeadline}
         </h1>
         <p className="mt-5 text-base leading-relaxed text-ink/60">
-          {t(
-            dict,
-            "products.intro",
-            "Every piece is mouth-blown from high-clarity crystalline glass and hand-finished to order. Within our NatureSphere collection, each sphere is individually shaped, so natural variations in color patterns occur, your lamp will be a unique original, distinct from the online image. Our MoodMAX collection offers a complementary aesthetic with its own character. Filter by color or finish to find the piece that fits your space. These are ambient lights, crafted to create mood and character, not merely to illuminate a room."
-          )}
+          {content.intro}
         </p>
       </RevealOnScroll>
 

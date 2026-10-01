@@ -57,7 +57,7 @@ export default function HomeContentForm({ content }: { content: HomeContentData 
       <section className="space-y-6">
         <h2 className="font-serif text-xl font-light text-ink">Featured Collection Section</h2>
         <p className="text-xs text-ink/65">
-          Currently spotlights the NatureSphere&rsquo;s collection on the
+          Currently spotlights the NatureSPHERE&rsquo;s collection on the
           homepage. Only shows up there if that collection has products in
           it.
         </p>

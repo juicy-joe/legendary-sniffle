@@ -87,6 +87,7 @@ export default async function Footer() {
                   {contact.email}
                 </a>
               </li>
+              <li className="text-paper/60">{contact.address}</li>
               <li>
                 <a
                   href={`tel:${contact.phone.replace(/[^\d+]/g, "")}`}
@@ -96,6 +97,11 @@ export default async function Footer() {
                 </a>
               </li>
               <li className="text-paper/60">{contact.hours}</li>
+              <li className="mt-2 border-t border-paper/10 pt-3.5 text-xs leading-relaxed text-paper/45">
+                New World Developments S.L.
+                <br />
+                CIF/NIF: B05618996
+              </li>
             </ul>
           </div>
         </div>

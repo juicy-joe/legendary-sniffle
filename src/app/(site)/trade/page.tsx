@@ -4,6 +4,7 @@ import { ArrowRight, Percent, ShieldCheck, Users } from "lucide-react";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import MagneticButton from "@/components/MagneticButton";
 import { getSettings } from "@/lib/settings";
+import { getTradeContent } from "@/lib/content";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 export const metadata: Metadata = {
@@ -14,7 +15,11 @@ export const metadata: Metadata = {
 
 export default async function TradePage() {
   const locale = await getLocale();
-  const [settings, dict] = await Promise.all([getSettings(), getUiTranslations(locale)]);
+  const [settings, content, dict] = await Promise.all([
+    getSettings(),
+    getTradeContent(),
+    getUiTranslations(locale),
+  ]);
 
   const perks = [
     {
@@ -60,17 +65,13 @@ export default async function TradePage() {
           </nav>
           <RevealOnScroll>
             <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold">
-              {t(dict, "trade.forTheTrade", "For the Trade")}
+              {content.heroEyebrow}
             </p>
             <h1 className="font-serif text-5xl font-light leading-tight md:text-6xl">
-              {t(dict, "trade.heroHeadline", "Wholesale Pricing for Retailers & Designers")}
+              {content.heroHeadline}
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-paper/60">
-              {t(
-                dict,
-                "trade.heroSubtext",
-                "A trade account gives you Ollerialight's full collection at wholesale pricing, direct access to our team for special orders, and a home for larger project requests."
-              )}
+              {content.heroSubtext}
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <MagneticButton href="/trade/apply" variant="paper">

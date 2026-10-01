@@ -3,7 +3,14 @@ import clsx from "clsx";
 import { prisma } from "@/lib/prisma";
 import { locales, localeNames, type Locale } from "@/lib/i18n";
 import { uiKeySections } from "@/lib/i18n-keys";
-import { getHomeContent, getAboutContent, getContactInfo } from "@/lib/content";
+import {
+  getHomeContent,
+  getAboutContent,
+  getProductsContent,
+  getConsultingContent,
+  getTradeContent,
+  getContactInfo,
+} from "@/lib/content";
 import { getCatalog, getDesigners, getCollections } from "@/lib/catalog";
 import UiTranslationsEditor from "@/components/admin/UiTranslationsEditor";
 import ContentTranslationsEditor, {
@@ -102,15 +109,19 @@ async function InterfaceTab({ locale }: { locale: Locale }) {
 }
 
 async function ContentTab({ locale }: { locale: Locale }) {
-  const [products, designers, collections, home, about, contact, menuItems] = await Promise.all([
-    getCatalog("en"),
-    getDesigners("en"),
-    getCollections("en"),
-    getHomeContent("en"),
-    getAboutContent("en"),
-    getContactInfo("en"),
-    prisma.menuItem.findMany({ orderBy: [{ location: "asc" }, { sortOrder: "asc" }] }),
-  ]);
+  const [products, designers, collections, home, about, productsPage, consulting, trade, contact, menuItems] =
+    await Promise.all([
+      getCatalog("en"),
+      getDesigners("en"),
+      getCollections("en"),
+      getHomeContent("en"),
+      getAboutContent("en"),
+      getProductsContent("en"),
+      getConsultingContent("en"),
+      getTradeContent("en"),
+      getContactInfo("en"),
+      prisma.menuItem.findMany({ orderBy: [{ location: "asc" }, { sortOrder: "asc" }] }),
+    ]);
 
   const recordIds = [
     ...products.map((p) => p.id),
@@ -119,6 +130,9 @@ async function ContentTab({ locale }: { locale: Locale }) {
     ...menuItems.map((m) => m.id),
     "home",
     "about",
+    "products",
+    "consulting",
+    "trade",
     "contact",
   ];
   const overrideRows = await prisma.contentTranslation.findMany({
@@ -140,6 +154,15 @@ async function ContentTab({ locale }: { locale: Locale }) {
     { model: "HomeContent", recordId: "home", field: "craftSubtext", label: "Home — Craft section subtext", english: home.craftSubtext, value: value("HomeContent", "home", "craftSubtext"), multiline: true },
     { model: "AboutContent", recordId: "about", field: "heroHeadline", label: "About — Hero headline", english: about.heroHeadline, value: value("AboutContent", "about", "heroHeadline") },
     { model: "AboutContent", recordId: "about", field: "heroSubtext", label: "About — Hero subtext", english: about.heroSubtext, value: value("AboutContent", "about", "heroSubtext"), multiline: true },
+    { model: "ProductsContent", recordId: "products", field: "heroEyebrow", label: "Products — Eyebrow", english: productsPage.heroEyebrow, value: value("ProductsContent", "products", "heroEyebrow") },
+    { model: "ProductsContent", recordId: "products", field: "heroHeadline", label: "Products — Headline", english: productsPage.heroHeadline, value: value("ProductsContent", "products", "heroHeadline") },
+    { model: "ProductsContent", recordId: "products", field: "intro", label: "Products — Intro", english: productsPage.intro, value: value("ProductsContent", "products", "intro"), multiline: true },
+    { model: "ConsultingContent", recordId: "consulting", field: "heroEyebrow", label: "Consulting — Eyebrow", english: consulting.heroEyebrow, value: value("ConsultingContent", "consulting", "heroEyebrow") },
+    { model: "ConsultingContent", recordId: "consulting", field: "heroHeadline", label: "Consulting — Headline", english: consulting.heroHeadline, value: value("ConsultingContent", "consulting", "heroHeadline") },
+    { model: "ConsultingContent", recordId: "consulting", field: "heroSubtext", label: "Consulting — Subtext", english: consulting.heroSubtext, value: value("ConsultingContent", "consulting", "heroSubtext"), multiline: true },
+    { model: "TradeContent", recordId: "trade", field: "heroEyebrow", label: "B2B — Eyebrow", english: trade.heroEyebrow, value: value("TradeContent", "trade", "heroEyebrow") },
+    { model: "TradeContent", recordId: "trade", field: "heroHeadline", label: "B2B — Headline", english: trade.heroHeadline, value: value("TradeContent", "trade", "heroHeadline") },
+    { model: "TradeContent", recordId: "trade", field: "heroSubtext", label: "B2B — Subtext", english: trade.heroSubtext, value: value("TradeContent", "trade", "heroSubtext"), multiline: true },
     { model: "ContactInfo", recordId: "contact", field: "hours", label: "Contact — Hours", english: contact.hours, value: value("ContactInfo", "contact", "hours") },
   ];
 

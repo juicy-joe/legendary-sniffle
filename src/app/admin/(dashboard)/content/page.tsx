@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Home, Info, Mail } from "lucide-react";
+import { ArrowRight, Briefcase, Compass, Home, Info, Mail, Package } from "lucide-react";
 
 export const metadata = { title: "Content — Admin" };
 
@@ -11,10 +11,28 @@ const pages = [
     description: "Hero copy, the Chroma Editions spotlight, and the Craft section.",
   },
   {
+    href: "/admin/content/products",
+    icon: Package,
+    title: "Products Page",
+    description: "The Products page's eyebrow, headline, and intro copy.",
+  },
+  {
     href: "/admin/content/about",
     icon: Info,
     title: "About Page",
     description: "The About page's headline and intro copy.",
+  },
+  {
+    href: "/admin/content/consulting",
+    icon: Compass,
+    title: "Consulting Page",
+    description: "The Consulting page's hero eyebrow, headline, and subtext.",
+  },
+  {
+    href: "/admin/content/trade",
+    icon: Briefcase,
+    title: "B2B Page",
+    description: "The B2B (trade) page's hero eyebrow, headline, and subtext.",
   },
   {
     href: "/admin/content/contact",

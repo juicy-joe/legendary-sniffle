@@ -39,6 +39,27 @@ const aboutDefaults = {
     "Ollerialight exists to give a small circle of master designers the time, materials, and patience their work deserves — and to bring the result into homes that will keep it for generations.",
 };
 
+const productsDefaults = {
+  heroEyebrow: "The Collection",
+  heroHeadline: "Designer Table Lamps",
+  intro:
+    "Every piece is mouth-blown from high-clarity crystalline glass and hand-finished to order. Within our NatureSPHERE collection, each sphere is individually shaped, so natural variations in color patterns occur, your lamp will be a unique original, distinct from the online image. Our MoodMAX collection offers a complementary aesthetic with its own character. Filter by color or finish to find the piece that fits your space. These are ambient lights, crafted to create mood and character, not merely to illuminate a room.",
+};
+
+const consultingDefaults = {
+  heroEyebrow: "For Architects, Developers & Designers",
+  heroHeadline: "Lighting for Spaces That Deserve More Than Off-the-Shelf.",
+  heroSubtext:
+    "We design and produce bespoke lighting for hotels, offices, villas, and other large-scale projects — working directly with architects, interior designers, and developers from first concept to final installation.",
+};
+
+const tradeDefaults = {
+  heroEyebrow: "For the Trade",
+  heroHeadline: "Wholesale Pricing for Retailers & Designers",
+  heroSubtext:
+    "A trade account gives you Ollerialight's full collection at wholesale pricing, direct access to our team for special orders, and a home for larger project requests.",
+};
+
 const contactDefaults = {
   email: "J.J.F@ollerialight.com",
   phone: "+1 (555) 018-2043",
@@ -71,6 +92,30 @@ export async function getAboutContent(locale?: Locale) {
   const base = content ?? aboutDefaults;
   const resolvedLocale = locale ?? (await getLocale());
   const overrides = await getContentFields(resolvedLocale, "AboutContent", "about");
+  return withTranslations(base, overrides);
+}
+
+export async function getProductsContent(locale?: Locale) {
+  const content = await prisma.productsContent.findUnique({ where: { id: "products" } });
+  const base = content ?? productsDefaults;
+  const resolvedLocale = locale ?? (await getLocale());
+  const overrides = await getContentFields(resolvedLocale, "ProductsContent", "products");
+  return withTranslations(base, overrides);
+}
+
+export async function getConsultingContent(locale?: Locale) {
+  const content = await prisma.consultingContent.findUnique({ where: { id: "consulting" } });
+  const base = content ?? consultingDefaults;
+  const resolvedLocale = locale ?? (await getLocale());
+  const overrides = await getContentFields(resolvedLocale, "ConsultingContent", "consulting");
+  return withTranslations(base, overrides);
+}
+
+export async function getTradeContent(locale?: Locale) {
+  const content = await prisma.tradeContent.findUnique({ where: { id: "trade" } });
+  const base = content ?? tradeDefaults;
+  const resolvedLocale = locale ?? (await getLocale());
+  const overrides = await getContentFields(resolvedLocale, "TradeContent", "trade");
   return withTranslations(base, overrides);
 }
 

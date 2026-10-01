@@ -82,6 +82,93 @@ export async function updateAboutContent(
   return { success: true };
 }
 
+const productsContentSchema = z.object({
+  heroEyebrow: z.string().min(1, "Required"),
+  heroHeadline: z.string().min(1, "Required"),
+  intro: z.string().min(1, "Required"),
+});
+
+export async function updateProductsContent(
+  _prevState: ContentFormState,
+  formData: FormData
+): Promise<ContentFormState> {
+  const parsed = productsContentSchema.safeParse({
+    heroEyebrow: formData.get("heroEyebrow"),
+    heroHeadline: formData.get("heroHeadline"),
+    intro: formData.get("intro"),
+  });
+  if (!parsed.success) {
+    return { error: "Check the highlighted fields.", fieldErrors: fieldErrorsFrom(parsed.error.issues) };
+  }
+
+  await prisma.productsContent.upsert({
+    where: { id: "products" },
+    create: { id: "products", ...parsed.data },
+    update: parsed.data,
+  });
+  revalidatePath("/products");
+  revalidatePath("/admin/content/products");
+  return { success: true };
+}
+
+const consultingContentSchema = z.object({
+  heroEyebrow: z.string().min(1, "Required"),
+  heroHeadline: z.string().min(1, "Required"),
+  heroSubtext: z.string().min(1, "Required"),
+});
+
+export async function updateConsultingContent(
+  _prevState: ContentFormState,
+  formData: FormData
+): Promise<ContentFormState> {
+  const parsed = consultingContentSchema.safeParse({
+    heroEyebrow: formData.get("heroEyebrow"),
+    heroHeadline: formData.get("heroHeadline"),
+    heroSubtext: formData.get("heroSubtext"),
+  });
+  if (!parsed.success) {
+    return { error: "Check the highlighted fields.", fieldErrors: fieldErrorsFrom(parsed.error.issues) };
+  }
+
+  await prisma.consultingContent.upsert({
+    where: { id: "consulting" },
+    create: { id: "consulting", ...parsed.data },
+    update: parsed.data,
+  });
+  revalidatePath("/consulting");
+  revalidatePath("/admin/content/consulting");
+  return { success: true };
+}
+
+const tradeContentSchema = z.object({
+  heroEyebrow: z.string().min(1, "Required"),
+  heroHeadline: z.string().min(1, "Required"),
+  heroSubtext: z.string().min(1, "Required"),
+});
+
+export async function updateTradeContent(
+  _prevState: ContentFormState,
+  formData: FormData
+): Promise<ContentFormState> {
+  const parsed = tradeContentSchema.safeParse({
+    heroEyebrow: formData.get("heroEyebrow"),
+    heroHeadline: formData.get("heroHeadline"),
+    heroSubtext: formData.get("heroSubtext"),
+  });
+  if (!parsed.success) {
+    return { error: "Check the highlighted fields.", fieldErrors: fieldErrorsFrom(parsed.error.issues) };
+  }
+
+  await prisma.tradeContent.upsert({
+    where: { id: "trade" },
+    create: { id: "trade", ...parsed.data },
+    update: parsed.data,
+  });
+  revalidatePath("/trade");
+  revalidatePath("/admin/content/trade");
+  return { success: true };
+}
+
 const contactSchema = z.object({
   email: z.string().min(1, "Required").email("Enter a valid email"),
   phone: z.string().min(1, "Required"),

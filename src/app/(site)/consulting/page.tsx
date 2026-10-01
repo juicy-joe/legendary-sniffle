@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Building2, Compass, Hotel, Layers, PenTool, Store } from "lucide-react";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import MagneticButton from "@/components/MagneticButton";
+import { getConsultingContent } from "@/lib/content";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 export const metadata: Metadata = {
@@ -42,7 +43,7 @@ const projectTypes = [
 
 export default async function ConsultingPage() {
   const locale = await getLocale();
-  const dict = await getUiTranslations(locale);
+  const [content, dict] = await Promise.all([getConsultingContent(), getUiTranslations(locale)]);
   return (
     <div>
       <section className="bg-ink py-28 text-paper">
@@ -54,17 +55,13 @@ export default async function ConsultingPage() {
           </nav>
           <RevealOnScroll>
             <p className="mb-4 text-xs uppercase tracking-[0.2em] text-gold">
-              {t(dict, "consulting.forWhom", "For Architects, Developers & Designers")}
+              {content.heroEyebrow}
             </p>
             <h1 className="font-serif text-5xl font-light leading-tight md:text-6xl">
-              {t(dict, "consulting.heroHeadline", "Lighting for Spaces That Deserve More Than Off-the-Shelf.")}
+              {content.heroHeadline}
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-paper/60">
-              {t(
-                dict,
-                "consulting.heroSubtext",
-                "We design and produce bespoke lighting for hotels, offices, villas, and other large-scale projects — working directly with architects, interior designers, and developers from first concept to final installation."
-              )}
+              {content.heroSubtext}
             </p>
           </RevealOnScroll>
         </div>

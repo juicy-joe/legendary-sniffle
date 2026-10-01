@@ -59,21 +59,21 @@ export default async function TermsPage() {
       )}
 
       <RevealOnScroll className="mt-8 rounded-[6px] border border-gold/25 bg-gold/5 p-5 text-xs leading-relaxed text-ink/70">
-        A few fields below (marked <Placeholder>like this</Placeholder>) are genuine business
-        registration details — legal company name, registered address, Tax ID / NIF-CIF — that
-        need to come from you before this page is accurate. Everything else reflects how the
-        website actually operates today.
+The field below (marked <Placeholder>like this</Placeholder>) is the one remaining business
+        registration detail — the city for dispute jurisdiction — that needs to come from you
+        before this page is accurate. Everything else reflects how the website actually operates
+        today.
       </RevealOnScroll>
 
       <div className="mt-10 space-y-10 text-sm leading-relaxed text-ink/75">
         <RevealOnScroll>
           <h2 className="mb-3 font-serif text-2xl font-light text-ink">1. Introduction</h2>
           <p>
-            Welcome to Ollerialight.com (the &ldquo;Website&rdquo;), operated by{" "}
-            <Placeholder>Insert Full Legal Company Name</Placeholder>, a company registered in
-            Spain with registered address at Pol&iacute;gono 5, Parcela 34, Pla&ccedil;a
-            Diseminados Res, 280, 46850 L&rsquo;Olleria, Valencia, Espa&ntilde;a, Tax ID /
-            NIF-CIF: <Placeholder>Insert Tax ID</Placeholder> (hereinafter &ldquo;Ollerialight,&rdquo;
+            Welcome to Ollerialight.com (the &ldquo;Website&rdquo;), operated by New World
+            Developments S.L., a company registered in Spain with registered address at
+            Pol&iacute;gono 5, Parcela 34, Pla&ccedil;a Diseminados Res, 280, 46850
+            L&rsquo;Olleria, Valencia, Espa&ntilde;a, Tax ID / NIF-CIF: B05618996 (hereinafter
+            &ldquo;Ollerialight,&rdquo;
             &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;).
           </p>
           <p className="mt-3">
@@ -333,7 +333,7 @@ export default async function TermsPage() {
               {contact.email}
             </a>
             <br />
-            Tax ID / NIF-CIF: <Placeholder>Insert Tax ID</Placeholder>
+            Tax ID / NIF-CIF: B05618996
           </p>
         </RevealOnScroll>
 

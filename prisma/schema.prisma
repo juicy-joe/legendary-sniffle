@@ -309,6 +309,30 @@ model AboutContent {
   updatedAt    DateTime @updatedAt
 }
 
+model ProductsContent {
+  id           String   @id @default("products")
+  heroEyebrow  String
+  heroHeadline String
+  intro        String
+  updatedAt    DateTime @updatedAt
+}
+
+model ConsultingContent {
+  id           String   @id @default("consulting")
+  heroEyebrow  String
+  heroHeadline String
+  heroSubtext  String
+  updatedAt    DateTime @updatedAt
+}
+
+model TradeContent {
+  id           String   @id @default("trade")
+  heroEyebrow  String
+  heroHeadline String
+  heroSubtext  String
+  updatedAt    DateTime @updatedAt
+}
+
 model ContactInfo {
   id        String   @id @default("contact")
   email     String

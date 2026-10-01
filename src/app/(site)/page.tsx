@@ -24,10 +24,10 @@ export default async function Home() {
 
   const featured = products.filter((p) => p.featured);
   // The homepage's dedicated "featured collection" spotlight — currently
-  // NatureSphere's, previously The Chroma Editions. If the named collection
+  // NatureSPHERE's, previously The Chroma Editions. If the named collection
   // is ever retired again, this section simply won't render (see below)
   // rather than showing an empty grid under a live headline.
-  const featuredCollectionProducts = products.filter((p) => p.collection === "NatureSphere's");
+  const featuredCollectionProducts = products.filter((p) => p.collection === "NatureSPHERE's");
   const craftMosaic = ["obsidian-ceramic-drum", "meridian-glass-cone", "vesper-brass-orb", "atelier-marble-disc"]
     .map((slug) => bySlug.get(slug))
     .filter((p): p is NonNullable<typeof p> => Boolean(p));
@@ -140,7 +140,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Featured collection spotlight (currently NatureSphere's) — only
+      {/* Featured collection spotlight (currently NatureSPHERE's) — only
           renders when that collection actually has products in it, so an
           emptied-out or renamed collection never leaves a headline sitting
           over a blank grid. */}
@@ -150,7 +150,7 @@ export default async function Home() {
             <RevealOnScroll className="mb-14 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
               <div>
                 <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
-                  {t(dict, "home.new", "New")} &mdash; NatureSphere&rsquo;s
+                  {t(dict, "home.new", "New")} &mdash; NatureSPHERE&rsquo;s
                 </p>
                 <h2 className="max-w-xl font-serif text-4xl leading-tight text-ink md:text-5xl">
                   {content.chromaHeadline}
@@ -159,7 +159,7 @@ export default async function Home() {
                   {content.chromaSubtext}
                 </p>
               </div>
-              <TextLink href="/products">{t(dict, "home.shop", "Shop")} NatureSphere&rsquo;s</TextLink>
+              <TextLink href="/products">{t(dict, "home.shop", "Shop")} NatureSPHERE&rsquo;s</TextLink>
             </RevealOnScroll>
 
             <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">

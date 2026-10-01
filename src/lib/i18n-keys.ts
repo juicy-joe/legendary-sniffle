@@ -76,13 +76,6 @@ export const uiKeySections: UiKeySection[] = [
   {
     section: "Products Grid",
     keys: [
-      { key: "products.theCollection", fallback: "The Collection" },
-      { key: "products.designerTableLamps", fallback: "Designer Table Lamps" },
-      {
-        key: "products.intro",
-        fallback:
-          "Every piece is mouth-blown from high-clarity crystalline glass and hand-finished to order. Within our NatureSphere collection, each sphere is individually shaped, so natural variations in color patterns occur, your lamp will be a unique original, distinct from the online image. Our MoodMAX collection offers a complementary aesthetic with its own character. Filter by color or finish to find the piece that fits your space. These are ambient lights, crafted to create mood and character, not merely to illuminate a room.",
-      },
       { key: "products.filterAll", fallback: "All" },
       { key: "products.sort", fallback: "Sort" },
       { key: "products.sortFeatured", fallback: "Featured" },
@@ -197,13 +190,6 @@ export const uiKeySections: UiKeySection[] = [
   {
     section: "Consulting Page",
     keys: [
-      { key: "consulting.forWhom", fallback: "For Architects, Developers & Designers" },
-      { key: "consulting.heroHeadline", fallback: "Lighting for Spaces That Deserve More Than Off-the-Shelf." },
-      {
-        key: "consulting.heroSubtext",
-        fallback:
-          "We design and produce bespoke lighting for hotels, offices, villas, and other large-scale projects — working directly with architects, interior designers, and developers from first concept to final installation.",
-      },
       { key: "consulting.howWeWork", fallback: "How We Work Together" },
       { key: "consulting.whatWeOffer", fallback: "What We Offer" },
       { key: "consulting.whoWeWorkWith", fallback: "Who We Work With" },
@@ -240,13 +226,6 @@ export const uiKeySections: UiKeySection[] = [
   {
     section: "Trade Page",
     keys: [
-      { key: "trade.forTheTrade", fallback: "For the Trade" },
-      { key: "trade.heroHeadline", fallback: "Wholesale Pricing for Retailers & Designers" },
-      {
-        key: "trade.heroSubtext",
-        fallback:
-          "A trade account gives you Ollerialight's full collection at wholesale pricing, direct access to our team for special orders, and a home for larger project requests.",
-      },
       { key: "trade.applyButton", fallback: "Apply for a Trade Account" },
       { key: "trade.alreadyHaveAccount", fallback: "Already have an account? Log in" },
       { key: "trade.perk.tradePricing.title", fallback: "Trade Pricing" },
