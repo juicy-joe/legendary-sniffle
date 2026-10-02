@@ -21,7 +21,14 @@ export default function ContactInfoForm({ content }: { content: ContactInfoData 
       </Field>
 
       <Field label="Showroom Address" name="address" error={err("address")}>
-        <input id="address" name="address" defaultValue={content.address} className={inputClass} />
+        <textarea
+          id="address"
+          name="address"
+          rows={3}
+          placeholder={"Street\nCity, Region\nCountry"}
+          defaultValue={content.address}
+          className={inputClass}
+        />
       </Field>
 
       <Field label="Hours" name="hours" error={err("hours")}>

@@ -102,7 +102,7 @@ export default async function ContactPage() {
                           {d.value}
                         </a>
                       ) : (
-                        <p className="text-sm text-ink/75">{d.value}</p>
+                        <p className="whitespace-pre-line text-sm text-ink/75">{d.value}</p>
                       )}
                     </div>
                   </li>

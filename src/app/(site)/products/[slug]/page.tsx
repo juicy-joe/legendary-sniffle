@@ -156,6 +156,16 @@ export default async function ProductPage({
                 {product.dimensions}
               </dd>
             </div>
+            <div className="col-span-2">
+              <dt className="text-xs uppercase tracking-[0.15em] text-ink/65">
+                {t(dict, "product.specifications", "Specifications")}
+              </dt>
+              <dd className="mt-1 space-y-1 text-sm text-ink/75">
+                <p>220&ndash;240V, E27 socket</p>
+                <p>Dimmable</p>
+                <p>Includes warm white light bulb</p>
+              </dd>
+            </div>
           </dl>
 
           {product.story && (

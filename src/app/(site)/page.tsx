@@ -119,26 +119,30 @@ export default async function Home() {
         ]}
       />
 
-      {/* Featured collection */}
-      <section id="featured" className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-32">
-        <RevealOnScroll className="mb-14 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-          <div>
-            <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
-              {t(dict, "home.theSelection", "The Selection")}
-            </p>
-            <h2 className="font-serif text-4xl text-ink md:text-5xl">
-              {t(dict, "home.featuredPieces", "Featured Pieces")}
-            </h2>
-          </div>
-          <TextLink href="/products">{t(dict, "home.viewFullCollection", "View Full Collection")}</TextLink>
-        </RevealOnScroll>
+      {/* Featured collection — only renders when at least one product is
+          marked featured, so an empty selection never leaves a bare
+          heading sitting over blank space. */}
+      {featured.length > 0 && (
+        <section id="featured" className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-32">
+          <RevealOnScroll className="mb-14 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+            <div>
+              <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
+                {t(dict, "home.theSelection", "The Selection")}
+              </p>
+              <h2 className="font-serif text-4xl text-ink md:text-5xl">
+                {t(dict, "home.featuredPieces", "Featured Pieces")}
+              </h2>
+            </div>
+            <TextLink href="/products">{t(dict, "home.viewFullCollection", "View Full Collection")}</TextLink>
+          </RevealOnScroll>
 
-        <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
-          {featured.map((product, i) => (
-            <ProductCard key={product.slug} product={product} index={i} />
-          ))}
-        </div>
-      </section>
+          <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+            {featured.map((product, i) => (
+              <ProductCard key={product.slug} product={product} index={i} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Featured collection spotlight (currently NatureSPHERE's) — only
           renders when that collection actually has products in it, so an
