@@ -13,6 +13,17 @@
 # testing
 /coverage
 
+# playwright (QA audit) — full HTML reports/traces/videos from every test
+# run are regenerated on demand and don't belong in git. qa/evidence/ is
+# different: it's deliberately-kept findings evidence (screenshots, JSON,
+# writeups) referenced from qa/QA-REPORT.md, and IS meant to be committed.
+/qa/playwright-report/
+/qa/test-results/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
 # next.js
 /.next/
 /out/
@@ -51,3 +62,9 @@ next-env.d.ts
 .idea/
 
 /src/generated/prisma
+
+# full database backup snapshots (contain customer PII, password hashes) —
+# local safety snapshots only, never meant to reach the git remote. The
+# backup/restore scripts themselves (backups/*.mjs, backups/README.md) are
+# still tracked.
+/backups/*/
