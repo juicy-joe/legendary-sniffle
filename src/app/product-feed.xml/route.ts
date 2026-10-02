@@ -44,7 +44,7 @@ export async function GET() {
     <link>${escapeXml(url)}</link>
     <g:image_link>${escapeXml(images[0].src)}</g:image_link>
 ${additionalImages}
-    <g:availability>in stock</g:availability>
+    <g:availability>${p.availableStock > 0 ? "in stock" : "backorder"}</g:availability>
     <g:price>${p.price}.00 EUR</g:price>
     <g:brand>${escapeXml(settings.siteName)}</g:brand>
     <g:condition>new</g:condition>

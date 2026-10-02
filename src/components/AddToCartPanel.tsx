@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Minus, Plus, ShoppingBag } from "lucide-react";
+import { Check, Minus, Plus, ShoppingBag, TriangleAlert } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useCatalog } from "@/context/CatalogContext";
 import WishlistButton from "./WishlistButton";
 import { useTranslations } from "./TranslationsProvider";
 
@@ -14,10 +15,15 @@ export default function AddToCartPanel({
   slug: string;
   name: string;
 }) {
-  const { addItem } = useCart();
+  const { addItem, lines } = useCart();
+  const { getProduct } = useCatalog();
   const { t } = useTranslations();
   const [qty, setQty] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
+
+  const availableStock = getProduct(slug)?.availableStock ?? 0;
+  const inCartQty = lines.find((l) => l.slug === slug)?.qty ?? 0;
+  const wouldExceedStock = inCartQty + qty > availableStock;
 
   const handleAdd = () => {
     addItem(slug, qty);
@@ -40,7 +46,7 @@ export default function AddToCartPanel({
           <span className="w-4 text-center text-sm font-feature-tabular">{qty}</span>
           <button
             type="button"
-            onClick={() => setQty((q) => Math.min(9, q + 1))}
+            onClick={() => setQty((q) => Math.min(99, q + 1))}
             aria-label={t("cart.increaseQty", "Increase quantity")}
             className="text-ink/60 transition-colors hover:text-ink"
           >
@@ -80,6 +86,19 @@ export default function AddToCartPanel({
 
         <WishlistButton slug={slug} />
       </div>
+
+      {(availableStock <= 0 || wouldExceedStock) && (
+        <p className="mt-4 flex items-start gap-2 text-sm text-amber-700">
+          <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+          {availableStock <= 0
+            ? t("product.madeToOrderWarning", "Made to order — ships in 2-3 weeks.")
+            : t(
+                "product.limitedStockWarning",
+                "Only {count} in stock — the rest of your order will take 2-3 weeks to ship."
+              ).replace("{count}", String(availableStock))}
+        </p>
+      )}
+
       <p className="sr-only" aria-live="polite">
         {justAdded ? `${name} ${t("product.addedToCartSr", "added to cart")}` : ""}
       </p>

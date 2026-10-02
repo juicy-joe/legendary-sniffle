@@ -6,6 +6,7 @@
 import "server-only";
 import { prisma } from "./prisma";
 import { getContentFields, getContentFieldsForModel, getLocale, type Locale } from "./i18n";
+import { getStockLevels } from "./stock-levels";
 
 export type LampPalette = "gold" | "ivory" | "onyx" | "bronze" | "smoke";
 export type LampShade = "dome" | "drum" | "cone" | "sphere" | "pleated";
@@ -41,6 +42,11 @@ export type CatalogProduct = {
   metaTitle: string | null;
   metaDescription: string | null;
   updatedAt: Date;
+  /** Stock on hand minus quantity already committed to open orders — see
+   * src/lib/stock-levels.ts. Ordering beyond this is allowed (these are
+   * made-to-order glass pieces), the storefront just warns about the
+   * longer lead time rather than blocking the sale. */
+  availableStock: number;
 };
 
 const include = {
@@ -60,7 +66,11 @@ async function fetchRows() {
 
 type ProductRow = Awaited<ReturnType<typeof fetchRows>>[number];
 
-function toCatalogProduct(p: ProductRow, translations?: Record<string, string>): CatalogProduct {
+function toCatalogProduct(
+  p: ProductRow,
+  translations?: Record<string, string>,
+  availableStock = 0
+): CatalogProduct {
   return {
     id: p.id,
     slug: p.slug,
@@ -88,6 +98,7 @@ function toCatalogProduct(p: ProductRow, translations?: Record<string, string>):
     metaTitle: p.metaTitle,
     metaDescription: p.metaDescription,
     updatedAt: p.updatedAt,
+    availableStock,
   };
 }
 
@@ -99,8 +110,11 @@ function toCatalogProduct(p: ProductRow, translations?: Record<string, string>):
 export async function getCatalog(locale?: Locale): Promise<CatalogProduct[]> {
   const rows = await fetchRows();
   const resolvedLocale = locale ?? (await getLocale());
-  const translations = await getContentFieldsForModel(resolvedLocale, "Product", rows.map((r) => r.id));
-  return rows.map((r) => toCatalogProduct(r, translations[r.id]));
+  const [translations, stockLevels] = await Promise.all([
+    getContentFieldsForModel(resolvedLocale, "Product", rows.map((r) => r.id)),
+    getStockLevels(),
+  ]);
+  return rows.map((r) => toCatalogProduct(r, translations[r.id], stockLevels.get(r.id)?.available ?? 0));
 }
 
 export async function getProductBySlug(slug: string, locale?: Locale): Promise<CatalogProduct | null> {
@@ -111,8 +125,11 @@ export async function getProductBySlug(slug: string, locale?: Locale): Promise<C
   const row = await prisma.product.findFirst({ where: { slug, visible: true }, include });
   if (!row) return null;
   const resolvedLocale = locale ?? (await getLocale());
-  const translations = await getContentFields(resolvedLocale, "Product", row.id);
-  return toCatalogProduct(row, translations);
+  const [translations, stockLevels] = await Promise.all([
+    getContentFields(resolvedLocale, "Product", row.id),
+    getStockLevels(),
+  ]);
+  return toCatalogProduct(row, translations, stockLevels.get(row.id)?.available ?? 0);
 }
 
 export function getRelatedProducts(

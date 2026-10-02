@@ -109,6 +109,12 @@ export const uiKeySections: UiKeySection[] = [
       { key: "product.addedToCartSr", fallback: "added to cart" },
       { key: "product.saved", fallback: "Saved" },
       { key: "product.addToWishlistButton", fallback: "Add to Wishlist" },
+      { key: "product.inStock", fallback: "{count} in stock" },
+      {
+        key: "product.limitedStockWarning",
+        fallback: "Only {count} in stock — the rest of your order will take 2-3 weeks to ship.",
+      },
+      { key: "product.madeToOrderWarning", fallback: "Made to order — ships in 2-3 weeks." },
     ],
   },
   {

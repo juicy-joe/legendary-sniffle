@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { Minus, Plus, ShoppingBag, X } from "lucide-react";
+import { Minus, Plus, ShoppingBag, TriangleAlert, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useCatalog } from "@/context/CatalogContext";
 import { EASE } from "@/lib/motion";
@@ -180,6 +180,17 @@ export default function CartDrawer() {
                                 {formatPrice(product.price * line.qty)}
                               </p>
                             </div>
+                            {(product.availableStock <= 0 || line.qty > product.availableStock) && (
+                              <p className="mt-2 flex items-start gap-1.5 text-xs text-amber-700">
+                                <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                                {product.availableStock <= 0
+                                  ? t("product.madeToOrderWarning", "Made to order — ships in 2-3 weeks.")
+                                  : t(
+                                      "product.limitedStockWarning",
+                                      "Only {count} in stock — the rest of your order will take 2-3 weeks to ship."
+                                    ).replace("{count}", String(product.availableStock))}
+                              </p>
+                            )}
                           </div>
                         </li>
                       );
