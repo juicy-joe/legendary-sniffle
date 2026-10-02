@@ -14,6 +14,7 @@ import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 import { productSeoTitle, productSeoDescription, productOgImage, productJsonLd, productPhotoAlt } from "@/lib/seo";
 import { getSettings } from "@/lib/settings";
 import { collectionHref } from "@/lib/collection-links";
+import { slugify } from "@/lib/slugify";
 
 export async function generateStaticParams() {
   // Only slugs are needed here, and getLocale() (the no-arg default) reads
@@ -82,7 +83,7 @@ export default async function ProductPage({
           "@type": "BreadcrumbList",
           itemListElement: [
             { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
-            { "@type": "ListItem", position: 2, name: "Products", item: `${siteUrl}/products` },
+            { "@type": "ListItem", position: 2, name: "Table Lamps", item: `${siteUrl}/table-lamps` },
             { "@type": "ListItem", position: 3, name: product.name },
           ],
         })}
@@ -92,7 +93,7 @@ export default async function ProductPage({
       <nav aria-label="Breadcrumb" className="mb-10 flex items-center gap-2 text-xs text-ink/65">
         <Link href="/" className="hover:text-ink">{t(dict, "breadcrumb.home", "Home")}</Link>
         <span aria-hidden="true">/</span>
-        <Link href="/products" className="hover:text-ink">{t(dict, "breadcrumb.products", "Products")}</Link>
+        <Link href="/table-lamps" className="hover:text-ink">{t(dict, "breadcrumb.products", "Table Lamps")}</Link>
         <span aria-hidden="true">/</span>
         <span className="text-ink/70">{product.name}</span>
       </nav>
@@ -141,7 +142,9 @@ export default async function ProductPage({
           </h1>
           <p className="mt-3 text-base text-ink/60">
             {t(dict, "product.designedBy", "Designed by")}{" "}
-            <span className="font-medium text-ink">{product.designer}</span>
+            <Link href={`/designers/${slugify(product.designer)}`} className="font-medium text-ink hover:text-gold-dark">
+              {product.designer}
+            </Link>
           </p>
 
           <p className="mt-6 font-serif text-3xl text-gold-dark font-feature-tabular">

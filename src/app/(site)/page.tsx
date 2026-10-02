@@ -102,7 +102,7 @@ export default async function Home() {
               {content.heroSubtext}
             </p>
             <Link
-              href="/products"
+              href="/table-lamps"
               className="mt-8 inline-flex items-center gap-2 border-b border-paper/40 pb-1 text-[11px] font-medium uppercase tracking-[0.16em] text-paper transition-colors hover:border-paper"
             >
               {t(dict, "home.exploreCollection", "Explore the Collection")} <ArrowRight className="h-3.5 w-3.5" />
@@ -146,7 +146,7 @@ export default async function Home() {
                 {t(dict, "home.featuredPieces", "Featured Pieces")}
               </h2>
             </div>
-            <TextLink href="/products">{t(dict, "home.viewFullCollection", "View Full Collection")}</TextLink>
+            <TextLink href="/table-lamps">{t(dict, "home.viewFullCollection", "View Full Collection")}</TextLink>
           </RevealOnScroll>
 
           <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">

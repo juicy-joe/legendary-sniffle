@@ -29,7 +29,7 @@ async function revalidateProductImagePaths(productId: string) {
   if (product) {
     revalidatePath(`/products/${product.slug}`);
     revalidatePath("/");
-    revalidatePath("/products");
+    revalidatePath("/table-lamps");
   }
 }
 

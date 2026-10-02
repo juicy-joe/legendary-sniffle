@@ -99,7 +99,7 @@ function ExplorerInner({ collectionOrder }: { collectionOrder: string[] }) {
           {groups.map((group) => (
             <section key={group.name} id={slugify(group.name)} className="mb-20 scroll-mt-28 last:mb-0">
               <div className="mb-8 flex items-baseline justify-between gap-4 border-b border-ink/10 pb-4">
-                <h2 className="font-serif text-2xl text-ink md:text-3xl">{group.name}</h2>
+                <h3 className="font-serif text-2xl text-ink md:text-3xl">{group.name}</h3>
                 <span className="shrink-0 text-xs uppercase tracking-[0.16em] text-ink/50">
                   {group.items.length}{" "}
                   {group.items.length === 1 ? t("products.piece", "piece") : t("products.pieces", "pieces")}

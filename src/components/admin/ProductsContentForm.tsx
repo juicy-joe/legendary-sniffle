@@ -31,7 +31,7 @@ export default function ProductsContentForm({ content }: { content: ProductsCont
       )}
       {state.success && (
         <p role="status" className="flex items-center gap-2 text-sm text-emerald-700">
-          <Check className="h-4 w-4" /> Saved — live on the Products page now.
+          <Check className="h-4 w-4" /> Saved — live on the Table Lamps page now.
         </p>
       )}
 

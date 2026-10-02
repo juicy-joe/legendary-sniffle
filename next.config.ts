@@ -41,6 +41,12 @@ const nextConfig: NextConfig = {
       { source: "/products/mushroom-lake", destination: "/products/lavaglow", permanent: true },
       { source: "/products/geysir-s", destination: "/products/geyserglow", permanent: true },
       { source: "/products/pine-and-ice", destination: "/collections/naturesphere", permanent: true },
+      // Product renamed from "Saturns" to "Sunny Beach" — slug updated to
+      // match (see prisma data change in the same commit as this redirect).
+      { source: "/products/saturns", destination: "/products/sunny-beach", permanent: true },
+      // The listing/hub page moved from /products to /table-lamps; the
+      // product detail route (/products/[slug]) is unaffected and unchanged.
+      { source: "/products", destination: "/table-lamps", permanent: true },
     ];
   },
 

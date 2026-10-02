@@ -39,7 +39,7 @@ async function revalidateCollectionPaths(collectionId?: string) {
       select: { slug: true },
     });
     if (products.length) {
-      revalidatePath("/products");
+      revalidatePath("/table-lamps");
       revalidatePath("/");
       for (const p of products) revalidatePath(`/products/${p.slug}`);
     }

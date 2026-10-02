@@ -4,7 +4,8 @@
 // this is an image-heavy catalog site. Everything this previously covered
 // via sitemap.ts (static routes, legal pages, every product) is preserved
 // here; only the output format changed.
-import { getCatalog } from "@/lib/catalog";
+import { getCatalog, getDesigners } from "@/lib/catalog";
+import { slugify } from "@/lib/slugify";
 import { siteUrl } from "@/lib/site";
 
 function escapeXml(value: string): string {
@@ -39,18 +40,20 @@ export async function GET() {
   // Only slugs/images are needed here — pass a fixed locale to skip
   // getLocale()'s cookies() lookup, which isn't available if this ever
   // runs at build time.
-  const products = await getCatalog("en");
+  const [products, designers] = await Promise.all([getCatalog("en"), getDesigners("en")]);
   const today = new Date().toISOString().slice(0, 10);
 
   const staticRoutes: UrlEntry[] = [
     "",
-    "/products",
+    "/table-lamps",
     "/about",
     "/contact",
     "/consulting",
     "/trade",
     "/collections/moodmax",
     "/collections/naturesphere",
+    "/designers",
+    "/hand-blown-glass",
   ].map((path) => ({
     loc: `${siteUrl}${path}`,
     lastmod: today,
@@ -78,7 +81,14 @@ export async function GET() {
     images: p.images?.map((img) => img.src) ?? [],
   }));
 
-  const urls = [...staticRoutes, ...legalRoutes, ...productRoutes];
+  const designerRoutes: UrlEntry[] = designers.map((d) => ({
+    loc: `${siteUrl}/designers/${slugify(d.shortName || d.name)}`,
+    lastmod: today,
+    changefreq: "monthly",
+    priority: 0.5,
+  }));
+
+  const urls = [...staticRoutes, ...legalRoutes, ...productRoutes, ...designerRoutes];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${urls.map(renderUrl).join("\n")}

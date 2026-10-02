@@ -13,7 +13,7 @@ export default function NotFound() {
         collection is still very much illuminated.
       </p>
       <Link
-        href="/products"
+        href="/table-lamps"
         className="mt-8 inline-flex items-center gap-2.5 rounded-[3px] border border-ink bg-ink px-9 py-4 text-[11px] font-medium uppercase tracking-[0.18em] text-paper transition-colors duration-300 hover:bg-gold-dark hover:border-gold-dark"
       >
         Browse the Collection <ArrowRight className="h-3.5 w-3.5" />

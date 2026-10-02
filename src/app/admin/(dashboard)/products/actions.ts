@@ -66,7 +66,7 @@ function parseProductForm(formData: FormData) {
 function revalidateProductPaths(...slugs: string[]) {
   revalidatePath("/admin/products");
   revalidatePath("/");
-  revalidatePath("/products");
+  revalidatePath("/table-lamps");
   revalidatePath("/sitemap.xml");
   for (const slug of slugs) {
     if (slug) revalidatePath(`/products/${slug}`);

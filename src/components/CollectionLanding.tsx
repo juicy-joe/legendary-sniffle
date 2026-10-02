@@ -31,7 +31,7 @@ export default function CollectionLanding({
           <nav aria-label="Breadcrumb" className="mb-8 flex items-center justify-center gap-2 text-xs text-paper/60">
             <Link href="/" className="hover:text-paper">Home</Link>
             <span aria-hidden="true">/</span>
-            <Link href="/products" className="hover:text-paper">Products</Link>
+            <Link href="/table-lamps" className="hover:text-paper">Table Lamps</Link>
             <span aria-hidden="true">/</span>
             <span className="text-paper/70">{headline}</span>
           </nav>
@@ -72,7 +72,7 @@ export default function CollectionLanding({
             <h2 className="font-serif text-3xl text-ink md:text-4xl">
               {headline} Lamps
             </h2>
-            <TextLink href="/products">View the Full Collection</TextLink>
+            <TextLink href="/table-lamps">View the Full Collection</TextLink>
           </RevealOnScroll>
 
           {products.length > 0 ? (
@@ -85,7 +85,7 @@ export default function CollectionLanding({
             <p className="text-sm text-ink/60">
               This collection&rsquo;s pieces are being prepared for their next run — in the
               meantime, see the{" "}
-              <Link href="/products" className="underline underline-offset-2 hover:text-gold-dark">
+              <Link href="/table-lamps" className="underline underline-offset-2 hover:text-gold-dark">
                 full collection
               </Link>
               .

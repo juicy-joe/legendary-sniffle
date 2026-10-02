@@ -23,7 +23,7 @@ export const uiKeySections: UiKeySection[] = [
     section: "Breadcrumbs",
     keys: [
       { key: "breadcrumb.home", fallback: "Home" },
-      { key: "breadcrumb.products", fallback: "Products" },
+      { key: "breadcrumb.products", fallback: "Table Lamps" },
       { key: "breadcrumb.about", fallback: "About Us" },
       { key: "breadcrumb.contact", fallback: "Contact" },
       { key: "breadcrumb.consulting", fallback: "Consulting & Projects" },

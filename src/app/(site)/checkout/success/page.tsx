@@ -95,7 +95,7 @@ export default async function CheckoutSuccessPage({
         </div>
 
         <Link
-          href="/products"
+          href="/table-lamps"
           className="mt-10 inline-flex items-center gap-2 border-b border-ink/40 pb-1 text-[11px] font-medium uppercase tracking-[0.16em] text-ink transition-colors hover:border-ink"
         >
           Continue Browsing

@@ -91,7 +91,7 @@ export default function CartDrawer() {
                 <ShoppingBag className="h-10 w-10 text-ink/20" strokeWidth={1} />
                 <p className="text-ink/65">{t("cart.empty", "Your selection is empty.")}</p>
                 <Link
-                  href="/products"
+                  href="/table-lamps"
                   onClick={closeCart}
                   className="rounded-[3px] bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.16em] text-paper transition-colors hover:bg-gold-dark"
                 >

@@ -36,7 +36,7 @@ async function revalidateCategoryPaths(categoryId?: string) {
       where: { categoryId },
       select: { slug: true },
     });
-    revalidatePath("/products");
+    revalidatePath("/table-lamps");
     revalidatePath("/");
     for (const p of products) revalidatePath(`/products/${p.slug}`);
   }

@@ -106,7 +106,7 @@ export async function updateProductsContent(
     create: { id: "products", ...parsed.data },
     update: parsed.data,
   });
-  revalidatePath("/products");
+  revalidatePath("/table-lamps");
   revalidatePath("/admin/content/products");
   return { success: true };
 }

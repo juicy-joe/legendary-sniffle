@@ -50,7 +50,7 @@ export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
         <ShoppingBag className="h-10 w-10 text-ink/20" strokeWidth={1} />
         <p className="text-ink/60">{t("checkout.cartEmpty", "Your cart is empty.")}</p>
         <Link
-          href="/products"
+          href="/table-lamps"
           className="rounded-[3px] bg-ink px-6 py-3.5 text-[11px] uppercase tracking-[0.16em] text-paper transition-colors hover:bg-gold-dark"
         >
           {t("cart.browseCollection", "Browse the Collection")}

@@ -13,8 +13,8 @@ const pages = [
   {
     href: "/admin/content/products",
     icon: Package,
-    title: "Products Page",
-    description: "The Products page's eyebrow, headline, and intro copy.",
+    title: "Table Lamps Page",
+    description: "The Table Lamps page's eyebrow, headline, and intro copy.",
   },
   {
     href: "/admin/content/about",

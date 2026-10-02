@@ -8,6 +8,7 @@ import { getAboutContent } from "@/lib/content";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
+import { slugify } from "@/lib/slugify";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -104,10 +105,20 @@ export default async function AboutPage() {
               <p className="text-[11px] uppercase tracking-[0.15em] text-ink/65">
                 {d.origin}
               </p>
-              <h3 className="mt-2 font-serif text-2xl text-ink">{d.name}</h3>
+              <h3 className="mt-2 font-serif text-2xl text-ink">
+                <Link href={`/designers/${slugify(d.shortName || d.name)}`} className="hover:text-gold-dark">
+                  {d.name}
+                </Link>
+              </h3>
               <p className="mt-3 text-sm leading-relaxed text-ink/60">
                 {d.bio}
               </p>
+              <Link
+                href={`/designers/${slugify(d.shortName || d.name)}`}
+                className="mt-3 inline-block text-[11px] font-medium uppercase tracking-[0.14em] text-gold-dark hover:underline"
+              >
+                View Their Table Lamps
+              </Link>
             </RevealOnScroll>
           ))}
         </div>

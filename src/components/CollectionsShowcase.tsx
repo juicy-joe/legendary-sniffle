@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import RevealOnScroll from "./RevealOnScroll";
 import CollectionSlideshow from "./CollectionSlideshow";
 import { t } from "@/lib/i18n";
+import { collectionHref } from "@/lib/collection-links";
 
 export type CollectionSummary = {
   name: string;
@@ -28,7 +29,7 @@ export default function CollectionsShowcase({
     <div className="mb-20 grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-8">
       {collections.map((collection, i) => (
         <RevealOnScroll key={collection.slug} delay={i * 0.1}>
-          <Link href={`#${collection.slug}`} className="group block">
+          <Link href={collectionHref(collection.name) ?? `#${collection.slug}`} className="group block">
             <CollectionSlideshow images={collection.images} />
             <div className="mt-5 flex items-start justify-between gap-4">
               <div>

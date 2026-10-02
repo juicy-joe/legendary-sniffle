@@ -29,7 +29,7 @@ export default async function MoodMaxCollectionPage() {
           "@type": "BreadcrumbList",
           itemListElement: [
             { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
-            { "@type": "ListItem", position: 2, name: "Products", item: `${siteUrl}/products` },
+            { "@type": "ListItem", position: 2, name: "Table Lamps", item: `${siteUrl}/table-lamps` },
             { "@type": "ListItem", position: 3, name: "MoodMAX Collection" },
           ],
         })}
