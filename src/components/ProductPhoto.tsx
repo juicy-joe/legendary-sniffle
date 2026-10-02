@@ -44,6 +44,28 @@ export default function ProductPhoto({
       <div className="corner-ticks relative h-full w-full overflow-hidden rounded-2xl">
         {errored[index] ? (
           <PhotoFallback swatch={active.swatch} />
+        ) : showSelector ? (
+          // Only the standalone product-detail viewer (showSelector=true)
+          // gets this — ProductCard reuses this component inside its own
+          // <Link> to the product page, and nesting an <a> there would be
+          // invalid HTML.
+          <a
+            href={active.src}
+            target="_blank"
+            rel="noopener"
+            aria-label={`Open full-size image: ${alt} — ${active.label}`}
+            className="block h-full w-full"
+          >
+            <Image
+              src={active.src}
+              alt={`${alt} — ${active.label}`}
+              fill
+              priority={priority}
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover transition-opacity duration-500"
+              onError={() => setErrored((prev) => ({ ...prev, [index]: true }))}
+            />
+          </a>
         ) : (
           <Image
             src={active.src}

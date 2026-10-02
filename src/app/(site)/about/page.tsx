@@ -6,6 +6,8 @@ import MagneticButton from "@/components/MagneticButton";
 import { getDesigners } from "@/lib/catalog";
 import { getAboutContent } from "@/lib/content";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { jsonLdScriptProps } from "@/lib/json-ld";
+import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -51,6 +53,17 @@ export default async function AboutPage() {
 
   return (
     <div>
+      <script
+        type="application/ld+json"
+        {...jsonLdScriptProps({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+            { "@type": "ListItem", position: 2, name: "About Us" },
+          ],
+        })}
+      />
       <section className="bg-ink py-28 text-paper">
         <div className="mx-auto max-w-4xl px-6 text-center md:px-10">
           <nav aria-label="Breadcrumb" className="mb-8 flex items-center justify-center gap-2 text-xs text-paper/60">

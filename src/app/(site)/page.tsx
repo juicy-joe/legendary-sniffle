@@ -11,13 +11,17 @@ import HeroSlideshow from "@/components/HeroSlideshow";
 import { getCatalog } from "@/lib/catalog";
 import { getHomeContent, getHeroImages } from "@/lib/content";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { jsonLdScriptProps } from "@/lib/json-ld";
+import { siteUrl } from "@/lib/site";
+import { getSettings } from "@/lib/settings";
 
 export default async function Home() {
   const locale = await getLocale();
-  const [products, content, heroImages, dict] = await Promise.all([
+  const [products, content, heroImages, settings, dict] = await Promise.all([
     getCatalog(),
     getHomeContent(),
     getHeroImages(),
+    getSettings(),
     getUiTranslations(locale),
   ]);
   const bySlug = new Map(products.map((p) => [p.slug, p]));
@@ -63,6 +67,15 @@ export default async function Home() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        {...jsonLdScriptProps({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: settings.siteName,
+          url: siteUrl,
+        })}
+      />
       {/* Hero — Theme C: one product, full-bleed, minimal text bottom-left.
           No split layout, no stat counters, no decorative eyebrow icon —
           the image is the argument. */}
@@ -163,7 +176,7 @@ export default async function Home() {
                   {content.chromaSubtext}
                 </p>
               </div>
-              <TextLink href="/products">{t(dict, "home.shop", "Shop")} NatureSPHERE&rsquo;s</TextLink>
+              <TextLink href="/collections/naturesphere">{t(dict, "home.shop", "Shop")} NatureSPHERE&rsquo;s</TextLink>
             </RevealOnScroll>
 
             <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">

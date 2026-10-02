@@ -27,7 +27,7 @@ export const uiKeySections: UiKeySection[] = [
       { key: "breadcrumb.about", fallback: "About Us" },
       { key: "breadcrumb.contact", fallback: "Contact" },
       { key: "breadcrumb.consulting", fallback: "Consulting & Projects" },
-      { key: "breadcrumb.trade", fallback: "Trade" },
+      { key: "breadcrumb.trade", fallback: "B2B" },
     ],
   },
   {
@@ -200,27 +200,29 @@ export const uiKeySections: UiKeySection[] = [
         fallback: "Tell us about your space and its timeline — we'll get back to you to discuss fit, scope, and next steps.",
       },
       { key: "consulting.startConversation", fallback: "Start a Conversation" },
-      { key: "consulting.offer.bespokeDesign.title", fallback: "Bespoke Design" },
+      { key: "consulting.offer.bespokeDesign.title", fallback: "Custom Glass Lighting" },
       {
         key: "consulting.offer.bespokeDesign.body",
         fallback:
-          "A fixture designed around your space, not the other way around, from a single hero piece made of optical crystalline glass to a full lighting concept.",
+          "A fixture designed around your space, not the other way around — from a single hero piece in mouth-blown crystalline glass to a full lighting concept with custom colourways.",
       },
       { key: "consulting.offer.specConsulting.title", fallback: "Specification & Consulting" },
       {
         key: "consulting.offer.specConsulting.body",
         fallback:
-          "Guidance on material, scale, and placement from concept through construction documents, working alongside your architects and designers.",
+          "Guidance on material, scale, and placement from concept through construction documents, working alongside your architects and interior designers.",
       },
       { key: "consulting.offer.volumeProduction.title", fallback: "Volume Production" },
       {
         key: "consulting.offer.volumeProduction.body",
-        fallback: "The same hand-finishing standard as a single commission, scaled to the quantities a larger project actually needs.",
+        fallback: "The same hand-finishing standard as a single commission, scaled to the quantities a larger hospitality or retail project actually needs.",
       },
       { key: "consulting.projectType.hotels", fallback: "Hotels & Hospitality" },
+      { key: "consulting.projectType.restaurants", fallback: "Restaurants & Bars" },
       { key: "consulting.projectType.offices", fallback: "Offices & Commercial Spaces" },
       { key: "consulting.projectType.retail", fallback: "Retail & Showrooms" },
       { key: "consulting.projectType.villas", fallback: "Private Villas & Residences" },
+      { key: "consulting.projectType.interiorDesigners", fallback: "Interior Designers & Architects" },
     ],
   },
   {

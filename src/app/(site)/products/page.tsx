@@ -7,6 +7,8 @@ import { getCatalog, getCollections } from "@/lib/catalog";
 import { getProductsContent } from "@/lib/content";
 import { slugify } from "@/lib/slugify";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { jsonLdScriptProps } from "@/lib/json-ld";
+import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Designer Table Lamps",
@@ -51,6 +53,17 @@ export default async function ProductsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-28">
+      <script
+        type="application/ld+json"
+        {...jsonLdScriptProps({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+            { "@type": "ListItem", position: 2, name: "Products" },
+          ],
+        })}
+      />
       <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 text-xs text-ink/65">
         <Link href="/" className="hover:text-ink">{t(dict, "breadcrumb.home", "Home")}</Link>
         <span aria-hidden="true">/</span>

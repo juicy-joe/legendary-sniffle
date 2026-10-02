@@ -5,6 +5,8 @@ import RevealOnScroll from "@/components/RevealOnScroll";
 import MagneticButton from "@/components/MagneticButton";
 import { getTradeContent } from "@/lib/content";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { jsonLdScriptProps } from "@/lib/json-ld";
+import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Trade Accounts",
@@ -51,12 +53,23 @@ export default async function TradePage() {
 
   return (
     <div>
+      <script
+        type="application/ld+json"
+        {...jsonLdScriptProps({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+            { "@type": "ListItem", position: 2, name: "B2B" },
+          ],
+        })}
+      />
       <section className="bg-ink py-24 text-paper md:py-28">
         <div className="mx-auto max-w-4xl px-6 text-center md:px-10">
           <nav aria-label="Breadcrumb" className="mb-8 flex items-center justify-center gap-2 text-xs text-paper/60">
             <Link href="/" className="hover:text-paper">{t(dict, "breadcrumb.home", "Home")}</Link>
             <span aria-hidden="true">/</span>
-            <span className="text-paper/70">{t(dict, "breadcrumb.trade", "Trade")}</span>
+            <span className="text-paper/70">{t(dict, "breadcrumb.trade", "B2B")}</span>
           </nav>
           <RevealOnScroll>
             <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold">

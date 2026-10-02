@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Building2, Compass, Hotel, Layers, PenTool, Store } from "lucide-react";
+import { ArrowRight, Building2, Compass, Hotel, Layers, PenTool, Store, UtensilsCrossed, Users } from "lucide-react";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import MagneticButton from "@/components/MagneticButton";
 import { getConsultingContent } from "@/lib/content";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { jsonLdScriptProps } from "@/lib/json-ld";
+import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Consulting & Projects",
@@ -17,28 +19,30 @@ const offerings = [
   {
     key: "bespokeDesign",
     icon: PenTool,
-    title: "Bespoke Design",
-    body: "A fixture designed around your space, not the other way around, from a single hero piece made of optical crystalline glass to a full lighting concept.",
+    title: "Custom Glass Lighting",
+    body: "A fixture designed around your space, not the other way around — from a single hero piece in mouth-blown crystalline glass to a full lighting concept with custom colourways.",
   },
   {
     key: "specConsulting",
     icon: Compass,
     title: "Specification & Consulting",
-    body: "Guidance on material, scale, and placement from concept through construction documents, working alongside your architects and designers.",
+    body: "Guidance on material, scale, and placement from concept through construction documents, working alongside your architects and interior designers.",
   },
   {
     key: "volumeProduction",
     icon: Layers,
     title: "Volume Production",
-    body: "The same hand-finishing standard as a single commission, scaled to the quantities a larger project actually needs.",
+    body: "The same hand-finishing standard as a single commission, scaled to the quantities a larger hospitality or retail project actually needs.",
   },
 ];
 
 const projectTypes = [
   { key: "hotels", icon: Hotel, label: "Hotels & Hospitality" },
+  { key: "restaurants", icon: UtensilsCrossed, label: "Restaurants & Bars" },
   { key: "offices", icon: Building2, label: "Offices & Commercial Spaces" },
   { key: "retail", icon: Store, label: "Retail & Showrooms" },
   { key: "villas", icon: Compass, label: "Private Villas & Residences" },
+  { key: "interiorDesigners", icon: Users, label: "Interior Designers & Architects" },
 ];
 
 export default async function ConsultingPage() {
@@ -46,6 +50,17 @@ export default async function ConsultingPage() {
   const [content, dict] = await Promise.all([getConsultingContent(), getUiTranslations(locale)]);
   return (
     <div>
+      <script
+        type="application/ld+json"
+        {...jsonLdScriptProps({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+            { "@type": "ListItem", position: 2, name: "Consulting & Projects" },
+          ],
+        })}
+      />
       <section className="bg-ink py-28 text-paper">
         <div className="mx-auto max-w-4xl px-6 text-center md:px-10">
           <nav aria-label="Breadcrumb" className="mb-8 flex items-center justify-center gap-2 text-xs text-paper/60">

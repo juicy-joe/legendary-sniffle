@@ -43,7 +43,7 @@ const productsDefaults = {
   heroEyebrow: "The Collection",
   heroHeadline: "Designer Table Lamps",
   intro:
-    "Every piece is mouth-blown from high-clarity crystalline glass and hand-finished to order. Within our NatureSPHERE collection, each sphere is individually shaped, so natural variations in color patterns occur, your lamp will be a unique original, distinct from the online image. Our MoodMAX collection offers a complementary aesthetic with its own character. Filter by color or finish to find the piece that fits your space. These are ambient lights, crafted to create mood and character, not merely to illuminate a room.",
+    "Olleria Light makes designer table lamps in mouth-blown crystalline glass, each one hand-finished to order at our partner glassworks in L'Olleria, Valencia. Our MoodMAX collection pairs hand-coloured gradients with a compact 20cm sphere built for ambient mood lighting. Our NatureSPHERE's collection is larger at 30cm, with colour and texture drawn from the Icelandic landscape — since each sphere is individually shaped, natural variation means your lamp will be a unique original, distinct from the online image. Filter by color or finish to find the piece that fits your space.",
 };
 
 const consultingDefaults = {

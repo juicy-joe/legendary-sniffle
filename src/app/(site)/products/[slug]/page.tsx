@@ -13,6 +13,7 @@ import { formatPrice } from "@/lib/format";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 import { productSeoTitle, productSeoDescription, productOgImage, productJsonLd, productPhotoAlt } from "@/lib/seo";
 import { getSettings } from "@/lib/settings";
+import { collectionHref } from "@/lib/collection-links";
 
 export async function generateStaticParams() {
   // Only slugs are needed here, and getLocale() (the no-arg default) reads
@@ -122,9 +123,19 @@ export default async function ProductPage({
         </RevealOnScroll>
 
         <RevealOnScroll delay={0.08}>
-          <p className="text-xs uppercase tracking-[0.2em] text-gold-dark">
-            {product.collection}
-          </p>
+          {(() => {
+            const href = collectionHref(product.collection);
+            return href ? (
+              <Link
+                href={href}
+                className="text-xs uppercase tracking-[0.2em] text-gold-dark underline-offset-2 hover:underline"
+              >
+                {product.collection}
+              </Link>
+            ) : (
+              <p className="text-xs uppercase tracking-[0.2em] text-gold-dark">{product.collection}</p>
+            );
+          })()}
           <h1 className="mt-3 font-serif text-5xl leading-[1.05] text-ink">
             {product.name}
           </h1>

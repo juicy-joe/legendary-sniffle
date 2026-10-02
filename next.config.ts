@@ -31,6 +31,19 @@ const nextConfig: NextConfig = {
     qualities: [75, 92],
   },
 
+  // Permanent redirects for products renamed via the admin panel after
+  // being indexed under their old slugs, plus one product unpublished
+  // (visible: false) rather than renamed — sent to the closest living
+  // collection page instead of left as a dead link. Single hop each
+  // (A -> C, never A -> B -> C) per the SEO redirect-chain rule.
+  async redirects() {
+    return [
+      { source: "/products/mushroom-lake", destination: "/products/lavaglow", permanent: true },
+      { source: "/products/geysir-s", destination: "/products/geyserglow", permanent: true },
+      { source: "/products/pine-and-ice", destination: "/collections/naturesphere", permanent: true },
+    ];
+  },
+
   // Note: deliberately not shipping a Content-Security-Policy here.
   // Framer Motion animates via inline `style` attributes, which a strict
   // style-src CSP without 'unsafe-inline' (or per-element nonces) would

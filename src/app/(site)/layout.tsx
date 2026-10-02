@@ -10,6 +10,7 @@ import { CatalogProvider } from "@/context/CatalogContext";
 import { getCatalog } from "@/lib/catalog";
 import { getMenuItems, getSocialLinks } from "@/lib/menus";
 import { getSettings } from "@/lib/settings";
+import { getContactInfo } from "@/lib/content";
 import { siteUrl } from "@/lib/site";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { getLocale, getUiTranslations } from "@/lib/i18n";
@@ -98,11 +99,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const locale = await getLocale();
-  const [catalog, navLinks, socialLinks, settings, dict] = await Promise.all([
+  const [catalog, navLinks, socialLinks, settings, contact, dict] = await Promise.all([
     getCatalog(),
     getMenuItems("navbar"),
     getSocialLinks(),
     getSettings(),
+    getContactInfo(),
     getUiTranslations(locale),
   ]);
   // Placeholder "#" URLs (not yet configured in admin) shouldn't be
@@ -123,6 +125,15 @@ export default async function RootLayout({
             name: settings.siteName,
             url: siteUrl,
             description: settings.defaultMetaDesc,
+            logo: `${siteUrl}/icon.png`,
+            email: contact.email,
+            telephone: contact.phone,
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: contact.address.split("\n")[0],
+              addressLocality: contact.address.split("\n")[1],
+              addressCountry: contact.address.split("\n")[2],
+            },
             sameAs,
           })}
         />

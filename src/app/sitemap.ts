@@ -7,7 +7,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // cookies() lookup, which isn't available if this ever runs at build time.
   const products = await getCatalog("en");
 
-  const staticRoutes = ["", "/products", "/about", "/contact"].map((path) => ({
+  const staticRoutes = [
+    "",
+    "/products",
+    "/about",
+    "/contact",
+    "/consulting",
+    "/trade",
+    "/collections/moodmax",
+    "/collections/naturesphere",
+  ].map((path) => ({
     url: `${siteUrl}${path}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
