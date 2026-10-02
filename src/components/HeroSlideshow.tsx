@@ -60,6 +60,13 @@ export default function HeroSlideshow({
               alt={images[index].alt}
               fill
               priority={index === 0}
+              // `priority` alone (the pre-Next-16 API, now deprecated but
+              // still functional) only triggers the <head> preload — it no
+              // longer implies fetchpriority="high" on the <img> itself.
+              // Confirmed via Lighthouse against the live site: without
+              // this, the hero image's resource-load-delay was ~9.5s of
+              // LCP time even though the preload link was present.
+              fetchPriority={index === 0 ? "high" : undefined}
               quality={92}
               sizes="100vw"
               className="object-cover"

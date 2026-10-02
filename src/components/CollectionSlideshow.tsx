@@ -52,6 +52,7 @@ export default function CollectionSlideshow({
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             priority={index === 0}
+            fetchPriority={index === 0 ? "high" : undefined}
             className="object-cover"
           />
         </motion.div>

@@ -61,6 +61,9 @@ export default function ProductPhoto({
               alt={`${alt} — ${active.label}`}
               fill
               priority={priority}
+              // See HeroSlideshow.tsx — `priority` no longer implies
+              // fetchpriority="high" on its own in this Next.js version.
+              fetchPriority={priority ? "high" : undefined}
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover transition-opacity duration-500"
               onError={() => setErrored((prev) => ({ ...prev, [index]: true }))}
@@ -72,6 +75,7 @@ export default function ProductPhoto({
             alt={`${alt} — ${active.label}`}
             fill
             priority={priority}
+            fetchPriority={priority ? "high" : undefined}
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover transition-opacity duration-500"
             onError={() => setErrored((prev) => ({ ...prev, [index]: true }))}
