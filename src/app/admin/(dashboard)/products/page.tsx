@@ -28,12 +28,20 @@ export default async function AdminProductsPage() {
             {products.length} product{products.length === 1 ? "" : "s"}
           </p>
         </div>
-        <Link
-          href="/admin/products/new"
-          className="flex items-center gap-2 rounded-[3px] border border-ink bg-ink px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.15em] text-paper transition-colors hover:bg-gold-dark hover:border-gold-dark"
-        >
-          <Plus className="h-4 w-4" /> Add Product
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/admin/products/quality"
+            className="rounded-[3px] border border-ink/25 px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.15em] text-ink/70 transition-colors hover:border-ink hover:text-ink"
+          >
+            Data Quality
+          </Link>
+          <Link
+            href="/admin/products/new"
+            className="flex items-center gap-2 rounded-[3px] border border-ink bg-ink px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.15em] text-paper transition-colors hover:bg-gold-dark hover:border-gold-dark"
+          >
+            <Plus className="h-4 w-4" /> Add Product
+          </Link>
+        </div>
       </div>
 
       {products.length === 0 ? (
@@ -46,6 +54,7 @@ export default async function AdminProductsPage() {
             <thead>
               <tr className="border-b border-ink/10 text-left text-[11px] uppercase tracking-[0.12em] text-ink/50">
                 <th className="px-4 py-3 font-medium">Product</th>
+                <th className="px-4 py-3 font-medium">Product ID</th>
                 <th className="px-4 py-3 font-medium">Designer</th>
                 <th className="px-4 py-3 font-medium">Collection</th>
                 <th className="px-4 py-3 font-medium">Price</th>
@@ -66,6 +75,7 @@ export default async function AdminProductsPage() {
                       <span className="font-medium text-ink hover:text-gold-dark">{p.name}</span>
                     </Link>
                   </td>
+                  <td className="px-4 py-3 font-feature-tabular text-ink/60">{p.sku}</td>
                   <td className="px-4 py-3 text-ink/70">{p.designer.name}</td>
                   <td className="px-4 py-3 text-ink/70">{p.collection.name}</td>
                   <td className="px-4 py-3 text-ink/70">{formatPrice(p.price)}</td>

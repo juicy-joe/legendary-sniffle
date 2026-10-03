@@ -163,6 +163,19 @@ model Product {
   sku     String @unique
   barcode String @unique
 
+  // Genuine retail identifier only — never backfilled from sku/barcode and
+  // never invented. Null until a real GTIN/EAN/UPC is actually assigned;
+  // Merchant Center feed and Product JSON-LD both treat an empty value as
+  // "no identifier" (identifier_exists: no) rather than fabricating one.
+  gtin String? @unique
+
+  // Future cross-channel mapping — the Olleria SKU above stays the one
+  // stable internal identity regardless of what any sales channel calls
+  // the same product. All null until those integrations actually exist.
+  amazonSku String?
+  asin      String?
+  fnsku     String?
+
   wholesalePrices WholesaleProductPrice[]
   customOrders    CustomOrder[]
 
@@ -503,6 +516,14 @@ model Order {
   // stops a retried webhook delivery from creating a duplicate order.
   stripeSessionId String?    @unique
   createdAt      DateTime    @default(now())
+
+  // Marketing attribution captured client-side at the moment of checkout
+  // (see src/lib/attribution.ts) and passed through Stripe session
+  // metadata to this webhook — first-touch is set once per visitor and
+  // never overwritten; last-touch reflects whatever brought them back to
+  // complete this specific order. Null for orders placed before this was
+  // added, or if the visitor arrived with no campaign parameters at all.
+  attribution Json?
 
   // Set together when an admin marks the order shipped — trackingNumber is
   // the human-readable id shown in the email, trackingUrl is what it links

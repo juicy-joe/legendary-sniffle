@@ -24,6 +24,16 @@ const createCheckoutSessionSchema = z.object({
   // price here either.
   country: z.string().length(2),
   shippingSpeed: z.enum(["regular", "express"]),
+  // Marketing attribution captured client-side (see src/lib/attribution.ts)
+  // — optional and unvalidated beyond being well-formed, since it's purely
+  // informational reporting data, never used for pricing or any decision
+  // that needs tamper-resistance.
+  attribution: z
+    .object({
+      firstTouch: z.record(z.string(), z.unknown()).optional(),
+      lastTouch: z.record(z.string(), z.unknown()).optional(),
+    })
+    .optional(),
 });
 
 export type CreateCheckoutSessionInput = z.infer<typeof createCheckoutSessionSchema>;
@@ -54,7 +64,7 @@ export async function createCheckoutSession(
   const slugs = parsed.data.items.map((i) => i.slug);
   const products = await prisma.product.findMany({
     where: { slug: { in: slugs } },
-    select: { id: true, slug: true, name: true, price: true },
+    select: { id: true, slug: true, name: true, price: true, sku: true },
   });
   const bySlug = new Map(products.map((p) => [p.slug, p]));
 
@@ -99,7 +109,7 @@ export async function createCheckoutSession(
           price_data: {
             currency: "eur",
             unit_amount: Math.round(product.price * 100),
-            product_data: { name: product.name, metadata: { slug: item.slug } },
+            product_data: { name: product.name, metadata: { slug: item.slug, sku: product.sku } },
           },
         };
       }),
@@ -133,6 +143,7 @@ export async function createCheckoutSession(
         items: JSON.stringify(parsed.data.items),
         shippingSpeed,
         shippingCountry: country,
+        ...(parsed.data.attribution ? { attribution: JSON.stringify(parsed.data.attribution) } : {}),
       },
       success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/checkout`,

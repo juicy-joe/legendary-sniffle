@@ -4,9 +4,24 @@ import { notFound } from "next/navigation";
 import { Check } from "lucide-react";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import ClearCartOnMount from "@/components/ClearCartOnMount";
+import PurchaseTracker from "@/components/analytics/PurchaseTracker";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/format";
+
+type OrderItem = { sku?: string; name: string; price: number; qty: number };
+
+function parseOrderItems(items: unknown): OrderItem[] {
+  if (!Array.isArray(items)) return [];
+  return items.filter(
+    (i): i is OrderItem =>
+      typeof i === "object" &&
+      i !== null &&
+      typeof (i as OrderItem).name === "string" &&
+      typeof (i as OrderItem).price === "number" &&
+      typeof (i as OrderItem).qty === "number"
+  );
+}
 
 export const metadata: Metadata = {
   title: "Order Confirmed",
@@ -41,6 +56,16 @@ export default async function CheckoutSuccessPage({
   return (
     <div className="mx-auto max-w-2xl px-6 py-20 text-center md:px-10 md:py-28">
       <ClearCartOnMount />
+      {order && (
+        <PurchaseTracker
+          orderNumber={order.orderNumber}
+          email={order.email}
+          total={order.total}
+          shippingCost={order.shippingCost}
+          taxAmount={order.taxAmount}
+          items={parseOrderItems(order.items)}
+        />
+      )}
       <RevealOnScroll>
         <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-gold/15 text-gold-dark">
           <Check className="h-6 w-6" />

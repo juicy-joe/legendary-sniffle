@@ -34,8 +34,12 @@ export type CatalogProduct = {
   limited?: boolean;
   /** Real photography, when available. Falls back to the SVG study when absent. */
   images?: ProductPhoto[];
-  /** Warehouse-assigned identifier — doubles as schema.org Product.sku. */
+  /** Warehouse-assigned identifier — doubles as schema.org Product.sku and
+   * Product.mpn (see that field's doc comment in schema.prisma). */
   sku: string;
+  /** Genuine retail identifier only — null unless a real one has been
+   * entered; never derived from sku. */
+  gtin: string | null;
   /** Manual SEO overrides from the admin "SEO (optional)" fields — null
    * unless someone deliberately typed something; see src/lib/seo.ts for the
    * automatic fallback used everywhere else. */
@@ -95,6 +99,7 @@ function toCatalogProduct(
       ? p.images.map((img) => ({ src: img.url, label: img.label, swatch: img.swatch }))
       : undefined,
     sku: p.sku,
+    gtin: p.gtin,
     metaTitle: p.metaTitle,
     metaDescription: p.metaDescription,
     updatedAt: p.updatedAt,

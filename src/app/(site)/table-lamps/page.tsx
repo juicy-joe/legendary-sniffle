@@ -9,6 +9,7 @@ import { slugify } from "@/lib/slugify";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
+import TrackViewItemList from "@/components/analytics/TrackViewItemList";
 
 const faqs = [
   {
@@ -111,6 +112,7 @@ export default async function TableLampsPage() {
           })),
         })}
       />
+      <TrackViewItemList products={catalog} listName="Table Lamps" />
       <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 text-xs text-ink/65">
         <Link href="/" className="hover:text-ink">{t(dict, "breadcrumb.home", "Home")}</Link>
         <span aria-hidden="true">/</span>

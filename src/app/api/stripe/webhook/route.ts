@@ -73,10 +73,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // it), but falling back to an empty list beats crashing the webhook.
   }
 
+  let attribution: unknown = null;
+  try {
+    attribution = session.metadata?.attribution ? JSON.parse(session.metadata.attribution) : null;
+  } catch {
+    // Same reasoning as items above — attribution is purely informational,
+    // never worth failing order creation over.
+  }
+
   const slugs = items.map((i) => i.slug);
   const products = await prisma.product.findMany({
     where: { slug: { in: slugs } },
-    select: { id: true, slug: true, name: true, price: true },
+    select: { id: true, slug: true, name: true, price: true, sku: true },
   });
   const bySlug = new Map(products.map((p) => [p.slug, p]));
 
@@ -94,7 +102,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         const price = wholesaleAccount
           ? await getWholesalePrice(wholesaleAccount, product.id, product.price)
           : product.price;
-        return { slug: i.slug, name: product.name, price, qty: i.qty };
+        return { slug: i.slug, sku: product.sku, name: product.name, price, qty: i.qty };
       })
   );
 
@@ -137,6 +145,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         status: "NEW",
         stripeSessionId: session.id,
         wholesaleAccountId: wholesaleAccount?.id ?? null,
+        attribution: attribution ?? undefined,
       },
     });
     revalidatePath("/admin/orders");

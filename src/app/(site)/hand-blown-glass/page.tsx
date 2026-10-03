@@ -6,6 +6,7 @@ import { getCatalog } from "@/lib/catalog";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
+import TrackViewItemList from "@/components/analytics/TrackViewItemList";
 
 export const metadata: Metadata = {
   title: "Hand-Blown Glass Table Lamps",
@@ -20,6 +21,7 @@ export default async function HandBlownGlassPage() {
 
   return (
     <div>
+      <TrackViewItemList products={catalog} listName="Hand-Blown Glass" />
       <script
         type="application/ld+json"
         {...jsonLdScriptProps({

@@ -9,7 +9,7 @@ import PrintInvoiceButton from "@/components/admin/PrintInvoiceButton";
 
 export const metadata = { title: "Invoice — Admin" };
 
-type OrderItem = { slug: string; name: string; price: number; qty: number };
+type OrderItem = { slug: string; name: string; price: number; qty: number; sku?: string };
 
 function parseItems(items: unknown): OrderItem[] {
   if (!Array.isArray(items)) return [];
@@ -90,6 +90,7 @@ export default async function OrderInvoicePage({ params }: { params: Promise<{ i
           <thead>
             <tr className="border-b border-ink/15 text-[11px] uppercase tracking-[0.1em] text-ink/50">
               <th className="pb-2 font-medium">Item</th>
+              <th className="pb-2 font-medium">Product ID</th>
               <th className="pb-2 text-right font-medium">Qty</th>
               <th className="pb-2 text-right font-medium">Price</th>
               <th className="pb-2 text-right font-medium">Amount</th>
@@ -99,6 +100,7 @@ export default async function OrderInvoicePage({ params }: { params: Promise<{ i
             {items.map((item, i) => (
               <tr key={`${item.slug}-${i}`} className="border-b border-ink/5">
                 <td className="py-3 text-ink/80">{item.name}</td>
+                <td className="py-3 font-feature-tabular text-ink/60">{item.sku ?? "—"}</td>
                 <td className="py-3 text-right font-feature-tabular text-ink/70">{item.qty}</td>
                 <td className="py-3 text-right font-feature-tabular text-ink/70">{formatPrice(item.price)}</td>
                 <td className="py-3 text-right font-feature-tabular text-ink/80">{formatPrice(item.price * item.qty)}</td>

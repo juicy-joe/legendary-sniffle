@@ -4,6 +4,7 @@ import { getCatalog } from "@/lib/catalog";
 import { getSettings } from "@/lib/settings";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
+import TrackViewItemList from "@/components/analytics/TrackViewItemList";
 
 const COLLECTION_NAME = "MoodMAX Collection";
 const DESCRIPTION =
@@ -22,6 +23,7 @@ export default async function MoodMaxCollectionPage() {
 
   return (
     <>
+      <TrackViewItemList products={products} listName="MoodMAX Collection" />
       <script
         type="application/ld+json"
         {...jsonLdScriptProps({

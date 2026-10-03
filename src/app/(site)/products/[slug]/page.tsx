@@ -15,6 +15,7 @@ import { productSeoTitle, productSeoDescription, productOgImage, productJsonLd, 
 import { getSettings } from "@/lib/settings";
 import { collectionHref } from "@/lib/collection-links";
 import { slugify } from "@/lib/slugify";
+import TrackViewItem from "@/components/analytics/TrackViewItem";
 
 export async function generateStaticParams() {
   // Only slugs are needed here, and getLocale() (the no-arg default) reads
@@ -76,6 +77,7 @@ export default async function ProductPage({
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-14 md:px-10 md:py-20">
+      <TrackViewItem product={product} />
       <script
         type="application/ld+json"
         {...jsonLdScriptProps({
@@ -169,6 +171,12 @@ export default async function ProductPage({
               <dd className="mt-1 text-sm text-ink/75 font-feature-tabular">
                 {product.dimensions}
               </dd>
+            </div>
+            <div>
+              <dt className="text-xs uppercase tracking-[0.15em] text-ink/65">
+                {t(dict, "product.productId", "Product ID")}
+              </dt>
+              <dd className="mt-1 text-sm text-ink/75 font-feature-tabular">{product.sku}</dd>
             </div>
             <div className="col-span-2">
               <dt className="text-xs uppercase tracking-[0.15em] text-ink/65">

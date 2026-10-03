@@ -1,36 +1,39 @@
 import { prisma } from "@/lib/prisma";
 
+// Single store-wide prefix — every product gets "TL" + a 4-digit sequence
+// regardless of category, e.g. "TL0013". Previously this was per-category
+// ("GLAS-0013"); all 12 existing products were renumbered to TL0001-TL0012
+// (Sunset first, as TL0001) in the same change that introduced this, and
+// the SkuSequence("TL") row was seeded to continue from TL0013 — see
+// scratch-images/renumber-skus.mjs in that commit for the one-time backfill.
+const SKU_PREFIX = "TL";
+
 /**
- * Generates the next permanent SKU for a product in the given category —
- * "<first 4 letters of the category name, uppercased>-<4-digit sequence>",
- * e.g. "GLAS-0013". The sequence is tracked per-prefix in SkuSequence via
- * an atomic upsert (INSERT ... ON CONFLICT ... RETURNING, in one round
- * trip so two products created at once can never collide) and only ever
+ * Generates the next permanent SKU for a newly created product —
+ * "TL<4-digit sequence>". The sequence is tracked in SkuSequence via an
+ * atomic upsert (INSERT ... ON CONFLICT ... RETURNING, in one round trip
+ * so two products created at once can never collide) and only ever
  * increments, so a number is never reused even after every product that
- * had it is deleted. Mirrors the logic the initial backfill migration used.
+ * had it is deleted.
  *
  * barcode is generated as the identical string, rendered as a Code
  * 128/QR label — see the doc comment on Product.barcode in schema.prisma
  * for why that's still a separate column rather than reusing sku directly.
+ * (Product.gtin is the separate, genuine-identifier-only field — see its
+ * own doc comment in schema.prisma.)
  *
  * (prisma/seed.ts needs this same logic but runs with its own standalone
  * PrismaClient instance rather than this module's singleton, so it has a
  * small inlined copy of the query instead of importing this function.)
  */
-export async function generateSku(categoryId: string): Promise<{ sku: string; barcode: string }> {
-  const category = await prisma.category.findUniqueOrThrow({
-    where: { id: categoryId },
-    select: { name: true },
-  });
-  const prefix = category.name.slice(0, 4).toUpperCase();
-
+export async function generateSku(): Promise<{ sku: string; barcode: string }> {
   const rows = await prisma.$queryRaw<{ seq: number }[]>`
     INSERT INTO "SkuSequence" ("prefix", "nextValue")
-    VALUES (${prefix}, 2)
+    VALUES (${SKU_PREFIX}, 2)
     ON CONFLICT ("prefix") DO UPDATE SET "nextValue" = "SkuSequence"."nextValue" + 1
     RETURNING "nextValue" - 1 AS seq
   `;
-  const code = `${prefix}-${String(rows[0].seq).padStart(4, "0")}`;
+  const code = `${SKU_PREFIX}${String(rows[0].seq).padStart(4, "0")}`;
   return { sku: code, barcode: code };
 }
 

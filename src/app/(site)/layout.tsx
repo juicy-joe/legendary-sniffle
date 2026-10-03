@@ -15,6 +15,9 @@ import { siteUrl } from "@/lib/site";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { getLocale, getUiTranslations } from "@/lib/i18n";
 import TranslationsProvider from "@/components/TranslationsProvider";
+import GtmLoader from "@/components/analytics/GtmLoader";
+import ConsentBanner from "@/components/analytics/ConsentBanner";
+import AttributionCapture from "@/components/analytics/AttributionCapture";
 import "../globals.css";
 
 // Theme C ("Monochrome Atelier") uses one typeface family for everything —
@@ -117,6 +120,8 @@ export default async function RootLayout({
       className={`${archivoDisplay.variable} ${archivoText.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-paper text-ink font-sans">
+        <GtmLoader />
+        <AttributionCapture />
         <script
           type="application/ld+json"
           {...jsonLdScriptProps({
@@ -155,6 +160,7 @@ export default async function RootLayout({
                 </main>
                 <Footer />
                 <CartDrawer />
+                <ConsentBanner />
               </CartProvider>
             </WishlistProvider>
           </CatalogProvider>

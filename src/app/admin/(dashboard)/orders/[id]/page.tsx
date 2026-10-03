@@ -11,7 +11,7 @@ import { formatPrice } from "@/lib/format";
 
 export const metadata = { title: "Order — Admin" };
 
-type OrderItem = { slug: string; name: string; price: number; qty: number };
+type OrderItem = { slug: string; name: string; price: number; qty: number; sku?: string };
 
 function parseItems(items: unknown): OrderItem[] {
   if (!Array.isArray(items)) return [];
@@ -110,6 +110,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               <li key={`${item.slug}-${i}`} className="flex items-center justify-between text-sm">
                 <span className="text-ink/80">
                   {item.name} <span className="text-ink/50">&times; {item.qty}</span>
+                  {item.sku && <span className="ml-2 text-xs text-ink/45">({item.sku})</span>}
                 </span>
                 <span className="text-ink/70 font-feature-tabular">
                   {formatPrice(item.price * item.qty)}

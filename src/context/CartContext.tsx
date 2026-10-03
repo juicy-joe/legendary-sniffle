@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { useCatalog } from "./CatalogContext";
+import { trackAddToCart, trackRemoveFromCart, trackViewCart, productToGaItem } from "@/lib/analytics/gtm";
 
 export type CartLine = { slug: string; qty: number };
 
@@ -69,26 +70,47 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return next;
       });
       setIsOpen(true);
+
+      const product = getProduct(slug);
+      if (product) trackAddToCart(productToGaItem(product, qty, product.price));
     },
-    []
+    [getProduct]
   );
 
   const removeItem = useCallback(
     (slug: string) => {
+      const line = lines.find((l) => l.slug === slug);
       persist(lines.filter((l) => l.slug !== slug));
+
+      const product = line && getProduct(slug);
+      if (product && line) trackRemoveFromCart(productToGaItem(product, line.qty, product.price));
     },
-    [lines, persist]
+    [lines, persist, getProduct]
   );
 
   const setQty = useCallback(
     (slug: string, qty: number) => {
+      const line = lines.find((l) => l.slug === slug);
+      const previousQty = line?.qty ?? 0;
+
       if (qty < 1) {
         persist(lines.filter((l) => l.slug !== slug));
-        return;
+      } else {
+        persist(lines.map((l) => (l.slug === slug ? { ...l, qty } : l)));
       }
-      persist(lines.map((l) => (l.slug === slug ? { ...l, qty } : l)));
+
+      // A decrease (including down to removal) is a remove_from_cart of the
+      // difference; an increase is an add_to_cart of the difference — both
+      // fired with the exact delta so GA4's totals stay accurate rather
+      // than double-counting the quantity that was already tracked.
+      const product = getProduct(slug);
+      if (product && qty < previousQty) {
+        trackRemoveFromCart(productToGaItem(product, previousQty - qty, product.price));
+      } else if (product && qty > previousQty) {
+        trackAddToCart(productToGaItem(product, qty - previousQty, product.price));
+      }
     },
-    [lines, persist]
+    [lines, persist, getProduct]
   );
 
   const clear = useCallback(() => persist([]), [persist]);
@@ -107,11 +129,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     [lines, getProduct]
   );
 
+  const openCart = useCallback(() => {
+    setIsOpen(true);
+    const items = lines
+      .map((l) => {
+        const product = getProduct(l.slug);
+        return product ? productToGaItem(product, l.qty, product.price) : null;
+      })
+      .filter((i) => i !== null);
+    if (items.length > 0) trackViewCart(items, subtotal);
+  }, [lines, getProduct, subtotal]);
+
   const value = useMemo(
     () => ({
       lines,
       isOpen,
-      openCart: () => setIsOpen(true),
+      openCart,
       closeCart: () => setIsOpen(false),
       addItem,
       removeItem,
@@ -120,7 +153,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       count,
       subtotal,
     }),
-    [lines, isOpen, addItem, removeItem, setQty, clear, count, subtotal]
+    [lines, isOpen, openCart, addItem, removeItem, setQty, clear, count, subtotal]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

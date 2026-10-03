@@ -20,10 +20,12 @@ type SeoProduct = Pick<
   | "description"
   | "slug"
   | "sku"
+  | "gtin"
   | "price"
   | "metaTitle"
   | "metaDescription"
   | "images"
+  | "availableStock"
 >;
 
 function truncate(text: string, max: number): string {
@@ -76,7 +78,11 @@ export function productPhotoAlt(product: Pick<CatalogProduct, "name" | "designer
 
 /** schema.org Product structured data — includes real photos (falling back
  * to the branded OG image when a product has none yet), the warehouse SKU,
- * and an absolute canonical URL, all derived without any manual input. */
+ * and an absolute canonical URL, all derived without any manual input.
+ * mpn intentionally mirrors sku (see Product.sku's doc comment in
+ * schema.prisma) rather than being a second stored value that could drift
+ * out of sync with it. gtin is only ever included when a genuine one has
+ * been entered — never derived from sku/barcode, never invented. */
 export function productJsonLd(product: SeoProduct, siteName: string) {
   const url = `${siteUrl}/products/${product.slug}`;
   const images = product.images?.length
@@ -89,6 +95,8 @@ export function productJsonLd(product: SeoProduct, siteName: string) {
     name: product.name,
     description: product.description,
     sku: product.sku,
+    mpn: product.sku,
+    ...(product.gtin ? { gtin: product.gtin } : {}),
     category: product.category,
     material: product.materials,
     image: images,
@@ -99,7 +107,8 @@ export function productJsonLd(product: SeoProduct, siteName: string) {
       url,
       price: product.price,
       priceCurrency: "EUR",
-      availability: "https://schema.org/InStock",
+      availability: product.availableStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/NewCondition",
     },
   };
 }

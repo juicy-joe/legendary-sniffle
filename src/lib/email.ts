@@ -9,7 +9,7 @@ import { siteUrl } from "./site";
 // to keep consistent. Plain table-based HTML with inline styles throughout
 // — email clients strip <style> blocks and ignore most modern CSS, so this
 // is the one place in the codebase that intentionally doesn't use Tailwind.
-type EmailItem = { name: string; price: number; qty: number };
+type EmailItem = { name: string; price: number; qty: number; sku?: string };
 
 function layout(preheader: string, bodyHtml: string): string {
   return `<!doctype html>
@@ -51,7 +51,9 @@ function itemsTable(items: EmailItem[]): string {
     .map(
       (item) => `
         <tr>
-          <td style="padding:8px 0;font-size:14px;color:#141414;">${item.name} &times; ${item.qty}</td>
+          <td style="padding:8px 0;font-size:14px;color:#141414;">
+            ${item.name} &times; ${item.qty}${item.sku ? `<br /><span style="font-size:11px;color:#7a7568;">Product ID: ${item.sku}</span>` : ""}
+          </td>
           <td style="padding:8px 0;font-size:14px;color:#141414;text-align:right;">${formatPrice(item.price * item.qty)}</td>
         </tr>`
     )

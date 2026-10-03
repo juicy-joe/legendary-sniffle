@@ -25,6 +25,12 @@ const productSchema = z.object({
   designerId: z.string().min(1, "Required"),
   collectionId: z.string().min(1, "Required"),
   categoryId: z.string().min(1, "Required"),
+  // Genuine identifiers only — blank input becomes null, never a generated
+  // placeholder. See Product.gtin's doc comment in schema.prisma.
+  gtin: z.preprocess((v) => (typeof v === "string" && v.trim() ? v.trim() : null), z.string().nullable()),
+  amazonSku: z.preprocess((v) => (typeof v === "string" && v.trim() ? v.trim() : null), z.string().nullable()),
+  asin: z.preprocess((v) => (typeof v === "string" && v.trim() ? v.trim() : null), z.string().nullable()),
+  fnsku: z.preprocess((v) => (typeof v === "string" && v.trim() ? v.trim() : null), z.string().nullable()),
 });
 
 export type ProductFormState = {
@@ -50,6 +56,10 @@ function parseProductForm(formData: FormData) {
     designerId: formData.get("designerId"),
     collectionId: formData.get("collectionId"),
     categoryId: formData.get("categoryId"),
+    gtin: formData.get("gtin"),
+    amazonSku: formData.get("amazonSku"),
+    asin: formData.get("asin"),
+    fnsku: formData.get("fnsku"),
   };
   const parsed = productSchema.safeParse(raw);
   const featured = formData.get("featured") === "on";
@@ -95,7 +105,7 @@ export async function createProduct(
     };
   }
 
-  const { sku, barcode } = await generateSku(parsed.data.categoryId);
+  const { sku, barcode } = await generateSku();
   const product = await prisma.product.create({
     data: { ...parsed.data, featured, limited, sku, barcode },
   });

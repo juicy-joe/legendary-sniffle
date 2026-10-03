@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ShoppingBag, TriangleAlert } from "lucide-react";
 import { useCart } from "@/context/CartContext";
@@ -16,6 +16,8 @@ import {
 import LampIllustration from "./LampIllustration";
 import ProductPhoto from "./ProductPhoto";
 import { useTranslations } from "./TranslationsProvider";
+import { trackBeginCheckout, productToGaItem } from "@/lib/analytics/gtm";
+import { getAttributionForCheckout } from "@/lib/attribution";
 
 const sortedCountries = [...SHIPPABLE_COUNTRIES].sort((a, b) => a.name.localeCompare(b.name));
 
@@ -43,6 +45,17 @@ export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
         .filter((x) => x.product),
     [lines, getProduct]
   );
+
+  useEffect(() => {
+    if (lineItems.length === 0) return;
+    trackBeginCheckout(
+      lineItems.map(({ line, product }) => productToGaItem(product!, line.qty, product!.price)),
+      subtotal
+    );
+    // Fire once per checkout-page view for the cart as it stood on arrival
+    // — not on every quantity tweak made while reviewing it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (lines.length === 0) {
     return (
@@ -72,6 +85,7 @@ export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
       items: lines.map((l) => ({ slug: l.slug, qty: l.qty })),
       country,
       shippingSpeed,
+      attribution: getAttributionForCheckout(),
     });
     if ("error" in result) {
       setStarting(false);

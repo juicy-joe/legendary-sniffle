@@ -21,18 +21,17 @@ const DIACRITICS_RE = new RegExp(
   "g"
 );
 
-// Same atomic per-prefix counter as src/lib/sku.ts's generateSku() — not
+// Same atomic single-prefix counter as src/lib/sku.ts's generateSku() — not
 // imported directly because this script runs with its own standalone
 // PrismaClient rather than the app's singleton (see adapter/prisma above).
-async function generateSku(categoryName: string): Promise<{ sku: string; barcode: string }> {
-  const prefix = categoryName.slice(0, 4).toUpperCase();
+async function generateSku(): Promise<{ sku: string; barcode: string }> {
   const rows = await prisma.$queryRaw<{ seq: number }[]>`
     INSERT INTO "SkuSequence" ("prefix", "nextValue")
-    VALUES (${prefix}, 2)
+    VALUES ('TL', 2)
     ON CONFLICT ("prefix") DO UPDATE SET "nextValue" = "SkuSequence"."nextValue" + 1
     RETURNING "nextValue" - 1 AS seq
   `;
-  const code = `${prefix}-${String(rows[0].seq).padStart(4, "0")}`;
+  const code = `TL${String(rows[0].seq).padStart(4, "0")}`;
   return { sku: code, barcode: code };
 }
 
@@ -99,7 +98,7 @@ async function main() {
     const alreadyExists = await prisma.product.findUnique({ where: { slug: p.slug }, select: { id: true } });
     const { sku, barcode } = alreadyExists
       ? { sku: undefined, barcode: undefined }
-      : await generateSku(p.category);
+      : await generateSku();
 
     await prisma.product.upsert({
       where: { slug: p.slug },

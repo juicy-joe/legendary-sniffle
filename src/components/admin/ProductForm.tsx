@@ -27,6 +27,11 @@ type ProductForData = {
   designerId: string;
   collectionId: string;
   categoryId: string;
+  sku: string;
+  gtin: string | null;
+  amazonSku: string | null;
+  asin: string | null;
+  fnsku: string | null;
   images: { id: string; url: string; label: string; swatch: string; sortOrder: number }[];
 };
 
@@ -135,6 +140,35 @@ export default function ProductForm({
           </label>
         </div>
       </section>
+
+      {mode === "edit" && product && (
+        <section className="space-y-6">
+          <h2 className="font-serif text-xl font-light text-ink">Product Identifiers</h2>
+          <p className="-mt-3 text-xs text-ink/60">
+            The Product ID is assigned automatically when a product is created and never changes
+            — it&rsquo;s the one identifier used consistently across the website, Google Merchant
+            Center, analytics, and order records. GTIN/EAN and Amazon mapping are optional and
+            left blank until a genuine one actually exists; nothing here is ever invented.
+          </p>
+          <Field label="Product ID (SKU)" name="_sku_display">
+            <input value={product.sku} disabled className={`${inputClass} opacity-60`} />
+          </Field>
+          <Field label="GTIN / EAN (optional — leave blank unless genuine)" name="gtin">
+            <input id="gtin" name="gtin" defaultValue={product.gtin ?? ""} className={inputClass} />
+          </Field>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <Field label="Amazon SKU (optional)" name="amazonSku">
+              <input id="amazonSku" name="amazonSku" defaultValue={product.amazonSku ?? ""} className={inputClass} />
+            </Field>
+            <Field label="ASIN (optional)" name="asin">
+              <input id="asin" name="asin" defaultValue={product.asin ?? ""} className={inputClass} />
+            </Field>
+            <Field label="FNSKU (optional)" name="fnsku">
+              <input id="fnsku" name="fnsku" defaultValue={product.fnsku ?? ""} className={inputClass} />
+            </Field>
+          </div>
+        </section>
+      )}
 
       <section className="space-y-6">
         <h2 className="font-serif text-xl font-light text-ink">Classification</h2>

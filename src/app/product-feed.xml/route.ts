@@ -1,8 +1,10 @@
 // A Google Merchant Center product feed (RSS 2.0 + the "g:" Shopping
-// namespace). Only fields backed by real data are included — no invented
-// GTIN/MPN. These lamps are handmade, numbered pieces with no official
-// manufacturer part number, so each item sets g:identifier_exists=no
-// rather than fabricating one, per Google's own guidance for goods with no
+// namespace). g:id is the stable Olleria SKU (TL####) — the same
+// identifier used in Product JSON-LD, GA4 ecommerce events, and order
+// records, per the single-product-identity principle. mpn mirrors that
+// same SKU. gtin is only included when a genuine one has been entered on
+// the product; otherwise g:identifier_exists=no is set instead of
+// fabricating one, per Google's own guidance for goods with no
 // real-world identifier.
 import { getCatalog } from "@/lib/catalog";
 import { getSettings } from "@/lib/settings";
@@ -38,18 +40,19 @@ export async function GET() {
         .join("\n");
 
       return `  <item>
-    <g:id>${escapeXml(p.slug)}</g:id>
+    <g:id>${escapeXml(p.sku)}</g:id>
     <title>${cdata(`${p.name} — Designer Table Lamp`)}</title>
     <description>${cdata(p.description)}</description>
     <link>${escapeXml(url)}</link>
     <g:image_link>${escapeXml(images[0].src)}</g:image_link>
 ${additionalImages}
-    <g:availability>${p.availableStock > 0 ? "in stock" : "backorder"}</g:availability>
+    <g:availability>${p.availableStock > 0 ? "in stock" : "out of stock"}</g:availability>
     <g:price>${p.price}.00 EUR</g:price>
     <g:brand>${escapeXml(settings.siteName)}</g:brand>
     <g:condition>new</g:condition>
     <g:product_type>${escapeXml(`${p.category} > ${p.collection}`)}</g:product_type>
-    <g:identifier_exists>no</g:identifier_exists>
+    <g:mpn>${escapeXml(p.sku)}</g:mpn>
+${p.gtin ? `    <g:gtin>${escapeXml(p.gtin)}</g:gtin>` : `    <g:identifier_exists>no</g:identifier_exists>`}
     <g:shipping>
       <g:country>ES</g:country>
       <g:service>Standard</g:service>
