@@ -102,15 +102,13 @@ export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
               <div className="flex-1">
                 <p className="text-sm text-ink">{product!.name}</p>
                 <p className="text-xs text-ink/65">{t("checkout.qty", "Qty")} {line.qty}</p>
-                {(product!.availableStock <= 0 || line.qty > product!.availableStock) && (
+                {line.qty >= product!.availableStock && (
                   <p className="mt-1 flex items-start gap-1 text-xs text-amber-700">
                     <TriangleAlert className="mt-0.5 h-3 w-3 shrink-0" />
-                    {product!.availableStock <= 0
-                      ? t("product.madeToOrderWarning", "Made to order — ships in 2-3 weeks.")
-                      : t(
-                          "product.limitedStockWarning",
-                          "Only {count} in stock — the rest of your order will take 2-3 weeks to ship."
-                        ).replace("{count}", String(product!.availableStock))}
+                    {t("product.lowStockNotice", "Only {count} in stock.").replace(
+                      "{count}",
+                      String(product!.availableStock)
+                    )}
                   </p>
                 )}
               </div>

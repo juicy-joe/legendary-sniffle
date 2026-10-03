@@ -7,6 +7,7 @@ import { getStripe } from "@/lib/stripe";
 import { getShippingLabel, getShippingPrice, isShippableCountry } from "@/lib/shipping";
 import { getShippingRates } from "@/lib/settings";
 import { siteUrl } from "@/lib/site";
+import { getStockLevels } from "@/lib/stock-levels";
 
 const createCheckoutSessionSchema = z.object({
   // Only the slug + quantity come from the client — price and name are
@@ -53,7 +54,7 @@ export async function createCheckoutSession(
   const slugs = parsed.data.items.map((i) => i.slug);
   const products = await prisma.product.findMany({
     where: { slug: { in: slugs } },
-    select: { slug: true, name: true, price: true },
+    select: { id: true, slug: true, name: true, price: true },
   });
   const bySlug = new Map(products.map((p) => [p.slug, p]));
 
@@ -62,6 +63,24 @@ export async function createCheckoutSession(
     return {
       error: "One or more items in your cart are no longer available. Please review your cart and try again.",
     };
+  }
+
+  // Authoritative stock check — the cart/product-page caps are just UX, a
+  // tampered client request (or a stale cart from before stock dropped)
+  // could still arrive here with more than we have, so this is the one
+  // place that actually has to stop the sale rather than just warn.
+  const stockLevels = await getStockLevels();
+  for (const item of parsed.data.items) {
+    const product = bySlug.get(item.slug)!;
+    const available = stockLevels.get(product.id)?.available ?? 0;
+    if (item.qty > available) {
+      return {
+        error:
+          available > 0
+            ? `Only ${available} of "${product.name}" left in stock — please update the quantity in your cart.`
+            : `"${product.name}" is currently out of stock — please remove it from your cart.`,
+      };
+    }
   }
 
   const stripe = getStripe();

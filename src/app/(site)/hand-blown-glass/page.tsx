@@ -10,7 +10,7 @@ import { siteUrl } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Hand-Blown Glass Table Lamps",
   description:
-    "How Ollerialight's hand-blown crystalline glass table lamps are made: mouth-blown and hand-coloured at our partner glassworks in L'Olleria, Valencia.",
+    "How Ollerialight's hand-blown crystalline glass table lamps are made: mouth-blown and hand-coloured with our partner European glass makers.",
   alternates: { canonical: "/hand-blown-glass" },
 };
 
@@ -48,7 +48,7 @@ export default async function HandBlownGlassPage() {
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-paper/60">
               Every Ollerialight sphere starts as molten crystalline glass, shaped entirely by
-              hand at our partner glassworks in L&rsquo;Olleria, Valencia.
+              hand by our partner European glass makers.
             </p>
           </RevealOnScroll>
         </div>

@@ -17,7 +17,7 @@ const faqs = [
   },
   {
     q: "What materials are used?",
-    a: "Every Ollerialight table lamp is made from mouth-blown crystalline glass, individually hand-coloured during the glassblowing process at our partner glassworks in L'Olleria, Valencia.",
+    a: "Every Ollerialight table lamp is made from mouth-blown crystalline glass, individually hand-coloured during the glassblowing process with our partner European glass makers.",
   },
   {
     q: "Are the lamps handmade?",
@@ -167,7 +167,7 @@ export default async function TableLampsPage() {
         </h2>
         <p className="text-base leading-relaxed text-ink/70">
           Every sphere starts as molten glass, mouth-blown and hand-coloured by glassmakers at
-          our partner glassworks in L&rsquo;Olleria, Valencia — no two pieces take colour in
+          our partner European glass makers — no two pieces take colour in
           exactly the same way.{" "}
           <Link href="/hand-blown-glass" className="underline underline-offset-2 hover:text-gold-dark">
             Learn more about our hand-blown glass
