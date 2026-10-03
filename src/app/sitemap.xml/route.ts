@@ -8,6 +8,12 @@ import { getCatalog, getDesigners } from "@/lib/catalog";
 import { slugify } from "@/lib/slugify";
 import { siteUrl } from "@/lib/site";
 
+// See the matching comment in src/app/product-feed.xml/route.ts — same
+// reasoning (deliberately locale-fixed to avoid cookies()-based dynamic
+// rendering, which otherwise risks this being eligible for a cached
+// build-time snapshot rather than always reflecting current products).
+export const dynamic = "force-dynamic";
+
 function escapeXml(value: string): string {
   return value
     .replace(/&/g, "&amp;")

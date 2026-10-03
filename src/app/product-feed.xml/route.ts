@@ -10,6 +10,16 @@ import { getCatalog } from "@/lib/catalog";
 import { getSettings } from "@/lib/settings";
 import { siteUrl } from "@/lib/site";
 
+// Must run fresh on every request, never a cached/prerendered snapshot —
+// Merchant Center needs this feed's price/availability/SKU to reflect the
+// live database, not whatever it looked like at the last deploy. Route
+// Handlers with no explicit config can still be eligible for static
+// prerendering (this one calls getCatalog("en"), which deliberately skips
+// the cookies()-based locale lookup to avoid *that* kind of dynamic
+// rendering) — this makes the "always live" requirement explicit instead
+// of relying on an absence of dynamic APIs to imply it.
+export const dynamic = "force-dynamic";
+
 function escapeXml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
