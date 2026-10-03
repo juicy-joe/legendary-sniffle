@@ -17,11 +17,11 @@ const faqs = [
   },
   {
     q: "What materials are used?",
-    a: "Every Ollerialight table lamp is made from mouth-blown crystalline glass, individually hand-coloured during the glassblowing process with our partner European glass makers.",
+    a: "Every Ollerialight table lamp is made from mouth-blown crystalline glass. MoodMAX pieces are hand-painted once the glass has cooled; NatureSPHERE's pieces have their colour introduced directly into the glass during melting.",
   },
   {
     q: "Are the lamps handmade?",
-    a: "Yes. Each sphere is mouth-blown and hand-coloured by glassmakers, which is why colour patterns vary slightly from piece to piece — your lamp will be distinct from the exact one shown online.",
+    a: "Yes. Each sphere is mouth-blown by hand, then finished using one of two techniques depending on the collection — hand-painted for MoodMAX, or coloured through during melting for NatureSPHERE's — which is why colour patterns vary slightly from piece to piece, and your lamp will be distinct from the exact one shown online.",
   },
   {
     q: "What bulb does the lamp use?",
@@ -48,7 +48,7 @@ const faqs = [
 export const metadata: Metadata = {
   title: "Designer Table Lamps — Hand-Blown Glass",
   description:
-    "Discover Ollerialight's designer table lamps: mouth-blown crystalline glass, hand-coloured by hand, in the MoodMAX and NatureSPHERE's collections. Sculptural lighting for contemporary interiors.",
+    "Discover Ollerialight's designer table lamps: mouth-blown crystalline glass, hand-painted in MoodMAX and coloured through during melting in NatureSPHERE's. Sculptural lighting for contemporary interiors.",
   alternates: { canonical: "/table-lamps" },
 };
 
@@ -166,9 +166,10 @@ export default async function TableLampsPage() {
           Hand-Blown Glass Table Lamps
         </h2>
         <p className="text-base leading-relaxed text-ink/70">
-          Every sphere starts as molten glass, mouth-blown and hand-coloured by glassmakers at
-          our partner European glass makers — no two pieces take colour in
-          exactly the same way.{" "}
+          Every sphere starts as molten glass, mouth-blown by our partner European glass makers,
+          then coloured by hand for MoodMAX or coloured through during melting for
+          NatureSPHERE&rsquo;s — two different techniques, so no two pieces ever take colour
+          quite the same way.{" "}
           <Link href="/hand-blown-glass" className="underline underline-offset-2 hover:text-gold-dark">
             Learn more about our hand-blown glass
           </Link>

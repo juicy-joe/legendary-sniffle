@@ -7,7 +7,7 @@ import { siteUrl } from "@/lib/site";
 
 const COLLECTION_NAME = "MoodMAX Collection";
 const DESCRIPTION =
-  "MoodMAX: mouth-blown crystalline glass table lamps with hand-coloured gradients, designed by J. J. Finnbogason. Ambient mood lighting, not just brightness.";
+  "MoodMAX: mouth-blown crystalline glass table lamps with hand-painted gradients, designed by J. J. Finnbogason. Ambient mood lighting, not just brightness.";
 
 export const metadata: Metadata = {
   title: "MoodMAX Collection — Hand-Blown Glass Mood Lamps",
@@ -57,8 +57,8 @@ export default async function MoodMaxCollectionPage() {
       <CollectionLanding
         eyebrow="MoodMAX Collection"
         headline="MoodMAX"
-        intro="Mouth-blown crystalline glass table lamps with hand-coloured gradients, made in collaboration with our partner European glass makers. Each sphere is designed to fill a room with atmosphere, not just brightness."
-        story={`MoodMAX began with a simple idea: a table lamp should set a mood, not just light a room. Every sphere is mouth-blown from multi-layered crystalline glass, then hand-coloured so the gradient running through it — turquoise into purple, red into gold, amber into honey — is unique to that one piece.\n\nWhen lit, the layered glass diffuses the light into a soft, atmospheric glow rather than a hard point of brightness, which is what makes MoodMAX work as an ambient mood light rather than a reading lamp. Each colourway is designed by J. J. Finnbogason and produced in small runs with our partner European glass makers.`}
+        intro="Mouth-blown crystalline glass table lamps, hand-painted with expressive gradients, made in collaboration with our partner European glass makers. Each sphere is designed to fill a room with atmosphere, not just brightness."
+        story={`MoodMAX began with a simple idea: a table lamp should set a mood, not just light a room. Every sphere is mouth-blown from multi-layered crystalline glass, then hand-painted with a gradient — turquoise into purple, red into gold, amber into honey — unique to that one piece.\n\nWhen lit, the layered glass diffuses the light into a soft, atmospheric glow rather than a hard point of brightness, which is what makes MoodMAX work as an ambient mood light rather than a reading lamp. Each colourway is designed by J. J. Finnbogason and produced in small runs with our partner European glass makers.`}
         materials="Mouth-blown crystalline glass"
         dimensions="⌀ 20cm"
         designer="J. J. Finnbogason"

@@ -7,7 +7,7 @@ import { siteUrl } from "@/lib/site";
 
 const COLLECTION_NAME = "NatureSPHERE's";
 const DESCRIPTION =
-  "NatureSPHERE's: hand-blown crystalline glass spheres inspired by the Icelandic landscape, each one a unique, one-of-a-kind piece designed by J. J. Finnbogason.";
+  "NatureSPHERE's: hand-blown crystalline glass spheres coloured through during melting, inspired by the Icelandic landscape — each one a unique, one-of-a-kind piece designed by J. J. Finnbogason.";
 
 export const metadata: Metadata = {
   title: "NatureSPHERE's Collection — Hand-Blown Glass Lamps",
@@ -57,8 +57,8 @@ export default async function NatureSphereCollectionPage() {
       <CollectionLanding
         eyebrow="NatureSPHERE's Collection"
         headline="NatureSPHERE's"
-        intro="Hand-blown crystalline glass spheres that carry the colours of the Icelandic landscape — moss, volcanic rock, geothermal mist. Every piece is individually shaped, so no two are ever quite alike."
-        story={`NatureSPHERE's takes its colour and texture directly from Iceland: the cream and moss-green of geothermal valleys, the amber and ember-red of volcanic rock, the frost-white of a winter coastline. Each sphere is mouth-blown from multi-layered crystalline glass and hand-coloured in-process, so the pattern inside the glass is genuinely one-of-a-kind — no two pieces distribute colour the same way.\n\nAt 30cm in diameter, these are the larger of our two glass collections, designed to read as a sculptural object on a console or sideboard as much as a light source. Every piece is designed by J. J. Finnbogason and produced in small runs with our partner European glass makers.`}
+        intro="Hand-blown crystalline glass spheres, coloured through during melting so each carries the colours of the Icelandic landscape — moss, volcanic rock, geothermal mist — in real depth, not just on the surface. Every piece is individually shaped, so no two are ever quite alike."
+        story={`NatureSPHERE's takes its colour and texture directly from Iceland: the cream and moss-green of geothermal valleys, the amber and ember-red of volcanic rock, the frost-white of a winter coastline. Each sphere is mouth-blown from multi-layered crystalline glass, its colour introduced directly into the molten glass during melting rather than applied afterward, so the pattern running through the glass is genuinely one-of-a-kind — no two pieces distribute colour the same way.\n\nAt 30cm in diameter, these are the larger of our two glass collections, designed to read as a sculptural object on a console or sideboard as much as a light source. Every piece is designed by J. J. Finnbogason and produced in small runs with our partner European glass makers.`}
         materials="Mouth-blown crystalline glass"
         dimensions="⌀ 30cm"
         designer="J. J. Finnbogason"

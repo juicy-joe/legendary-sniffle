@@ -10,7 +10,7 @@ import { siteUrl } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Hand-Blown Glass Table Lamps",
   description:
-    "How Ollerialight's hand-blown crystalline glass table lamps are made: mouth-blown and hand-coloured with our partner European glass makers.",
+    "How Ollerialight's hand-blown crystalline glass table lamps are made, and the two different colouring techniques behind MoodMAX and NatureSPHERE's.",
   alternates: { canonical: "/hand-blown-glass" },
 };
 
@@ -59,22 +59,29 @@ export default async function HandBlownGlassPage() {
           <h2 className="mb-3 font-serif text-2xl text-ink md:text-3xl">What Mouth-Blown Means</h2>
           <p className="text-base leading-relaxed text-ink/70">
             Mouth-blowing is a centuries-old glassmaking technique: a glassmaker gathers molten
-            glass on the end of a blowpipe and shapes it by breath, gravity, and hand tools alone
-            — no mould dictates the final form of the colour inside it. It&rsquo;s slower and far
-            less consistent than machine-pressed glass, which is exactly why it produces results a
-            machine can&rsquo;t: subtle variation in wall thickness, bubbles, and colour
-            distribution that make every finished piece genuinely singular.
+            glass on the end of a blowpipe and shapes it by breath, gravity, and a traditional
+            glassblowing mould. It&rsquo;s slower and far less consistent than fully
+            machine-pressed glass, which is exactly why it produces results a machine
+            can&rsquo;t: subtle variation in wall thickness, bubbles, and finish that make every
+            piece genuinely singular.
           </p>
         </RevealOnScroll>
 
         <RevealOnScroll className="mb-14">
-          <h2 className="mb-3 font-serif text-2xl text-ink md:text-3xl">Hand-Coloured, Not Printed</h2>
+          <h2 className="mb-3 font-serif text-2xl text-ink md:text-3xl">Two Ways We Bring Colour to Glass</h2>
           <p className="text-base leading-relaxed text-ink/70">
-            The colour in an Ollerialight sphere isn&rsquo;t a coating or a print — it&rsquo;s
-            introduced into the glass itself while it&rsquo;s still workable, by hand, during the
-            blowing process. That&rsquo;s why a gradient like the one running through Deep Purple or
-            Sunset reads as depth rather than a flat surface effect, and why no two spheres take
-            colour in quite the same way.
+            Our two collections aren&rsquo;t just different colourways — they&rsquo;re coloured in
+            two genuinely different ways. <strong className="font-medium text-ink">MoodMAX is
+            hand-painted</strong>: once a sphere has been mouth-blown and cooled, each gradient —
+            turquoise into purple, red into gold — is applied to the glass by hand, so the exact
+            blend is never quite the same twice.
+          </p>
+          <p className="mt-4 text-base leading-relaxed text-ink/70">
+            <strong className="font-medium text-ink">NatureSPHERE&rsquo;s takes a different
+            approach</strong>: its colour is introduced directly into the molten glass during
+            melting, so it runs through the full thickness of the glass rather than sitting on
+            its surface. That&rsquo;s what gives pieces like Lava Glow and Geyser Glow their
+            sense of depth — the colour isn&rsquo;t applied to the glass, it&rsquo;s part of it.
           </p>
         </RevealOnScroll>
 
