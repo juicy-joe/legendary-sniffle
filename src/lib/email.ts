@@ -119,6 +119,57 @@ Questions? Reply to this email or write to ${EMAIL_REPLY_TO}.`;
   });
 }
 
+// Business-facing — fires once per paid order, right alongside the
+// customer's own confirmation (see the webhook), so a sale is never missed
+// just because nobody happened to be looking at Admin -> Orders. Sent to
+// EMAIL_REPLY_TO, the same inbox every other internal notification
+// (low-stock alerts, trade requests) already goes to.
+export async function sendNewOrderNotificationEmail(order: {
+  orderNumber: string;
+  customerName: string;
+  email: string;
+  items: EmailItem[];
+  total: number;
+  country: string;
+}): Promise<void> {
+  const html = layout(
+    `New order ${order.orderNumber} — ${formatPrice(order.total)} from ${order.customerName}.`,
+    `
+      <p style="margin:0 0 8px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:#b8935a;">New Sale</p>
+      <h1 style="margin:0 0 16px;font-size:26px;font-weight:normal;color:#141414;">New Order Received</h1>
+      <p style="margin:0 0 4px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#7a7568;">Order Number</p>
+      <p style="margin:0 0 20px;font-size:16px;color:#141414;font-weight:bold;">${order.orderNumber}</p>
+      <p style="margin:0 0 4px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#7a7568;">Customer</p>
+      <p style="margin:0 0 20px;font-size:15px;color:#141414;">${escapeHtml(order.customerName)} (${escapeHtml(order.email)}) — ${escapeHtml(order.country)}</p>
+      ${itemsTable(order.items)}
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#3a3730;">
+        <tr><td style="padding:10px 0 0;font-size:16px;color:#141414;border-top:1px solid #e5e1d8;">Total</td><td style="padding:10px 0 0;font-size:16px;color:#141414;text-align:right;border-top:1px solid #e5e1d8;">${formatPrice(order.total)}</td></tr>
+      </table>
+      <p style="margin:24px 0 0;font-size:14px;color:#3a3730;">Review it in Admin &rarr; Orders.</p>
+    `
+  );
+
+  const text = `New Order Received
+
+Order Number: ${order.orderNumber}
+Customer: ${order.customerName} (${order.email}) — ${order.country}
+
+${order.items.map((i) => `${i.name} x ${i.qty} — ${formatPrice(i.price * i.qty)}`).join("\n")}
+
+Total: ${formatPrice(order.total)}
+
+Review it in Admin -> Orders.`;
+
+  await getResend().emails.send({
+    from: EMAIL_FROM,
+    replyTo: order.email,
+    to: EMAIL_REPLY_TO,
+    subject: `New Order — ${order.orderNumber} (${formatPrice(order.total)})`,
+    html,
+    text,
+  });
+}
+
 export async function sendShippedEmail(order: {
   orderNumber: string;
   email: string;

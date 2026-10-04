@@ -4,7 +4,7 @@ import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 import { getShippingLabel, type ShippingSpeed } from "@/lib/shipping";
-import { sendOrderConfirmationEmail } from "@/lib/email";
+import { sendOrderConfirmationEmail, sendNewOrderNotificationEmail } from "@/lib/email";
 import { getApprovedWholesaleAccount, getWholesalePrice } from "@/lib/wholesale";
 
 // The only thing that's allowed to create an Order row for a Stripe-paid
@@ -169,6 +169,21 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       });
     } catch (err) {
       console.error("Failed to send order confirmation email:", err);
+    }
+
+    // Same best-effort reasoning as the customer email above — a notification
+    // hiccup shouldn't make Stripe retry an otherwise-successful order.
+    try {
+      await sendNewOrderNotificationEmail({
+        orderNumber: order.orderNumber,
+        customerName: order.customerName,
+        email: order.email,
+        items: orderItems,
+        total: order.total,
+        country: order.country,
+      });
+    } catch (err) {
+      console.error("Failed to send new order notification email:", err);
     }
 
     return NextResponse.json({ received: true, orderNumber: order.orderNumber });
