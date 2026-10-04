@@ -18,6 +18,7 @@ import {
   Warehouse,
   Handshake,
   Languages,
+  BarChart3,
 } from "lucide-react";
 import { getSession } from "@/lib/get-session";
 import { logout } from "@/app/admin/login/actions";
@@ -42,6 +43,7 @@ const baseNavItems = [
   { href: "/admin/social", label: "Social", icon: Share2 },
   { href: "/admin/enquiries", label: "Enquiries", icon: Mail },
   { href: "/admin/orders", label: "Orders", icon: Package },
+  { href: "/admin/analytics", label: "Traffic", icon: BarChart3 },
   { href: "/admin/warehouse", label: "Warehouse", icon: Warehouse },
   { href: "/admin/wholesale", label: "Wholesale", icon: Handshake },
   { href: "/admin/settings", label: "Settings", icon: SettingsIcon },

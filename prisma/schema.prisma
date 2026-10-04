@@ -593,3 +593,32 @@ model ContentTranslation {
   @@unique([locale, model, recordId, field])
   @@index([locale, model])
 }
+
+// --- First-party traffic ---------------------------------------------------
+// A lightweight, self-hosted page-view log — gives the admin dashboard real
+// traffic numbers immediately, without waiting on a GA4/GTM account to be
+// configured (see src/lib/analytics/ for that separate, heavier marketing
+// layer). One row per page view; only ever written by the consent-gated
+// client tracker (src/components/analytics/PageViewTracker.tsx) via
+// src/app/api/track/pageview/route.ts — never includes IP address or any
+// other directly identifying data, only what's needed to chart traffic and
+// break it down by page/referrer/device/country.
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  referrer  String?
+  // "mobile" | "tablet" | "desktop" — parsed from the User-Agent header
+  // server-side at write time, not trusted from the client.
+  device    String
+  // ISO 3166-1 alpha-2, from Vercel's own request geo headers — no
+  // third-party geolocation call needed. Null outside Vercel (local dev).
+  country   String?
+  // A random id set in a first-party cookie (see the API route) — lets
+  // "sessions" be counted distinctly from raw page views without needing
+  // a real user identity.
+  sessionId String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([sessionId])
+}

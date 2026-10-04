@@ -18,6 +18,7 @@ import TranslationsProvider from "@/components/TranslationsProvider";
 import GtmLoader from "@/components/analytics/GtmLoader";
 import ConsentBanner from "@/components/analytics/ConsentBanner";
 import AttributionCapture from "@/components/analytics/AttributionCapture";
+import PageViewTracker from "@/components/analytics/PageViewTracker";
 import "../globals.css";
 
 // Theme C ("Monochrome Atelier") uses one typeface family for everything —
@@ -122,6 +123,7 @@ export default async function RootLayout({
       <body className="flex min-h-full flex-col bg-paper text-ink font-sans">
         <GtmLoader />
         <AttributionCapture />
+        <PageViewTracker />
         <script
           type="application/ld+json"
           {...jsonLdScriptProps({
