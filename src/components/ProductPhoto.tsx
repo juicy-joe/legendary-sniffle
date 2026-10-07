@@ -39,9 +39,22 @@ export default function ProductPhoto({
   const [errored, setErrored] = useState<Record<number, boolean>>({});
   const active = images[index];
 
+  // The image frame is either exactly as tall as its parent (every other
+  // caller: a fixed-size square thumbnail in the cart drawer, checkout
+  // summary, or a product card) or, when this is the full detail-page
+  // viewer with its own thumbnail row underneath (showSelector), sized by
+  // its own 3:4 ratio instead — it can't be h-full there, since h-full
+  // would force the whole component (image + selector row) into whatever
+  // fixed-aspect box the page wraps it in, leaving the selector row with no
+  // reserved space and overflowing on top of whatever follows on the page.
   return (
-    <div className={clsx("relative h-full w-full", className)}>
-      <div className="corner-ticks relative h-full w-full overflow-hidden rounded-2xl">
+    <div className={clsx("relative w-full", showSelector ? "" : "h-full", className)}>
+      <div
+        className={clsx(
+          "corner-ticks relative w-full overflow-hidden rounded-2xl",
+          showSelector ? "aspect-[3/4]" : "h-full"
+        )}
+      >
         {errored[index] ? (
           <PhotoFallback swatch={active.swatch} />
         ) : showSelector ? (

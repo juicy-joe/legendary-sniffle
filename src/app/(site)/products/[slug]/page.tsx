@@ -102,7 +102,7 @@ export default async function ProductPage({
 
       <div className="grid grid-cols-1 gap-14 md:grid-cols-2 md:gap-20">
         <RevealOnScroll className="md:sticky md:top-28 md:self-start">
-          <div className="relative aspect-[3/4] rounded-[6px] border border-ink/10 bg-paper-dim">
+          <div className="relative rounded-[6px] border border-ink/10 bg-paper-dim">
             {product.limited && (
               <span className="absolute left-6 top-6 z-10 border border-paper/40 bg-ink/90 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-paper backdrop-blur-sm">
                 {t(dict, "product.limitedEdition", "Limited Edition")}
@@ -118,7 +118,7 @@ export default async function ProductPage({
                 priority
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center p-10">
+              <div className="flex aspect-[3/4] w-full items-center justify-center p-10">
                 <LampIllustration product={product} className="h-full w-full" />
               </div>
             )}
