@@ -2,11 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Globe } from "lucide-react";
 import { localeNames, LOCALE_COOKIE, type Locale } from "@/lib/i18n-shared";
 import { useTranslations } from "@/components/TranslationsProvider";
+import FlagIcon from "@/components/FlagIcon";
 
-const allLocales: Locale[] = ["en", "es", "de", "fr", "it", "tr", "is"];
+// Scoped to the four languages the site is actually translated into —
+// "fr"/"it"/"tr" exist in the shared Locale type for future use but have no
+// translated content yet, so offering them here would just be a flag that
+// silently does nothing.
+const supportedLocales: Locale[] = ["en", "es", "de", "is"];
 
 // Setting the cookie directly (not a server action) so the switch is
 // instant and works from anywhere the component is mounted, then a router
@@ -32,11 +36,11 @@ export default function LanguageSwitcher({ dark = false }: { dark?: boolean }) {
         onClick={() => setOpen((o) => !o)}
         aria-label="Choose language"
         aria-expanded={open}
-        className={`flex items-center gap-1.5 text-xs uppercase tracking-[0.1em] transition-colors ${
+        className={`flex items-center gap-2 text-xs uppercase tracking-[0.1em] transition-colors ${
           dark ? "text-paper/70 hover:text-paper" : "text-ink/70 hover:text-ink"
         }`}
       >
-        <Globe className="h-4 w-4" />
+        <FlagIcon locale={locale} />
         {locale}
       </button>
       {open && (
@@ -47,16 +51,17 @@ export default function LanguageSwitcher({ dark = false }: { dark?: boolean }) {
             className="fixed inset-0 z-40 cursor-default"
             onClick={() => setOpen(false)}
           />
-          <ul className="absolute right-0 top-full z-50 mt-2 w-40 rounded-[3px] border border-ink/10 bg-paper py-1.5 shadow-lg">
-            {allLocales.map((l) => (
+          <ul className="absolute right-0 top-full z-50 mt-2 w-44 rounded-[3px] border border-ink/10 bg-paper py-1.5 shadow-lg">
+            {supportedLocales.map((l) => (
               <li key={l}>
                 <button
                   type="button"
                   onClick={() => choose(l)}
-                  className={`flex w-full items-center justify-between px-4 py-2 text-left text-sm transition-colors hover:bg-paper-dim ${
+                  className={`flex w-full items-center gap-3 px-4 py-2 text-left text-sm transition-colors hover:bg-paper-dim ${
                     l === locale ? "text-gold-dark" : "text-ink"
                   }`}
                 >
+                  <FlagIcon locale={l} />
                   {localeNames[l]}
                 </button>
               </li>
