@@ -90,7 +90,7 @@ function toCatalogProduct(
     shade: p.shade,
     base: p.base,
     materials: translations?.materials ?? p.materials,
-    dimensions: p.dimensions,
+    dimensions: translations?.dimensions ?? p.dimensions,
     description: translations?.description ?? p.description,
     story: translations?.story ?? p.story,
     featured: p.featured,

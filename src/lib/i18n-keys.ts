@@ -95,6 +95,7 @@ export const uiKeySections: UiKeySection[] = [
       { key: "product.materials", fallback: "Materials" },
       { key: "product.dimensions", fallback: "Dimensions" },
       { key: "product.productId", fallback: "Product ID" },
+      { key: "product.specifications", fallback: "Specifications" },
       { key: "product.quickDelivery", fallback: "Quick delivery" },
       { key: "product.whiteGlove", fallback: "White-glove delivery included" },
       { key: "product.preferToTalk", fallback: "Prefer to talk first?" },

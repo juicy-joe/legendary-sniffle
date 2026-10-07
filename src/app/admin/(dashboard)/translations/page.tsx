@@ -224,6 +224,14 @@ async function ContentTab({ locale }: { locale: Locale }) {
       english: p.materials,
       value: value("Product", p.id, "materials"),
     },
+    {
+      model: "Product",
+      recordId: p.id,
+      field: "dimensions",
+      label: `${p.name} — Dimensions`,
+      english: p.dimensions,
+      value: value("Product", p.id, "dimensions"),
+    },
   ]);
 
   return (

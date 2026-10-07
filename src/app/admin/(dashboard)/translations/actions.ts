@@ -68,6 +68,9 @@ const contentModelSchema = z.enum([
   "Collection",
   "HomeContent",
   "AboutContent",
+  "ProductsContent",
+  "ConsultingContent",
+  "TradeContent",
   "ContactInfo",
   "MenuItem",
 ]);
