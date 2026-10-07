@@ -5,8 +5,12 @@ import { getSettings } from "@/lib/settings";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
 import TrackViewItemList from "@/components/analytics/TrackViewItemList";
+import { getLocale, getContentFields } from "@/lib/i18n";
 
 const COLLECTION_NAME = "NatureSPHERE's";
+const INTRO_EN =
+  "Hand-blown crystalline glass spheres, coloured through during melting so each carries the colours of the Icelandic landscape — moss, volcanic rock, geothermal mist — in real depth, not just on the surface. Every piece is individually shaped, so no two are ever quite alike.";
+const STORY_EN = `NatureSPHERE's takes its colour and texture directly from Iceland: the cream and moss-green of geothermal valleys, the amber and ember-red of volcanic rock, the frost-white of a winter coastline. Each sphere is mouth-blown from multi-layered crystalline glass, its colour introduced directly into the molten glass during melting rather than applied afterward, so the pattern running through the glass is genuinely one-of-a-kind — no two pieces distribute colour the same way.\n\nAt 30cm in diameter, these are the larger of our two glass collections, designed to read as a sculptural object on a console or sideboard as much as a light source. Every piece is designed by J. J. Finnbogason and produced in small runs with our partner European glass makers.`;
 const DESCRIPTION =
   "NatureSPHERE's: hand-blown crystalline glass spheres coloured through during melting, inspired by the Icelandic landscape — each one a unique, one-of-a-kind piece designed by J. J. Finnbogason.";
 
@@ -17,9 +21,16 @@ export const metadata: Metadata = {
 };
 
 export default async function NatureSphereCollectionPage() {
-  const catalog = await getCatalog();
-  const settings = await getSettings();
+  const locale = await getLocale();
+  const [catalog, settings, translations] = await Promise.all([
+    getCatalog(),
+    getSettings(),
+    getContentFields(locale, "CollectionPage", "naturesphere"),
+  ]);
   const products = catalog.filter((p) => p.collection === COLLECTION_NAME);
+  const intro = translations.intro ?? INTRO_EN;
+  const story = translations.story ?? STORY_EN;
+  const materials = translations.materials ?? "Mouth-blown crystalline glass";
 
   return (
     <>
@@ -59,9 +70,9 @@ export default async function NatureSphereCollectionPage() {
       <CollectionLanding
         eyebrow="NatureSPHERE's Collection"
         headline="NatureSPHERE's"
-        intro="Hand-blown crystalline glass spheres, coloured through during melting so each carries the colours of the Icelandic landscape — moss, volcanic rock, geothermal mist — in real depth, not just on the surface. Every piece is individually shaped, so no two are ever quite alike."
-        story={`NatureSPHERE's takes its colour and texture directly from Iceland: the cream and moss-green of geothermal valleys, the amber and ember-red of volcanic rock, the frost-white of a winter coastline. Each sphere is mouth-blown from multi-layered crystalline glass, its colour introduced directly into the molten glass during melting rather than applied afterward, so the pattern running through the glass is genuinely one-of-a-kind — no two pieces distribute colour the same way.\n\nAt 30cm in diameter, these are the larger of our two glass collections, designed to read as a sculptural object on a console or sideboard as much as a light source. Every piece is designed by J. J. Finnbogason and produced in small runs with our partner European glass makers.`}
-        materials="Mouth-blown crystalline glass"
+        intro={intro}
+        story={story}
+        materials={materials}
         dimensions="⌀ 30cm"
         designer="J. J. Finnbogason"
         products={products}

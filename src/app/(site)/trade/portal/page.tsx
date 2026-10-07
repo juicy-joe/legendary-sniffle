@@ -7,6 +7,7 @@ import { getApprovedWholesaleAccount, getWholesalePrices } from "@/lib/wholesale
 import { getShippingRates } from "@/lib/settings";
 import TradePortal from "@/components/TradePortal";
 import { wholesaleLogout } from "@/app/(site)/trade/login/actions";
+import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Trade Portal",
@@ -34,8 +35,12 @@ export default async function TradePortalPage() {
     },
   });
 
-  const priceByProductId = await getWholesalePrices(account, products);
-  const shippingRates = await getShippingRates();
+  const locale = await getLocale();
+  const [priceByProductId, shippingRates, dict] = await Promise.all([
+    getWholesalePrices(account, products),
+    getShippingRates(),
+    getUiTranslations(locale),
+  ]);
 
   const items = products.map((p) => ({
     id: p.id,
@@ -50,14 +55,19 @@ export default async function TradePortalPage() {
     <div className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-20">
       <div className="mb-10 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="mb-2 text-xs uppercase tracking-[0.2em] text-gold-dark">Trade Portal</p>
+          <p className="mb-2 text-xs uppercase tracking-[0.2em] text-gold-dark">
+            {t(dict, "tradePortal.heading", "Trade Portal")}
+          </p>
           <h1 className="font-serif text-3xl font-light text-ink md:text-4xl">
-            Welcome, {account.businessName}
+            {t(dict, "tradePortal.welcome", "Welcome, {businessName}").replace("{businessName}", account.businessName)}
           </h1>
           <p className="mt-2 text-sm text-ink/60">
             {account.discountPercent != null
-              ? `Your account discount: ${account.discountPercent}% off retail (with per-item pricing where negotiated).`
-              : "Prices below reflect your trade account."}
+              ? t(dict, "tradePortal.discountNote", "Your account discount: {percent}% off retail (with per-item pricing where negotiated).").replace(
+                  "{percent}",
+                  String(account.discountPercent)
+                )
+              : t(dict, "tradePortal.pricesReflect", "Prices below reflect your trade account.")}
           </p>
         </div>
         <div className="flex items-center gap-6">
@@ -65,14 +75,14 @@ export default async function TradePortalPage() {
             href="/trade/portal/requests"
             className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink/70 transition-colors hover:text-ink"
           >
-            Special Order Requests
+            {t(dict, "tradePortal.specialOrderRequests", "Special Order Requests")}
           </Link>
           <form action={wholesaleLogout}>
             <button
               type="submit"
               className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink/50 transition-colors hover:text-ink"
             >
-              Log Out
+              {t(dict, "tradePortal.logOut", "Log Out")}
             </button>
           </form>
         </div>

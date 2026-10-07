@@ -5,8 +5,12 @@ import { getSettings } from "@/lib/settings";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
 import TrackViewItemList from "@/components/analytics/TrackViewItemList";
+import { getLocale, getContentFields } from "@/lib/i18n";
 
 const COLLECTION_NAME = "MoodMAX Collection";
+const INTRO_EN =
+  "Mouth-blown crystalline glass table lamps, hand-painted with expressive gradients, made in collaboration with our partner European glass makers. Each sphere is designed to fill a room with atmosphere, not just brightness.";
+const STORY_EN = `MoodMAX began with a simple idea: a table lamp should set a mood, not just light a room. Every sphere is mouth-blown from multi-layered crystalline glass, then hand-painted with a gradient — turquoise into purple, red into gold, amber into honey — unique to that one piece.\n\nWhen lit, the layered glass diffuses the light into a soft, atmospheric glow rather than a hard point of brightness, which is what makes MoodMAX work as an ambient mood light rather than a reading lamp. Each colourway is designed by J. J. Finnbogason and produced in small runs with our partner European glass makers.`;
 const DESCRIPTION =
   "MoodMAX: mouth-blown crystalline glass table lamps with hand-painted gradients, designed by J. J. Finnbogason. Ambient mood lighting, not just brightness.";
 
@@ -17,9 +21,16 @@ export const metadata: Metadata = {
 };
 
 export default async function MoodMaxCollectionPage() {
-  const catalog = await getCatalog();
-  const settings = await getSettings();
+  const locale = await getLocale();
+  const [catalog, settings, translations] = await Promise.all([
+    getCatalog(),
+    getSettings(),
+    getContentFields(locale, "CollectionPage", "moodmax"),
+  ]);
   const products = catalog.filter((p) => p.collection === COLLECTION_NAME);
+  const intro = translations.intro ?? INTRO_EN;
+  const story = translations.story ?? STORY_EN;
+  const materials = translations.materials ?? "Mouth-blown crystalline glass";
 
   return (
     <>
@@ -59,9 +70,9 @@ export default async function MoodMaxCollectionPage() {
       <CollectionLanding
         eyebrow="MoodMAX Collection"
         headline="MoodMAX"
-        intro="Mouth-blown crystalline glass table lamps, hand-painted with expressive gradients, made in collaboration with our partner European glass makers. Each sphere is designed to fill a room with atmosphere, not just brightness."
-        story={`MoodMAX began with a simple idea: a table lamp should set a mood, not just light a room. Every sphere is mouth-blown from multi-layered crystalline glass, then hand-painted with a gradient — turquoise into purple, red into gold, amber into honey — unique to that one piece.\n\nWhen lit, the layered glass diffuses the light into a soft, atmospheric glow rather than a hard point of brightness, which is what makes MoodMAX work as an ambient mood light rather than a reading lamp. Each colourway is designed by J. J. Finnbogason and produced in small runs with our partner European glass makers.`}
-        materials="Mouth-blown crystalline glass"
+        intro={intro}
+        story={story}
+        materials={materials}
         dimensions="⌀ 20cm"
         designer="J. J. Finnbogason"
         products={products}

@@ -36,14 +36,21 @@ export default async function DesignersPage() {
           <nav aria-label="Breadcrumb" className="mb-8 flex items-center justify-center gap-2 text-xs text-paper/60">
             <Link href="/" className="hover:text-paper">{t(dict, "breadcrumb.home", "Home")}</Link>
             <span aria-hidden="true">/</span>
-            <span className="text-paper/70">Designers</span>
+            <span className="text-paper/70">{t(dict, "breadcrumb.designers", "Designers")}</span>
           </nav>
           <RevealOnScroll>
-            <p className="mb-4 text-xs uppercase tracking-[0.2em] text-gold">The Atelier</p>
-            <h1 className="font-serif text-5xl font-light leading-tight md:text-6xl">Our Designers</h1>
+            <p className="mb-4 text-xs uppercase tracking-[0.2em] text-gold">
+              {t(dict, "designers.heroEyebrow", "The Atelier")}
+            </p>
+            <h1 className="font-serif text-5xl font-light leading-tight md:text-6xl">
+              {t(dict, "designers.heroHeading", "Our Designers")}
+            </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-paper/60">
-              Every Ollerialight table lamp begins with a designer&rsquo;s own hand — here&rsquo;s who
-              shapes our collections.
+              {t(
+                dict,
+                "designers.heroSubtext",
+                "Every Ollerialight table lamp begins with a designer's own hand — here's who shapes our collections."
+              )}
             </p>
           </RevealOnScroll>
         </div>

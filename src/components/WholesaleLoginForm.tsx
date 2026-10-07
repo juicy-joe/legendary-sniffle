@@ -2,11 +2,13 @@
 
 import { useActionState } from "react";
 import { wholesaleLogin, type WholesaleLoginState } from "@/app/(site)/trade/login/actions";
+import { useTranslations } from "./TranslationsProvider";
 
 const initialState: WholesaleLoginState = {};
 
 export default function WholesaleLoginForm({ from }: { from?: string }) {
   const [state, formAction, pending] = useActionState(wholesaleLogin, initialState);
+  const { t } = useTranslations();
 
   return (
     <form action={formAction} className="space-y-6" noValidate>
@@ -14,7 +16,7 @@ export default function WholesaleLoginForm({ from }: { from?: string }) {
 
       <div>
         <label htmlFor="email" className="mb-2 block text-[11px] uppercase tracking-[0.15em] text-ink/65">
-          Email
+          {t("contact.email", "Email")}
         </label>
         <input
           key={state.email ?? "initial"}
@@ -31,7 +33,7 @@ export default function WholesaleLoginForm({ from }: { from?: string }) {
 
       <div>
         <label htmlFor="password" className="mb-2 block text-[11px] uppercase tracking-[0.15em] text-ink/65">
-          Password
+          {t("wholesaleForm.password", "Password")}
         </label>
         <input
           id="password"
@@ -54,7 +56,7 @@ export default function WholesaleLoginForm({ from }: { from?: string }) {
         disabled={pending}
         className="w-full rounded-[3px] border border-ink bg-ink px-9 py-4 text-[11px] font-medium uppercase tracking-[0.18em] text-paper transition-colors duration-300 hover:bg-gold-dark hover:border-gold-dark disabled:opacity-60"
       >
-        {pending ? "Signing In..." : "Sign In"}
+        {pending ? t("wholesaleForm.signingIn", "Signing In...") : t("wholesaleForm.signIn", "Sign In")}
       </button>
     </form>
   );

@@ -73,6 +73,8 @@ const contentModelSchema = z.enum([
   "TradeContent",
   "ContactInfo",
   "MenuItem",
+  "CollectionPage",
+  "StaticPage",
 ]);
 
 // Bulk variant of saveContentTranslation for a whole "Page Content" section

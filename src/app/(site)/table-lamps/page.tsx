@@ -6,12 +6,12 @@ import CollectionsShowcase, { type CollectionSummary } from "@/components/Collec
 import { getCatalog, getCollections } from "@/lib/catalog";
 import { getProductsContent } from "@/lib/content";
 import { slugify } from "@/lib/slugify";
-import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { getLocale, getUiTranslations, getContentFields, t } from "@/lib/i18n";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
 import TrackViewItemList from "@/components/analytics/TrackViewItemList";
 
-const faqs = [
+const faqsEn = [
   {
     q: "What is a designer table lamp?",
     a: "A designer table lamp is a lighting object created as a piece of design in its own right — chosen for its form, materials, and character, not just its brightness. Every Ollerialight table lamp is designed to work as a sculptural object whether it's switched on or off.",
@@ -44,7 +44,27 @@ const faqs = [
     q: "How should the glass be cared for?",
     a: "Dust with a soft, dry cloth and avoid abrasive cleaners or solvents on the glass surface. Always unplug the lamp before cleaning.",
   },
-];
+] as const;
+
+// English fallbacks for the rest of this page's static copy — the single
+// source of truth for what getContentFields falls back to when a locale has
+// no translation row yet.
+const EN = {
+  section2Heading: "Designer Table Lamps for Contemporary Interiors",
+  section2BodyPrefix:
+    "An Ollerialight table lamp is designed to work as a console or sideboard centrepiece, a bedside light, or a desk companion — anywhere a room benefits from a warm, sculptural glow rather than a flat wash of light. The same hand-blown glass that makes each piece genuinely one of a kind also makes it suited to hospitality and interior design projects: our pieces are specified for hotels, restaurants, and private villas through our",
+  section2LinkText: "Consulting & Projects",
+  section2BodySuffix: "service.",
+  collectionsHeading: "Explore Our Table Lamp Collections",
+  collectionsSubtext: "Each collection has its own design language — explore the full story behind each one.",
+  featuredHeading: "Featured Designer Table Lamps",
+  handBlownHeading: "Hand-Blown Glass Table Lamps",
+  handBlownBodyPrefix:
+    "Every sphere starts as molten glass, mouth-blown by our partner European glass makers, then coloured by hand for MoodMAX or coloured through during melting for NatureSPHERE's — two different techniques, so no two pieces ever take colour quite the same way.",
+  handBlownLinkText: "Learn more about our hand-blown glass",
+  faqHeading: "Frequently Asked Questions",
+  ...Object.fromEntries(faqsEn.flatMap((f, i) => [[`faq${i}Q`, f.q], [`faq${i}A`, f.a]])),
+};
 
 export const metadata: Metadata = {
   title: "Designer Table Lamps — Hand-Blown Glass",
@@ -55,12 +75,15 @@ export const metadata: Metadata = {
 
 export default async function TableLampsPage() {
   const locale = await getLocale();
-  const [catalog, collectionRows, content, dict] = await Promise.all([
+  const [catalog, collectionRows, content, dict, pageContent] = await Promise.all([
     getCatalog(),
     getCollections(),
     getProductsContent(),
     getUiTranslations(locale),
+    getContentFields(locale, "StaticPage", "tableLamps"),
   ]);
+  const c = (field: keyof typeof EN) => pageContent[field] ?? EN[field];
+  const faqs = faqsEn.map((f, i) => ({ q: c(`faq${i}Q` as keyof typeof EN), a: c(`faq${i}A` as keyof typeof EN) }));
 
   // Canonical collection order (alphabetical, from the admin-managed
   // Collection table) — passed to ProductsExplorer too so the showcase
@@ -132,48 +155,40 @@ export default async function TableLampsPage() {
 
       <RevealOnScroll className="mb-20 max-w-3xl">
         <h2 className="mb-3 font-serif text-2xl text-ink md:text-3xl">
-          Designer Table Lamps for Contemporary Interiors
+          {c("section2Heading")}
         </h2>
         <p className="text-base leading-relaxed text-ink/70">
-          An Ollerialight table lamp is designed to work as a console or sideboard centrepiece,
-          a bedside light, or a desk companion — anywhere a room benefits from a warm, sculptural
-          glow rather than a flat wash of light. The same hand-blown glass that makes each piece
-          genuinely one of a kind also makes it suited to hospitality and interior design
-          projects: our pieces are specified for hotels, restaurants, and private villas through
-          our{" "}
+          {c("section2BodyPrefix")}{" "}
           <Link href="/consulting" className="underline underline-offset-2 hover:text-gold-dark">
-            Consulting &amp; Projects
+            {c("section2LinkText")}
           </Link>{" "}
-          service.
+          {c("section2BodySuffix")}
         </p>
       </RevealOnScroll>
 
       <RevealOnScroll className="mb-14">
         <h2 className="mb-2 font-serif text-2xl text-ink md:text-3xl">
-          Explore Our Table Lamp Collections
+          {c("collectionsHeading")}
         </h2>
         <p className="max-w-2xl text-sm text-ink/60">
-          Each collection has its own design language — explore the full story behind each one.
+          {c("collectionsSubtext")}
         </p>
       </RevealOnScroll>
       <CollectionsShowcase collections={showcaseCollections} dict={dict} />
 
       <RevealOnScroll className="mb-8">
-        <h2 className="font-serif text-2xl text-ink md:text-3xl">Featured Designer Table Lamps</h2>
+        <h2 className="font-serif text-2xl text-ink md:text-3xl">{c("featuredHeading")}</h2>
       </RevealOnScroll>
       <ProductsExplorer collectionOrder={collectionOrder} />
 
       <RevealOnScroll className="mt-24 max-w-3xl border-t border-ink/10 pt-14">
         <h2 className="mb-3 font-serif text-2xl text-ink md:text-3xl">
-          Hand-Blown Glass Table Lamps
+          {c("handBlownHeading")}
         </h2>
         <p className="text-base leading-relaxed text-ink/70">
-          Every sphere starts as molten glass, mouth-blown by our partner European glass makers,
-          then coloured by hand for MoodMAX or coloured through during melting for
-          NatureSPHERE&rsquo;s — two different techniques, so no two pieces ever take colour
-          quite the same way.{" "}
+          {c("handBlownBodyPrefix")}{" "}
           <Link href="/hand-blown-glass" className="underline underline-offset-2 hover:text-gold-dark">
-            Learn more about our hand-blown glass
+            {c("handBlownLinkText")}
           </Link>
           .
         </p>
@@ -181,7 +196,7 @@ export default async function TableLampsPage() {
 
       <RevealOnScroll className="mt-20 max-w-3xl border-t border-ink/10 pt-14">
         <h2 className="mb-6 font-serif text-2xl text-ink md:text-3xl">
-          Frequently Asked Questions
+          {c("faqHeading")}
         </h2>
         <dl className="space-y-6">
           {faqs.map((f) => (

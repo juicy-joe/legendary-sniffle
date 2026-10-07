@@ -8,6 +8,7 @@ import PurchaseTracker from "@/components/analytics/PurchaseTracker";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/format";
+import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 
 type OrderItem = { sku?: string; name: string; price: number; qty: number };
 
@@ -52,6 +53,9 @@ export default async function CheckoutSuccessPage({
   const order = await prisma.order.findUnique({ where: { stripeSessionId: session.id } });
 
   const lineItems = session.line_items?.data ?? [];
+  const locale = await getLocale();
+  const dict = await getUiTranslations(locale);
+  const email = session.customer_details?.email ?? "";
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-20 text-center md:px-10 md:py-28">
@@ -71,15 +75,25 @@ export default async function CheckoutSuccessPage({
           <Check className="h-6 w-6" />
         </div>
         <p className="mb-3 text-xs uppercase tracking-[0.2em] text-gold-dark">
-          Thank You
+          {t(dict, "checkoutSuccess.thankYou", "Thank You")}
         </p>
         <h1 className="font-serif text-4xl font-light text-ink md:text-5xl">
-          Order Confirmed
+          {t(dict, "checkoutSuccess.orderConfirmed", "Order Confirmed")}
         </h1>
         <p className="mx-auto mt-4 max-w-md text-ink/60">
           {order
-            ? <>Order <span className="font-medium text-ink">{order.orderNumber}</span> is confirmed — a receipt has been sent to {session.customer_details?.email}.</>
-            : <>Your payment went through — a receipt has been sent to {session.customer_details?.email}. Your order is being recorded now.</>}
+            ? t(
+                dict,
+                "checkoutSuccess.confirmedWithReceipt",
+                "Order {orderNumber} is confirmed — a receipt has been sent to {email}."
+              )
+                .replace("{orderNumber}", order.orderNumber)
+                .replace("{email}", email)
+            : t(
+                dict,
+                "checkoutSuccess.paidPendingRecord",
+                "Your payment went through — a receipt has been sent to {email}. Your order is being recorded now."
+              ).replace("{email}", email)}
         </p>
 
         <div className="mt-10 space-y-4 rounded-[6px] border border-ink/10 bg-paper-dim p-6 text-left">
@@ -97,23 +111,23 @@ export default async function CheckoutSuccessPage({
           </ul>
           <div className="space-y-2 border-t border-ink/10 pt-4 text-sm">
             <div className="flex justify-between text-ink/60">
-              <span>Subtotal</span>
+              <span>{t(dict, "checkout.subtotal", "Subtotal")}</span>
               <span className="font-feature-tabular">{formatPrice((session.amount_subtotal ?? 0) / 100)}</span>
             </div>
             <div className="flex justify-between text-ink/60">
-              <span>Shipping</span>
+              <span>{t(dict, "checkout.shipping", "Shipping")}</span>
               <span className="font-feature-tabular">
                 {formatPrice((session.shipping_cost?.amount_total ?? 0) / 100)}
               </span>
             </div>
             <div className="flex justify-between text-ink/60">
-              <span>Tax</span>
+              <span>{t(dict, "checkout.tax", "Tax")}</span>
               <span className="font-feature-tabular">
                 {formatPrice((session.total_details?.amount_tax ?? 0) / 100)}
               </span>
             </div>
             <div className="flex justify-between border-t border-ink/10 pt-2 font-serif text-lg text-ink">
-              <span>Total</span>
+              <span>{t(dict, "checkout.total", "Total")}</span>
               <span className="font-feature-tabular">{formatPrice((session.amount_total ?? 0) / 100)}</span>
             </div>
           </div>
@@ -123,7 +137,7 @@ export default async function CheckoutSuccessPage({
           href="/table-lamps"
           className="mt-10 inline-flex items-center gap-2 border-b border-ink/40 pb-1 text-[11px] font-medium uppercase tracking-[0.16em] text-ink transition-colors hover:border-ink"
         >
-          Continue Browsing
+          {t(dict, "checkoutSuccess.continueBrowsing", "Continue Browsing")}
         </Link>
       </RevealOnScroll>
     </div>

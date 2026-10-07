@@ -2,11 +2,13 @@
 
 import { useActionState } from "react";
 import { setWholesalePassword, type SetPasswordState } from "@/app/(site)/trade/set-password/actions";
+import { useTranslations } from "./TranslationsProvider";
 
 const initialState: SetPasswordState = {};
 
 export default function WholesaleSetPasswordForm({ token }: { token: string }) {
   const [state, formAction, pending] = useActionState(setWholesalePassword, initialState);
+  const { t } = useTranslations();
 
   return (
     <form action={formAction} className="space-y-6" noValidate>
@@ -14,7 +16,7 @@ export default function WholesaleSetPasswordForm({ token }: { token: string }) {
 
       <div>
         <label htmlFor="password" className="mb-2 block text-[11px] uppercase tracking-[0.15em] text-ink/65">
-          Password
+          {t("wholesaleForm.password", "Password")}
         </label>
         <input
           id="password"
@@ -34,7 +36,7 @@ export default function WholesaleSetPasswordForm({ token }: { token: string }) {
 
       <div>
         <label htmlFor="confirmPassword" className="mb-2 block text-[11px] uppercase tracking-[0.15em] text-ink/65">
-          Confirm Password
+          {t("wholesaleForm.confirmPassword", "Confirm Password")}
         </label>
         <input
           id="confirmPassword"
@@ -62,7 +64,7 @@ export default function WholesaleSetPasswordForm({ token }: { token: string }) {
         disabled={pending}
         className="w-full rounded-[3px] border border-ink bg-ink px-9 py-4 text-[11px] font-medium uppercase tracking-[0.18em] text-paper transition-colors duration-300 hover:bg-gold-dark hover:border-gold-dark disabled:opacity-60"
       >
-        {pending ? "Saving..." : "Set Password & Log In"}
+        {pending ? t("wholesaleForm.saving", "Saving...") : t("wholesaleForm.setPasswordAndLogIn", "Set Password & Log In")}
       </button>
     </form>
   );

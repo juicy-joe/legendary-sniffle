@@ -134,6 +134,8 @@ async function ContentTab({ locale }: { locale: Locale }) {
     "consulting",
     "trade",
     "contact",
+    "moodmax",
+    "naturesphere",
   ];
   const overrideRows = await prisma.contentTranslation.findMany({
     where: { locale, recordId: { in: recordIds } },
@@ -174,6 +176,65 @@ async function ContentTab({ locale }: { locale: Locale }) {
     english: m.label,
     value: value("MenuItem", m.id, "label"),
   }));
+
+  const collectionPageFields: ContentField[] = [
+    {
+      model: "CollectionPage",
+      recordId: "moodmax",
+      field: "intro",
+      label: "MoodMAX Page — Intro",
+      english:
+        "Mouth-blown crystalline glass table lamps, hand-painted with expressive gradients, made in collaboration with our partner European glass makers. Each sphere is designed to fill a room with atmosphere, not just brightness.",
+      value: value("CollectionPage", "moodmax", "intro"),
+      multiline: true,
+    },
+    {
+      model: "CollectionPage",
+      recordId: "moodmax",
+      field: "story",
+      label: "MoodMAX Page — Story",
+      english:
+        "MoodMAX began with a simple idea: a table lamp should set a mood, not just light a room. Every sphere is mouth-blown from multi-layered crystalline glass, then hand-painted with a gradient — turquoise into purple, red into gold, amber into honey — unique to that one piece.\n\nWhen lit, the layered glass diffuses the light into a soft, atmospheric glow rather than a hard point of brightness, which is what makes MoodMAX work as an ambient mood light rather than a reading lamp. Each colourway is designed by J. J. Finnbogason and produced in small runs with our partner European glass makers.",
+      value: value("CollectionPage", "moodmax", "story"),
+      multiline: true,
+    },
+    {
+      model: "CollectionPage",
+      recordId: "moodmax",
+      field: "materials",
+      label: "MoodMAX Page — Materials",
+      english: "Mouth-blown crystalline glass",
+      value: value("CollectionPage", "moodmax", "materials"),
+    },
+    {
+      model: "CollectionPage",
+      recordId: "naturesphere",
+      field: "intro",
+      label: "NatureSPHERE's Page — Intro",
+      english:
+        "Hand-blown crystalline glass spheres, coloured through during melting so each carries the colours of the Icelandic landscape — moss, volcanic rock, geothermal mist — in real depth, not just on the surface. Every piece is individually shaped, so no two are ever quite alike.",
+      value: value("CollectionPage", "naturesphere", "intro"),
+      multiline: true,
+    },
+    {
+      model: "CollectionPage",
+      recordId: "naturesphere",
+      field: "story",
+      label: "NatureSPHERE's Page — Story",
+      english:
+        "NatureSPHERE's takes its colour and texture directly from Iceland: the cream and moss-green of geothermal valleys, the amber and ember-red of volcanic rock, the frost-white of a winter coastline. Each sphere is mouth-blown from multi-layered crystalline glass, its colour introduced directly into the molten glass during melting rather than applied afterward, so the pattern running through the glass is genuinely one-of-a-kind — no two pieces distribute colour the same way.\n\nAt 30cm in diameter, these are the larger of our two glass collections, designed to read as a sculptural object on a console or sideboard as much as a light source. Every piece is designed by J. J. Finnbogason and produced in small runs with our partner European glass makers.",
+      value: value("CollectionPage", "naturesphere", "story"),
+      multiline: true,
+    },
+    {
+      model: "CollectionPage",
+      recordId: "naturesphere",
+      field: "materials",
+      label: "NatureSPHERE's Page — Materials",
+      english: "Mouth-blown crystalline glass",
+      value: value("CollectionPage", "naturesphere", "materials"),
+    },
+  ];
 
   const collectionFields: ContentField[] = collections
     .filter((c) => c.description)
@@ -239,6 +300,7 @@ async function ContentTab({ locale }: { locale: Locale }) {
       <ContentTranslationsEditor locale={locale} heading="Site Content" fields={siteContentFields} />
       <ContentTranslationsEditor locale={locale} heading="Navigation Labels" fields={navFields} />
       <ContentTranslationsEditor locale={locale} heading="Collections" fields={collectionFields} />
+      <ContentTranslationsEditor locale={locale} heading="Collection Landing Pages" fields={collectionPageFields} />
       <ContentTranslationsEditor locale={locale} heading="Designers" fields={designerFields} collapsible />
       <ContentTranslationsEditor locale={locale} heading="Products" fields={productFields} collapsible groupEvery={3} />
     </div>

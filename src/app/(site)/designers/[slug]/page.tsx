@@ -82,7 +82,7 @@ export default async function DesignerPage({
           <nav aria-label="Breadcrumb" className="mb-8 flex items-center justify-center gap-2 text-xs text-paper/60">
             <Link href="/" className="hover:text-paper">{t(dict, "breadcrumb.home", "Home")}</Link>
             <span aria-hidden="true">/</span>
-            <Link href="/designers" className="hover:text-paper">Designers</Link>
+            <Link href="/designers" className="hover:text-paper">{t(dict, "breadcrumb.designers", "Designers")}</Link>
             <span aria-hidden="true">/</span>
             <span className="text-paper/70">{name}</span>
           </nav>
@@ -98,13 +98,13 @@ export default async function DesignerPage({
         <section className="mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-24">
           <RevealOnScroll className="mb-14 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <h2 className="font-serif text-3xl text-ink md:text-4xl">
-              Table Lamps by {name}
+              {t(dict, "designers.tableLampsBy", "Table Lamps by")} {name}
             </h2>
             <Link
               href="/table-lamps"
               className="text-[11px] font-medium uppercase tracking-[0.16em] text-ink/70 transition-colors hover:text-gold-dark"
             >
-              View All Table Lamps
+              {t(dict, "designers.viewAllTableLamps", "View All Table Lamps")}
             </Link>
           </RevealOnScroll>
           <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">

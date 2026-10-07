@@ -11,6 +11,7 @@ import {
   type ShippingSpeed,
 } from "@/lib/shipping";
 import { createWholesaleCheckoutSession } from "@/app/(site)/trade/portal/actions";
+import { useTranslations } from "./TranslationsProvider";
 
 type Item = {
   id: string;
@@ -43,6 +44,7 @@ export default function TradePortal({
   items: Item[];
   shippingRates: ShippingRates;
 }) {
+  const { t } = useTranslations();
   const [cart, setCart] = useState<CartLine[]>([]);
   const [country, setCountry] = useState("");
   const [shippingSpeed, setShippingSpeed] = useState<ShippingSpeed>("regular");
@@ -97,7 +99,7 @@ export default function TradePortal({
   const handleCheckout = async () => {
     if (cartLines.length === 0) return;
     if (!country) {
-      setError("Please select a shipping country before continuing.");
+      setError(t("tradePortal.selectCountryError", "Please select a shipping country before continuing."));
       return;
     }
     setStarting(true);
@@ -149,7 +151,7 @@ export default function TradePortal({
                 onClick={() => addToCart(item.slug)}
                 className="mt-3 rounded-[3px] border border-ink px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.14em] text-ink transition-colors hover:bg-ink hover:text-paper"
               >
-                Add to Order
+                {t("tradePortal.addToOrder", "Add to Order")}
               </button>
             </div>
           </div>
@@ -158,11 +160,11 @@ export default function TradePortal({
 
       <aside className="h-fit rounded-[6px] border border-ink/10 bg-paper-dim p-6 lg:sticky lg:top-24">
         <h2 className="mb-4 flex items-center gap-2 font-serif text-xl font-light text-ink">
-          <ShoppingBag className="h-4 w-4" /> Your Order
+          <ShoppingBag className="h-4 w-4" /> {t("tradePortal.yourOrder", "Your Order")}
         </h2>
 
         {cartLines.length === 0 ? (
-          <p className="text-sm text-ink/60">No items yet — add pieces from the catalog.</p>
+          <p className="text-sm text-ink/60">{t("tradePortal.noItemsYet", "No items yet — add pieces from the catalog.")}</p>
         ) : (
           <>
             <ul className="space-y-3">
@@ -173,7 +175,7 @@ export default function TradePortal({
                     <button
                       type="button"
                       onClick={() => setQty(line.slug, line.qty - 1)}
-                      aria-label={`Decrease quantity of ${item.name}`}
+                      aria-label={`${t("cart.decreaseQty", "Decrease quantity")} — ${item.name}`}
                       className="flex h-6 w-6 items-center justify-center rounded-[3px] border border-ink/20 text-ink/60 hover:border-ink hover:text-ink"
                     >
                       <Minus className="h-3 w-3" />
@@ -182,7 +184,7 @@ export default function TradePortal({
                     <button
                       type="button"
                       onClick={() => setQty(line.slug, line.qty + 1)}
-                      aria-label={`Increase quantity of ${item.name}`}
+                      aria-label={`${t("cart.increaseQty", "Increase quantity")} — ${item.name}`}
                       className="flex h-6 w-6 items-center justify-center rounded-[3px] border border-ink/20 text-ink/60 hover:border-ink hover:text-ink"
                     >
                       <Plus className="h-3 w-3" />
@@ -198,7 +200,7 @@ export default function TradePortal({
             <div className="mt-5 space-y-3 border-t border-ink/10 pt-4">
               <div>
                 <label htmlFor="trade-country" className="mb-1.5 block text-[11px] uppercase tracking-[0.15em] text-ink/65">
-                  Country
+                  {t("checkout.country", "Country")}
                 </label>
                 <select
                   id="trade-country"
@@ -206,7 +208,7 @@ export default function TradePortal({
                   onChange={(e) => setCountry(e.target.value)}
                   className="w-full rounded-[3px] border border-ink/20 bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-gold-dark"
                 >
-                  <option value="">Select&hellip;</option>
+                  <option value="">{t("tradePortal.selectEllipsis", "Select…")}</option>
                   {sortedCountries.map((c) => (
                     <option key={c.code} value={c.code}>
                       {c.name}
@@ -231,23 +233,23 @@ export default function TradePortal({
                       onChange={() => setShippingSpeed(speed)}
                       className="sr-only"
                     />
-                    {speed === "express" ? "Express" : "Regular"}
+                    {speed === "express" ? t("tradePortal.expressShort", "Express") : t("tradePortal.regularShort", "Regular")}
                   </label>
                 ))}
               </div>
 
               <div className="space-y-1.5 pt-1 text-sm">
                 <div className="flex justify-between text-ink/60">
-                  <span>Subtotal</span>
+                  <span>{t("checkout.subtotal", "Subtotal")}</span>
                   <span className="font-feature-tabular">{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-ink/60">
-                  <span>Shipping</span>
+                  <span>{t("checkout.shipping", "Shipping")}</span>
                   <span className="font-feature-tabular">
-                    {shippingCost === null ? "—" : shippingCost === 0 ? "Free" : formatPrice(shippingCost)}
+                    {shippingCost === null ? "—" : shippingCost === 0 ? t("checkout.free", "Free") : formatPrice(shippingCost)}
                   </span>
                 </div>
-                <p className="text-xs text-ink/50">Tax is calculated on Stripe&rsquo;s checkout page.</p>
+                <p className="text-xs text-ink/50">{t("tradePortal.taxNote", "Tax is calculated on Stripe's checkout page.")}</p>
               </div>
             </div>
 
@@ -263,7 +265,7 @@ export default function TradePortal({
               disabled={starting}
               className="mt-4 w-full rounded-[3px] border border-ink bg-ink px-6 py-3.5 text-[11px] font-medium uppercase tracking-[0.16em] text-paper transition-colors hover:bg-gold-dark hover:border-gold-dark disabled:opacity-60"
             >
-              {starting ? "Redirecting..." : "Continue to Payment"}
+              {starting ? t("tradePortal.redirectingShort", "Redirecting...") : t("checkout.continueToPayment", "Continue to Payment")}
             </button>
           </>
         )}
