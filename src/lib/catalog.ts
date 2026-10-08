@@ -73,7 +73,8 @@ type ProductRow = Awaited<ReturnType<typeof fetchRows>>[number];
 function toCatalogProduct(
   p: ProductRow,
   translations?: Record<string, string>,
-  availableStock = 0
+  availableStock = 0,
+  imageLabelTranslations?: Record<string, Record<string, string>>
 ): CatalogProduct {
   return {
     id: p.id,
@@ -96,7 +97,11 @@ function toCatalogProduct(
     featured: p.featured,
     limited: p.limited,
     images: p.images.length
-      ? p.images.map((img) => ({ src: img.url, label: img.label, swatch: img.swatch }))
+      ? p.images.map((img) => ({
+          src: img.url,
+          label: imageLabelTranslations?.[img.id]?.label ?? img.label,
+          swatch: img.swatch,
+        }))
       : undefined,
     sku: p.sku,
     gtin: p.gtin,
@@ -115,11 +120,15 @@ function toCatalogProduct(
 export async function getCatalog(locale?: Locale): Promise<CatalogProduct[]> {
   const rows = await fetchRows();
   const resolvedLocale = locale ?? (await getLocale());
-  const [translations, stockLevels] = await Promise.all([
+  const imageIds = rows.flatMap((r) => r.images.map((img) => img.id));
+  const [translations, stockLevels, imageLabelTranslations] = await Promise.all([
     getContentFieldsForModel(resolvedLocale, "Product", rows.map((r) => r.id)),
     getStockLevels(),
+    getContentFieldsForModel(resolvedLocale, "ProductImage", imageIds),
   ]);
-  return rows.map((r) => toCatalogProduct(r, translations[r.id], stockLevels.get(r.id)?.available ?? 0));
+  return rows.map((r) =>
+    toCatalogProduct(r, translations[r.id], stockLevels.get(r.id)?.available ?? 0, imageLabelTranslations)
+  );
 }
 
 export async function getProductBySlug(slug: string, locale?: Locale): Promise<CatalogProduct | null> {
@@ -130,11 +139,12 @@ export async function getProductBySlug(slug: string, locale?: Locale): Promise<C
   const row = await prisma.product.findFirst({ where: { slug, visible: true }, include });
   if (!row) return null;
   const resolvedLocale = locale ?? (await getLocale());
-  const [translations, stockLevels] = await Promise.all([
+  const [translations, stockLevels, imageLabelTranslations] = await Promise.all([
     getContentFields(resolvedLocale, "Product", row.id),
     getStockLevels(),
+    getContentFieldsForModel(resolvedLocale, "ProductImage", row.images.map((img) => img.id)),
   ]);
-  return toCatalogProduct(row, translations, stockLevels.get(row.id)?.available ?? 0);
+  return toCatalogProduct(row, translations, stockLevels.get(row.id)?.available ?? 0, imageLabelTranslations);
 }
 
 export function getRelatedProducts(

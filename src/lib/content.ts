@@ -47,10 +47,10 @@ const productsDefaults = {
 };
 
 const consultingDefaults = {
-  heroEyebrow: "For Architects, Developers & Designers",
+  heroEyebrow: "For Architects, Interior Designers & Developers",
   heroHeadline: "Lighting for Spaces That Deserve More Than Off-the-Shelf.",
   heroSubtext:
-    "We design and produce bespoke lighting for hotels, offices, villas, and other large-scale projects — working directly with architects, interior designers, and developers from first concept to final installation.",
+    "We design and produce bespoke lighting for hotels, offices, villas, and other interior design and architecture projects — working directly with architects, interior designers, and developers from first concept to final installation.",
 };
 
 const tradeDefaults = {

@@ -44,6 +44,14 @@ const faqsEn = [
     q: "How should the glass be cared for?",
     a: "Dust with a soft, dry cloth and avoid abrasive cleaners or solvents on the glass surface. Always unplug the lamp before cleaning.",
   },
+  {
+    q: "How do I choose the right table lamp for my interior?",
+    a: "Start with the mood you want the room to have, not just the lamp's shape. Ollerialight's lamps are built for ambient, atmospheric light rather than task lighting, so they suit a living room console, a bedroom nightstand, or a hallway table where a soft glow matters more than bright, even illumination. From there, let colour and finish follow the rest of the room — MoodMAX leans toward refined, expressive colourways, while NatureSPHERE's suits spaces built around natural, earthy tones.",
+  },
+  {
+    q: "What's the difference between ambient and task lighting?",
+    a: "Task lighting is meant to be bright and even — a desk lamp or reading light. Ambient lighting is about mood and atmosphere rather than brightness, which is exactly what a table lamp from Ollerialight is designed for: a soft, diffused glow that shapes how a room feels, not a replacement for your main overhead light.",
+  },
 ] as const;
 
 // English fallbacks for the rest of this page's static copy — the single

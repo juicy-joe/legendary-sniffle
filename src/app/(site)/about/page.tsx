@@ -165,6 +165,12 @@ export default async function AboutPage() {
               {t(dict, "about.bookConsultation", "Book a Consultation")} <ArrowRight className="h-3.5 w-3.5" />
             </MagneticButton>
           </div>
+          <Link
+            href="/table-lamps"
+            className="mt-6 inline-block text-sm text-paper/60 underline underline-offset-2 transition-colors hover:text-paper"
+          >
+            {t(dict, "about.orBrowseCollection", "Or browse the full collection of designer table lamps")}
+          </Link>
         </RevealOnScroll>
       </section>
     </div>

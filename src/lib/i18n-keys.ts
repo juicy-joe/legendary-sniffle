@@ -58,7 +58,7 @@ export const uiKeySections: UiKeySection[] = [
       { key: "home.marquee.edition", fallback: "Edition of 100" },
       { key: "home.marquee.durability", fallback: "Generational Durability" },
       { key: "home.theSelection", fallback: "The Selection" },
-      { key: "home.featuredPieces", fallback: "Featured Pieces" },
+      { key: "home.featuredPieces", fallback: "Featured Designer Table Lamps" },
       { key: "home.viewFullCollection", fallback: "View Full Collection" },
       { key: "home.new", fallback: "New" },
       { key: "home.shop", fallback: "Shop" },
@@ -131,6 +131,7 @@ export const uiKeySections: UiKeySection[] = [
         fallback: "Speak with our design team about a commission, a specific finish, or a piece for a space you love.",
       },
       { key: "about.bookConsultation", fallback: "Book a Consultation" },
+      { key: "about.orBrowseCollection", fallback: "Or browse the full collection of designer table lamps" },
       { key: "about.value.madeByHand.title", fallback: "Made by Hand" },
       {
         key: "about.value.madeByHand.body",
@@ -451,7 +452,7 @@ export const uiKeySections: UiKeySection[] = [
       { key: "collectionLanding.designer", fallback: "Designer" },
       { key: "collectionLanding.materials", fallback: "Materials" },
       { key: "collectionLanding.dimensions", fallback: "Dimensions" },
-      { key: "collectionLanding.lampsSuffix", fallback: "Lamps" },
+      { key: "collectionLanding.lampsSuffix", fallback: "Table Lamps" },
       { key: "collectionLanding.viewFullCollection", fallback: "View the Full Collection" },
       {
         key: "collectionLanding.comingSoon",
