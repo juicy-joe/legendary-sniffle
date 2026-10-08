@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getStoredConsent, setConsent } from "@/lib/analytics/consent";
+import { flushPendingAttribution } from "@/lib/attribution";
 
 // Deliberately minimal — a single quiet bar, not a modal or a full-screen
 // takeover, and no "manage preferences" wizard for a site that only has
@@ -28,6 +29,7 @@ export default function ConsentBanner() {
       analytics: granted ? "granted" : "denied",
       marketing: granted ? "granted" : "denied",
     });
+    if (granted) flushPendingAttribution();
     setVisible(false);
   };
 

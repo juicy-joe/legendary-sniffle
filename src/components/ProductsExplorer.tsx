@@ -107,7 +107,7 @@ function ExplorerInner({ collectionOrder }: { collectionOrder: string[] }) {
               </div>
               <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
                 {group.items.map((product, i) => (
-                  <ProductCard key={product.slug} product={product} index={i} />
+                  <ProductCard key={product.slug} product={product} index={i} listName="Table Lamps" />
                 ))}
               </div>
             </section>

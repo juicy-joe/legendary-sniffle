@@ -31,6 +31,23 @@ export default async function DesignersPage() {
           ],
         })}
       />
+      <script
+        type="application/ld+json"
+        {...jsonLdScriptProps({
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          itemListElement: designers.map((d, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            item: {
+              "@type": "Person",
+              name: d.shortName || d.name,
+              description: d.bio,
+              url: `${siteUrl}/designers/${slugify(d.shortName || d.name)}`,
+            },
+          })),
+        })}
+      />
       <section className="bg-ink py-28 text-paper">
         <div className="mx-auto max-w-4xl px-6 text-center md:px-10">
           <nav aria-label="Breadcrumb" className="mb-8 flex items-center justify-center gap-2 text-xs text-paper/60">

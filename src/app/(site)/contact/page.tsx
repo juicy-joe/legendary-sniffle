@@ -5,6 +5,9 @@ import RevealOnScroll from "@/components/RevealOnScroll";
 import ContactForm from "@/components/ContactForm";
 import { getContactInfo } from "@/lib/content";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { jsonLdScriptProps } from "@/lib/json-ld";
+import { siteUrl } from "@/lib/site";
+import { getSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "Contact Us",
@@ -15,7 +18,7 @@ export const metadata: Metadata = {
 
 export default async function ContactPage() {
   const locale = await getLocale();
-  const [content, dict] = await Promise.all([getContactInfo(), getUiTranslations(locale)]);
+  const [content, dict, settings] = await Promise.all([getContactInfo(), getUiTranslations(locale), getSettings()]);
 
   const details = [
     {
@@ -48,6 +51,39 @@ export default async function ContactPage() {
 
   return (
     <div>
+      <script
+        type="application/ld+json"
+        {...jsonLdScriptProps({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+            { "@type": "ListItem", position: 2, name: "Contact" },
+          ],
+        })}
+      />
+      <script
+        type="application/ld+json"
+        {...jsonLdScriptProps({
+          "@context": "https://schema.org",
+          "@type": "ContactPage",
+          name: `Contact ${settings.siteName}`,
+          url: `${siteUrl}/contact`,
+          mainEntity: {
+            "@type": "Organization",
+            name: settings.siteName,
+            url: siteUrl,
+            email: content.email,
+            telephone: content.phone,
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: content.address.split("\n")[0],
+              addressLocality: content.address.split("\n")[1],
+              addressCountry: content.address.split("\n")[2],
+            },
+          },
+        })}
+      />
       <section className="bg-ink py-24 text-paper md:py-28">
         <div className="mx-auto max-w-4xl px-6 text-center md:px-10">
           <nav aria-label="Breadcrumb" className="mb-8 flex items-center justify-center gap-2 text-xs text-paper/60">

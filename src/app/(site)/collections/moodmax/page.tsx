@@ -68,6 +68,7 @@ export default async function MoodMaxCollectionPage() {
         })}
       />
       <CollectionLanding
+        listName="MoodMAX Collection"
         eyebrow="MoodMAX Collection"
         headline="MoodMAX"
         intro={intro}

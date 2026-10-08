@@ -14,6 +14,7 @@ import { getLocale, getUiTranslations, t } from "@/lib/i18n";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
 import { getSettings } from "@/lib/settings";
+import TrackViewItemList from "@/components/analytics/TrackViewItemList";
 
 export default async function Home() {
   const locale = await getLocale();
@@ -143,15 +144,16 @@ export default async function Home() {
                 {t(dict, "home.theSelection", "The Selection")}
               </p>
               <h2 className="font-serif text-4xl text-ink md:text-5xl">
-                {t(dict, "home.featuredPieces", "Featured Pieces")}
+                {t(dict, "home.featuredPieces", "Featured Designer Table Lamps")}
               </h2>
             </div>
             <TextLink href="/table-lamps">{t(dict, "home.viewFullCollection", "View Full Collection")}</TextLink>
           </RevealOnScroll>
 
           <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+            <TrackViewItemList products={featured} listName="Home — Featured" />
             {featured.map((product, i) => (
-              <ProductCard key={product.slug} product={product} index={i} />
+              <ProductCard key={product.slug} product={product} index={i} listName="Home — Featured" />
             ))}
           </div>
         </section>
@@ -180,8 +182,9 @@ export default async function Home() {
             </RevealOnScroll>
 
             <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+              <TrackViewItemList products={featuredCollectionProducts} listName="Home — NatureSPHERE's" />
               {featuredCollectionProducts.map((product, i) => (
-                <ProductCard key={product.slug} product={product} index={i} />
+                <ProductCard key={product.slug} product={product} index={i} listName="Home — NatureSPHERE's" />
               ))}
             </div>
           </div>

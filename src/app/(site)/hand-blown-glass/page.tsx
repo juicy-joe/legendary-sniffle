@@ -35,7 +35,7 @@ const EN = {
     ": its colour is introduced directly into the molten glass during melting, so it runs through the full thickness of the glass rather than sitting on its surface. That's what gives pieces like Lava Glow and Geyser Glow their sense of depth — the colour isn't applied to the glass, it's part of it.",
   section3Heading: "Every Piece Is Unique",
   section3Body:
-    "Because each sphere is shaped and coloured individually, your lamp will differ in small ways from the exact piece photographed for the website — in the precise line of a gradient, the placement of an inclusion, the thickness of the glass. This is a natural signature of the handcrafting process, not a flaw to be corrected.",
+    "Because each sphere is shaped and coloured individually, your lamp will differ in small ways from the exact piece photographed for the website — in the precise line of a gradient, the placement of an inclusion, the thickness of the glass. This is a natural signature of the handcrafting process, not a flaw to be corrected, and it's exactly what separates a piece of decorative lighting like this from anything mass-produced.",
   section4Heading: "From Glass to Light Object",
   section4BodyPrefix:
     "Once shaped and cooled, each sphere is fitted with its lighting components and a turned wooden base, then checked before it leaves the workshop. The result is a table lamp designed to work as a sculptural object in daylight, and as a warm, diffused light source once switched on — see our",
@@ -64,6 +64,24 @@ export default async function HandBlownGlassPage() {
             { "@type": "ListItem", position: 2, name: "Table Lamps", item: `${siteUrl}/table-lamps` },
             { "@type": "ListItem", position: 3, name: "Hand-Blown Glass" },
           ],
+        })}
+      />
+      <script
+        type="application/ld+json"
+        {...jsonLdScriptProps({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Hand-Blown Glass Table Lamps",
+          url: `${siteUrl}/hand-blown-glass`,
+          mainEntity: {
+            "@type": "ItemList",
+            itemListElement: catalog.map((p, i) => ({
+              "@type": "ListItem",
+              position: i + 1,
+              url: `${siteUrl}/products/${p.slug}`,
+              name: p.name,
+            })),
+          },
         })}
       />
       <section className="bg-ink py-28 text-paper">
@@ -136,7 +154,7 @@ export default async function HandBlownGlassPage() {
           </RevealOnScroll>
           <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
             {catalog.map((product, i) => (
-              <ProductCard key={product.slug} product={product} index={i} />
+              <ProductCard key={product.slug} product={product} index={i} listName="Hand-Blown Glass" />
             ))}
           </div>
         </div>

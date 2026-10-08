@@ -74,6 +74,21 @@ export function trackBeginCheckout(items: GaItem[], value: number, coupon?: stri
   push("begin_checkout", { currency: CURRENCY, value, items, ...(coupon ? { coupon } : {}) });
 }
 
+/** Fired once the shipping destination/speed is actually known — on this
+ * site that's decided on our own checkout page before Stripe is ever
+ * involved (see CheckoutFlow), not on a shipping-method step inside Stripe
+ * itself, so this is the one moment that data exists to report. */
+export function trackAddShippingInfo(items: GaItem[], value: number, shippingTier: string) {
+  push("add_shipping_info", { currency: CURRENCY, value, shipping_tier: shippingTier, items });
+}
+
+/** Fired when a product is clicked from a list (grid, carousel, related
+ * items) — pairs with view_item_list's item_list_name/item_list_id so GA4
+ * can report list-to-detail click-through, not just that the list rendered. */
+export function trackSelectItem(item: GaItem, listName: string) {
+  push("select_item", { item_list_name: listName, items: [item] });
+}
+
 export type PurchaseInput = {
   transactionId: string;
   value: number;

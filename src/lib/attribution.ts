@@ -1,5 +1,7 @@
 "use client";
 
+import { getStoredConsent } from "@/lib/analytics/consent";
+
 // Captures marketing attribution on arrival (UTM params + Google's click
 // IDs) and stores it in two cookies: first-touch is written once and never
 // overwritten, last-touch is overwritten on every visit that carries
@@ -8,6 +10,18 @@
 // metadata (see src/app/api/stripe/webhook/route.ts) — so a completed
 // order can always answer "what actually brought this customer here" and
 // "what brought them back to finish this particular purchase."
+//
+// These are marketing-attribution cookies (they can carry gclid/gbraid/
+// wbraid), so they only get written once marketing consent is actually
+// granted — never unconditionally on arrival. The catch: the UTM/gclid
+// params are usually only present on the very first pageview (the ad
+// click's landing URL), before the visitor has necessarily answered the
+// consent banner yet, and gone from the URL on every page after that. So a
+// touch computed before consent is granted is held in sessionStorage (tab-
+// scoped, cleared on tab close, never sent anywhere) rather than discarded
+// outright, and only gets promoted into the real persistent cookies via
+// flushPendingAttribution(), which ConsentBanner calls the moment the
+// visitor actually grants marketing consent.
 export type Touch = {
   source?: string;
   medium?: string;
@@ -26,6 +40,7 @@ export type Attribution = { firstTouch?: Touch; lastTouch?: Touch };
 
 const FIRST_TOUCH_COOKIE = "ollerialight:first_touch";
 const LAST_TOUCH_COOKIE = "ollerialight:last_touch";
+const PENDING_TOUCH_KEY = "ollerialight:pending_touch";
 const MAX_AGE_DAYS = 180;
 
 function getCookie(name: string): string | null {
@@ -60,15 +75,46 @@ function buildTouch(): Touch | null {
   return hasSignal ? touch : null;
 }
 
+function persistTouch(touch: Touch) {
+  if (!getCookie(FIRST_TOUCH_COOKIE)) {
+    setCookie(FIRST_TOUCH_COOKIE, JSON.stringify(touch));
+  }
+  setCookie(LAST_TOUCH_COOKIE, JSON.stringify(touch));
+}
+
 /** Call once per page load (see AttributionCapture component). */
 export function captureAttribution() {
   const touch = buildTouch();
   if (!touch) return;
 
-  if (!getCookie(FIRST_TOUCH_COOKIE)) {
-    setCookie(FIRST_TOUCH_COOKIE, JSON.stringify(touch));
+  if (getStoredConsent()?.marketing === "granted") {
+    persistTouch(touch);
+    return;
   }
-  setCookie(LAST_TOUCH_COOKIE, JSON.stringify(touch));
+  // Consent not yet granted — hold the touch in tab-scoped storage instead
+  // of writing the real cookies. Overwrites any earlier pending touch this
+  // same tab already captured, same "last one wins until persisted" logic
+  // the real last-touch cookie uses.
+  try {
+    window.sessionStorage.setItem(PENDING_TOUCH_KEY, JSON.stringify(touch));
+  } catch {
+    // Storage unavailable (private mode, quota) — nothing to fall back to;
+    // this visit's attribution is simply not captured.
+  }
+}
+
+/** Called by ConsentBanner the moment marketing consent is granted —
+ * promotes a touch captured earlier this tab (before consent existed) into
+ * the real persistent cookies. A no-op if nothing was ever pending. */
+export function flushPendingAttribution() {
+  try {
+    const raw = window.sessionStorage.getItem(PENDING_TOUCH_KEY);
+    if (!raw) return;
+    window.sessionStorage.removeItem(PENDING_TOUCH_KEY);
+    persistTouch(JSON.parse(raw) as Touch);
+  } catch {
+    // Malformed or inaccessible — nothing worth persisting.
+  }
 }
 
 /** Read back at checkout time — never throws on malformed/missing cookies. */

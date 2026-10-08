@@ -109,7 +109,7 @@ export default async function DesignerPage({
           </RevealOnScroll>
           <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
             {products.map((product, i) => (
-              <ProductCard key={product.slug} product={product} index={i} />
+              <ProductCard key={product.slug} product={product} index={i} listName={`Designer — ${name}`} />
             ))}
           </div>
         </section>

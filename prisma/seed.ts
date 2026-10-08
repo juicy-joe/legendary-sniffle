@@ -188,19 +188,30 @@ async function main() {
   });
 
   console.log("Seeding menus...");
+  // Mirrors the live, current nav/footer structure (table-lamps hub,
+  // consulting, B2B trade portal, designers, hand-blown-glass, and the
+  // MoodMAX/NatureSPHERE collection pages) — this used to lag badly behind
+  // reality (still had the pre-rebrand "/products" listing and Marble/
+  // Brass/Alabaster category links from the old product line), which only
+  // mattered if the project was ever re-seeded from scratch, but is worth
+  // keeping honest as the one place a new environment's menus come from.
   const menus: { location: string; label: string; href: string }[] = [
     { location: "navbar", label: "Home", href: "/" },
-    { location: "navbar", label: "Products", href: "/products" },
+    { location: "navbar", label: "Table Lamps", href: "/table-lamps" },
     { location: "navbar", label: "About Us", href: "/about" },
     { location: "navbar", label: "Contact", href: "/contact" },
+    { location: "navbar", label: "Consulting", href: "/consulting" },
+    { location: "navbar", label: "B2B", href: "/trade" },
     { location: "footer-explore", label: "Home", href: "/" },
-    { location: "footer-explore", label: "Products", href: "/products" },
+    { location: "footer-explore", label: "Table Lamps", href: "/table-lamps" },
     { location: "footer-explore", label: "About Us", href: "/about" },
     { location: "footer-explore", label: "Contact", href: "/contact" },
-    { location: "footer-collections", label: "Marble", href: "/products?category=Marble" },
-    { location: "footer-collections", label: "Brass", href: "/products?category=Brass" },
-    { location: "footer-collections", label: "Alabaster", href: "/products?category=Alabaster" },
-    { location: "footer-collections", label: "The Chroma Editions", href: "/products?category=Glass" },
+    { location: "footer-explore", label: "Consulting", href: "/consulting" },
+    { location: "footer-explore", label: "B2B", href: "/trade" },
+    { location: "footer-explore", label: "Designers", href: "/designers" },
+    { location: "footer-explore", label: "Hand-Blown Glass", href: "/hand-blown-glass" },
+    { location: "footer-collections", label: "MoodMAX", href: "/collections/moodmax" },
+    { location: "footer-collections", label: "NatureSPHERE", href: "/collections/naturesphere" },
   ];
   const sortCounters: Record<string, number> = {};
   for (const link of menus) {

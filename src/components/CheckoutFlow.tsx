@@ -16,7 +16,7 @@ import {
 import LampIllustration from "./LampIllustration";
 import ProductPhoto from "./ProductPhoto";
 import { useTranslations } from "./TranslationsProvider";
-import { trackBeginCheckout, productToGaItem } from "@/lib/analytics/gtm";
+import { trackBeginCheckout, trackAddShippingInfo, productToGaItem } from "@/lib/analytics/gtm";
 import { getAttributionForCheckout } from "@/lib/attribution";
 
 const sortedCountries = [...SHIPPABLE_COUNTRIES].sort((a, b) => a.name.localeCompare(b.name));
@@ -81,6 +81,11 @@ export default function CheckoutFlow({ rates }: { rates: ShippingRates }) {
     }
     setStarting(true);
     setError("");
+    trackAddShippingInfo(
+      lineItems.map(({ line, product }) => productToGaItem(product!, line.qty, product!.price)),
+      subtotal,
+      shippingSpeed
+    );
     const result = await createCheckoutSession({
       items: lines.map((l) => ({ slug: l.slug, qty: l.qty })),
       country,

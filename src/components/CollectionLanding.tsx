@@ -15,6 +15,7 @@ export default async function CollectionLanding({
   dimensions,
   designer,
   products,
+  listName,
 }: {
   eyebrow: string;
   headline: string;
@@ -24,6 +25,7 @@ export default async function CollectionLanding({
   dimensions: string;
   designer: string;
   products: CatalogProduct[];
+  listName: string;
 }) {
   const locale = await getLocale();
   const dict = await getUiTranslations(locale);
@@ -82,7 +84,7 @@ export default async function CollectionLanding({
         <div className="mx-auto max-w-7xl px-6 md:px-10">
           <RevealOnScroll className="mb-14 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <h2 className="font-serif text-3xl text-ink md:text-4xl">
-              {headline} {t(dict, "collectionLanding.lampsSuffix", "Lamps")}
+              {headline} {t(dict, "collectionLanding.lampsSuffix", "Table Lamps")}
             </h2>
             <TextLink href="/table-lamps">{t(dict, "collectionLanding.viewFullCollection", "View the Full Collection")}</TextLink>
           </RevealOnScroll>
@@ -90,7 +92,7 @@ export default async function CollectionLanding({
           {products.length > 0 ? (
             <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
               {products.map((product, i) => (
-                <ProductCard key={product.slug} product={product} index={i} />
+                <ProductCard key={product.slug} product={product} index={i} listName={listName} />
               ))}
             </div>
           ) : (

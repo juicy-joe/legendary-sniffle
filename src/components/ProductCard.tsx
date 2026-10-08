@@ -13,13 +13,19 @@ import LampIllustration from "./LampIllustration";
 import ProductPhoto from "./ProductPhoto";
 import { useTranslations } from "./TranslationsProvider";
 import { productPhotoAlt } from "@/lib/seo";
+import { trackSelectItem, productToGaItem } from "@/lib/analytics/gtm";
 
 export default function ProductCard({
   product,
   index = 0,
+  listName = "Products",
 }: {
   product: CatalogProduct;
   index?: number;
+  // Matches whatever item_list_name this same grid already reported via
+  // trackViewItemList, so GA4 can report list-to-detail click-through
+  // rather than just that the list rendered.
+  listName?: string;
 }) {
   const { isSaved, toggle } = useWishlist();
   const { addItem } = useCart();
@@ -34,7 +40,11 @@ export default function ProductCard({
       transition={{ duration: DURATION.slow, delay: (index % 6) * 0.06, ease: EASE }}
       className="group relative"
     >
-      <Link href={`/products/${product.slug}`} className="block">
+      <Link
+        href={`/products/${product.slug}`}
+        className="block"
+        onClick={() => trackSelectItem(productToGaItem(product), listName)}
+      >
         <div className="corner-ticks relative aspect-[3/4] overflow-hidden rounded-[2px] border border-ink/10 bg-paper-dim">
           {product.limited && (
             <span className="absolute left-4 top-4 z-10 border border-paper/40 bg-ink/90 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-paper backdrop-blur-sm">

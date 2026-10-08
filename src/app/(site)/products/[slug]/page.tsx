@@ -224,7 +224,7 @@ export default async function ProductPage({
           </RevealOnScroll>
           <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
             {related.map((p, i) => (
-              <ProductCard key={p.slug} product={p} index={i} />
+              <ProductCard key={p.slug} product={p} index={i} listName="Related Products" />
             ))}
           </div>
         </section>

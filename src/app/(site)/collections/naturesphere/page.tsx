@@ -68,6 +68,7 @@ export default async function NatureSphereCollectionPage() {
         })}
       />
       <CollectionLanding
+        listName="NatureSPHERE's Collection"
         eyebrow="NatureSPHERE's Collection"
         headline="NatureSPHERE's"
         intro={intro}
