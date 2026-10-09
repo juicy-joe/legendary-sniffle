@@ -148,6 +148,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         attribution: attribution ?? undefined,
       },
     });
+    // The order row is now the thing reserving this stock — the hold
+    // createCheckoutSession made for this same session (see
+    // src/lib/stock-levels.ts / checkout/actions.ts) has done its job and
+    // would otherwise double-count the same units. Best-effort: if this
+    // session never had a hold (shouldn't happen, but harmless either
+    // way), there's nothing to delete.
+    prisma.checkoutHold.deleteMany({ where: { stripeSessionId: session.id } }).catch(() => {});
     revalidatePath("/admin/orders");
     revalidatePath("/admin");
     if (wholesaleAccount) revalidatePath("/admin/wholesale");

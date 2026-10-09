@@ -7,6 +7,7 @@ import AddToCartPanel from "@/components/AddToCartPanel";
 import ProductCard from "@/components/ProductCard";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import { getCatalog, getProductBySlug, getRelatedProducts } from "@/lib/catalog";
+import { getStockLevels } from "@/lib/stock-levels";
 import { siteUrl } from "@/lib/site";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { formatPrice } from "@/lib/format";
@@ -64,14 +65,18 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
   const locale = await getLocale();
-  const [product, catalog, dict, settings] = await Promise.all([
+  const [product, catalog, dict, settings, stockLevels] = await Promise.all([
     getProductBySlug(slug),
     getCatalog(),
     getUiTranslations(locale),
     getSettings(),
+    getStockLevels(),
   ]);
   if (!product) notFound();
 
+  // Server-only, never passed to a Client Component — JSON-LD's
+  // availability only ever needs in-stock/out-of-stock, never the number.
+  const inStock = (stockLevels.get(product.id)?.available ?? 0) > 0;
   const related = getRelatedProducts(catalog, product);
   const editionNo = String(catalog.findIndex((p) => p.slug === product.slug) + 1).padStart(2, "0");
 
@@ -90,7 +95,7 @@ export default async function ProductPage({
           ],
         })}
       />
-      <script type="application/ld+json" {...jsonLdScriptProps(productJsonLd(product, settings.siteName))} />
+      <script type="application/ld+json" {...jsonLdScriptProps(productJsonLd(product, settings.siteName, inStock))} />
 
       <nav aria-label="Breadcrumb" className="mb-10 flex items-center gap-2 text-xs text-ink/65">
         <Link href="/" className="hover:text-ink">{t(dict, "breadcrumb.home", "Home")}</Link>

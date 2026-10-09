@@ -111,7 +111,6 @@ export const uiKeySections: UiKeySection[] = [
       { key: "product.addedToCartSr", fallback: "added to cart" },
       { key: "product.saved", fallback: "Saved" },
       { key: "product.addToWishlistButton", fallback: "Add to Wishlist" },
-      { key: "product.lowStockNotice", fallback: "Only {count} in stock." },
     ],
   },
   {

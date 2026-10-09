@@ -2,12 +2,29 @@
 
 import { z } from "zod";
 import type Stripe from "stripe";
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 import { getShippingLabel, getShippingPrice, isShippableCountry } from "@/lib/shipping";
 import { getShippingRates } from "@/lib/settings";
 import { siteUrl } from "@/lib/site";
 import { getStockLevels } from "@/lib/stock-levels";
+
+// How long a checkout attempt holds its stock before it's treated as
+// abandoned and stops counting against availability. Matches the Stripe
+// Checkout Session's own `expires_at` below, so a hold never outlives the
+// session it belongs to (and never expires while that session could still
+// be completed). 31, not 30 — Stripe's own minimum for expires_at is
+// exactly 30 minutes from creation, and the few seconds this function
+// spends on the DB transaction before calling Stripe would otherwise
+// occasionally land just under that floor.
+const HOLD_MINUTES = 31;
+
+// Thrown only for the "insufficient stock" business-logic case inside the
+// transaction below, so the catch block can tell it apart from a real
+// serialization failure (which should get a different, retry-oriented
+// message) without checking error message strings.
+class CheckoutError extends Error {}
 
 const createCheckoutSessionSchema = z.object({
   // Only the slug + quantity come from the client — price and name are
@@ -75,22 +92,57 @@ export async function createCheckoutSession(
     };
   }
 
-  // Authoritative stock check — the cart/product-page caps are just UX, a
-  // tampered client request (or a stale cart from before stock dropped)
-  // could still arrive here with more than we have, so this is the one
-  // place that actually has to stop the sale rather than just warn.
-  const stockLevels = await getStockLevels();
-  for (const item of parsed.data.items) {
-    const product = bySlug.get(item.slug)!;
-    const available = stockLevels.get(product.id)?.available ?? 0;
-    if (item.qty > available) {
-      return {
-        error:
-          available > 0
-            ? `Only ${available} of "${product.name}" left in stock — please update the quantity in your cart.`
-            : `"${product.name}" is currently out of stock — please remove it from your cart.`,
-      };
-    }
+  // Authoritative stock check + reservation, done together inside one
+  // Serializable transaction — the cart/product-page UI never shows or
+  // enforces stock at all (see AddToCartPanel/CartDrawer), so this is the
+  // only place that actually has to stop an oversell. Serializable matters
+  // here, not just a plain transaction: two requests for the last unit
+  // could otherwise both read "1 available" before either has written
+  // anything, and both proceed. Under Serializable, Postgres detects that
+  // conflict and fails one of the two transactions outright (caught below
+  // as a generic "please try again"), rather than letting both succeed.
+  // The hold itself is what makes this different from the old check-only
+  // version: without it, "available" wouldn't reflect this in-flight
+  // attempt until the webhook creates a real Order after payment, which
+  // could be minutes away — see CheckoutHold's schema comment.
+  let holdId: string;
+  try {
+    holdId = await prisma.$transaction(
+      async (tx) => {
+        const stockLevels = await getStockLevels(tx);
+        for (const item of parsed.data.items) {
+          const product = bySlug.get(item.slug)!;
+          const available = stockLevels.get(product.id)?.available ?? 0;
+          if (item.qty > available) {
+            // Deliberately generic — never discloses how many are actually
+            // left. available === 0 and available > 0 but insufficient
+            // both read the same to the customer; the only difference
+            // internally is which sentence fits better.
+            throw new CheckoutError(
+              available > 0
+                ? `The requested quantity for "${product.name}" is not fully available. Please reduce the quantity to continue.`
+                : `"${product.name}" is currently unavailable. Please remove it from your cart.`
+            );
+          }
+        }
+        const hold = await tx.checkoutHold.create({
+          data: {
+            items: parsed.data.items.map((item) => ({ productId: bySlug.get(item.slug)!.id, qty: item.qty })),
+            expiresAt: new Date(Date.now() + HOLD_MINUTES * 60 * 1000),
+          },
+          select: { id: true },
+        });
+        return hold.id;
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
+    );
+  } catch (err) {
+    if (err instanceof CheckoutError) return { error: err.message };
+    // Serialization failure (Postgres error code 40001) — another
+    // checkout for the same stock committed first. Not a tampering
+    // attempt, just a genuine race; ask them to retry rather than
+    // claiming a specific cause.
+    return { error: "Something went wrong checking stock availability. Please try again." };
   }
 
   const stripe = getStripe();
@@ -101,6 +153,7 @@ export async function createCheckoutSession(
 
   try {
     const session = await stripe.checkout.sessions.create({
+      expires_at: Math.floor(Date.now() / 1000) + HOLD_MINUTES * 60,
       mode: "payment",
       line_items: parsed.data.items.map((item) => {
         const product = bySlug.get(item.slug)!;
@@ -150,10 +203,16 @@ export async function createCheckoutSession(
     });
 
     if (!session.url) {
+      await prisma.checkoutHold.delete({ where: { id: holdId } }).catch(() => {});
       return { error: "Something went wrong starting checkout. Please try again." };
     }
+    // The hold already reserved the stock the moment it was created above
+    // — this just attaches the real session id so the webhook can find and
+    // delete it once the Order row takes over as the reservation.
+    await prisma.checkoutHold.update({ where: { id: holdId }, data: { stripeSessionId: session.id } });
     return { url: session.url };
   } catch {
+    await prisma.checkoutHold.delete({ where: { id: holdId } }).catch(() => {});
     return { error: "Something went wrong starting checkout. Please try again." };
   }
 }

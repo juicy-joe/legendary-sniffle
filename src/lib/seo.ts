@@ -25,7 +25,6 @@ type SeoProduct = Pick<
   | "metaTitle"
   | "metaDescription"
   | "images"
-  | "availableStock"
 >;
 
 function truncate(text: string, max: number): string {
@@ -83,7 +82,7 @@ export function productPhotoAlt(product: Pick<CatalogProduct, "name" | "designer
  * schema.prisma) rather than being a second stored value that could drift
  * out of sync with it. gtin is only ever included when a genuine one has
  * been entered — never derived from sku/barcode, never invented. */
-export function productJsonLd(product: SeoProduct, siteName: string) {
+export function productJsonLd(product: SeoProduct, siteName: string, inStock: boolean) {
   const url = `${siteUrl}/products/${product.slug}`;
   const images = product.images?.length
     ? product.images.map((img) => img.src)
@@ -107,7 +106,7 @@ export function productJsonLd(product: SeoProduct, siteName: string) {
       url,
       price: product.price,
       priceCurrency: "EUR",
-      availability: product.availableStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      availability: inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       itemCondition: "https://schema.org/NewCondition",
     },
   };

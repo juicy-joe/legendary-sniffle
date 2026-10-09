@@ -551,6 +551,37 @@ model Order {
   customOrders   CustomOrder[]
 }
 
+// A short-lived hold on stock for a checkout session that's been created
+// but hasn't been paid (or abandoned) yet. Without this, getStockLevels()
+// only counts stock as "reserved" once a real Order row exists — which the
+// webhook only creates AFTER Stripe confirms payment. That leaves a real
+// window (the entire time a customer spends on Stripe's hosted page, which
+// can be minutes) where two customers checking out the last unit at once
+// would both see it as available, both get a valid Stripe session, and
+// both could actually pay — overselling. This closes that window: created
+// atomically (inside a Serializable transaction that re-checks stock) the
+// moment createCheckoutSession decides to proceed, and deleted by the
+// webhook once the real Order row takes over as the reservation. A hold
+// that's never completed (abandoned checkout) simply stops counting once
+// expiresAt passes — no cleanup job required for correctness, since every
+// read filters on expiresAt, though old expired rows are opportunistically
+// deleted during that same read to keep the table from growing forever.
+// This is not a second inventory system — it feeds the same
+// getStockLevels() computation open Orders already feed, just for the
+// in-flight case Orders can't cover yet.
+model CheckoutHold {
+  id              String    @id @default(cuid())
+  // Set once Stripe actually returns a session — null for the brief window
+  // between reserving stock and getting Stripe's response. If the Stripe
+  // call fails, createCheckoutSession deletes this row by id instead.
+  stripeSessionId String?   @unique
+  // { productId: string, qty: number }[] — productId (not slug) so a
+  // product rename after a hold is created still resolves correctly.
+  items           Json
+  expiresAt       DateTime
+  createdAt       DateTime  @default(now())
+}
+
 // --- Internationalization ------------------------------------------------
 // English is never stored here — it's the language every existing hardcoded
 // string and database column is already written in, and stays the

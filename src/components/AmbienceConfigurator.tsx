@@ -47,7 +47,6 @@ export default function AmbienceConfigurator() {
       metaTitle: null,
       metaDescription: null,
       updatedAt: new Date(),
-      availableStock: 0,
       gtin: null,
     }),
     [palette, shade]

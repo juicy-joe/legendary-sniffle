@@ -6,7 +6,6 @@
 import "server-only";
 import { prisma } from "./prisma";
 import { getContentFields, getContentFieldsForModel, getLocale, type Locale } from "./i18n";
-import { getStockLevels } from "./stock-levels";
 
 export type LampPalette = "gold" | "ivory" | "onyx" | "bronze" | "smoke";
 export type LampShade = "dome" | "drum" | "cone" | "sphere" | "pleated";
@@ -46,11 +45,17 @@ export type CatalogProduct = {
   metaTitle: string | null;
   metaDescription: string | null;
   updatedAt: Date;
-  /** Stock on hand minus quantity already committed to open orders — see
-   * src/lib/stock-levels.ts. Ordering beyond this is allowed (these are
-   * made-to-order glass pieces), the storefront just warns about the
-   * longer lead time rather than blocking the sale. */
-  availableStock: number;
+  // Deliberately no stock/availableStock field here — this type is what
+  // gets passed into Client Components (CatalogProvider, ProductCard, and
+  // friends), and Next.js serializes Client Component props into the page
+  // payload verbatim. An exact quantity here would be visible to anyone
+  // who opened dev tools, regardless of whether any component actually
+  // renders it. The few places that genuinely need real-time availability
+  // — createCheckoutSession's server-side validation, product-feed.xml's
+  // g:availability, and the product page's JSON-LD — call
+  // getStockLevels() directly themselves instead, server-side only, and
+  // only ever expose a boolean in-stock/out-of-stock state, never the
+  // underlying number.
 };
 
 const include = {
@@ -73,7 +78,6 @@ type ProductRow = Awaited<ReturnType<typeof fetchRows>>[number];
 function toCatalogProduct(
   p: ProductRow,
   translations?: Record<string, string>,
-  availableStock = 0,
   imageLabelTranslations?: Record<string, Record<string, string>>
 ): CatalogProduct {
   return {
@@ -108,7 +112,6 @@ function toCatalogProduct(
     metaTitle: p.metaTitle,
     metaDescription: p.metaDescription,
     updatedAt: p.updatedAt,
-    availableStock,
   };
 }
 
@@ -121,14 +124,11 @@ export async function getCatalog(locale?: Locale): Promise<CatalogProduct[]> {
   const rows = await fetchRows();
   const resolvedLocale = locale ?? (await getLocale());
   const imageIds = rows.flatMap((r) => r.images.map((img) => img.id));
-  const [translations, stockLevels, imageLabelTranslations] = await Promise.all([
+  const [translations, imageLabelTranslations] = await Promise.all([
     getContentFieldsForModel(resolvedLocale, "Product", rows.map((r) => r.id)),
-    getStockLevels(),
     getContentFieldsForModel(resolvedLocale, "ProductImage", imageIds),
   ]);
-  return rows.map((r) =>
-    toCatalogProduct(r, translations[r.id], stockLevels.get(r.id)?.available ?? 0, imageLabelTranslations)
-  );
+  return rows.map((r) => toCatalogProduct(r, translations[r.id], imageLabelTranslations));
 }
 
 export async function getProductBySlug(slug: string, locale?: Locale): Promise<CatalogProduct | null> {
@@ -139,12 +139,11 @@ export async function getProductBySlug(slug: string, locale?: Locale): Promise<C
   const row = await prisma.product.findFirst({ where: { slug, visible: true }, include });
   if (!row) return null;
   const resolvedLocale = locale ?? (await getLocale());
-  const [translations, stockLevels, imageLabelTranslations] = await Promise.all([
+  const [translations, imageLabelTranslations] = await Promise.all([
     getContentFields(resolvedLocale, "Product", row.id),
-    getStockLevels(),
     getContentFieldsForModel(resolvedLocale, "ProductImage", row.images.map((img) => img.id)),
   ]);
-  return toCatalogProduct(row, translations, stockLevels.get(row.id)?.available ?? 0, imageLabelTranslations);
+  return toCatalogProduct(row, translations, imageLabelTranslations);
 }
 
 export function getRelatedProducts(

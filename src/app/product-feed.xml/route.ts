@@ -9,6 +9,7 @@
 import { getCatalog } from "@/lib/catalog";
 import { getSettings } from "@/lib/settings";
 import { siteUrl } from "@/lib/site";
+import { getStockLevels } from "@/lib/stock-levels";
 
 // Must run fresh on every request, never a cached/prerendered snapshot —
 // Merchant Center needs this feed's price/availability/SKU to reflect the
@@ -34,7 +35,7 @@ function cdata(value: string): string {
 }
 
 export async function GET() {
-  const [products, settings] = await Promise.all([getCatalog("en"), getSettings()]);
+  const [products, settings, stockLevels] = await Promise.all([getCatalog("en"), getSettings(), getStockLevels()]);
 
   const items = products
     // A product with no photography yet has nothing Merchant Center can
@@ -42,6 +43,7 @@ export async function GET() {
     // guaranteed-to-be-rejected item.
     .filter((p) => p.images && p.images.length > 0)
     .map((p) => {
+      const inStock = (stockLevels.get(p.id)?.available ?? 0) > 0;
       const url = `${siteUrl}/products/${p.slug}`;
       const images = p.images!;
       const additionalImages = images
@@ -56,7 +58,7 @@ export async function GET() {
     <link>${escapeXml(url)}</link>
     <g:image_link>${escapeXml(images[0].src)}</g:image_link>
 ${additionalImages}
-    <g:availability>${p.availableStock > 0 ? "in stock" : "out of stock"}</g:availability>
+    <g:availability>${inStock ? "in stock" : "out of stock"}</g:availability>
     <g:price>${p.price}.00 EUR</g:price>
     <g:brand>${escapeXml(settings.siteName)}</g:brand>
     <g:condition>new</g:condition>
