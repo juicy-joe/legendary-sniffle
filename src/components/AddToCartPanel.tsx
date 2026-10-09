@@ -2,15 +2,19 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Minus, Plus, ShoppingBag, TriangleAlert } from "lucide-react";
+import { Check, Minus, Plus, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { useCatalog } from "@/context/CatalogContext";
 import WishlistButton from "./WishlistButton";
 import { useTranslations } from "./TranslationsProvider";
 
-// Below this, we show a scarcity count ("3 in stock") rather than staying
-// silent — above it, the exact number isn't useful information for anyone.
-const LOW_STOCK_DISPLAY_THRESHOLD = 10;
+// Deliberately not stock-aware — stock is never shown or enforced while
+// browsing (no cap, no "N left" notice, no disabled button). The only
+// place a shopper hears about insufficient stock is checkout, where the
+// server does the real, authoritative check against current stock (see
+// createCheckoutSession) and the error it returns is what's actually
+// shown. A generous, fixed sanity cap unrelated to real stock, just to
+// keep the stepper from accepting an absurd quantity.
+const MAX_QTY = 20;
 
 export default function AddToCartPanel({
   slug,
@@ -19,28 +23,13 @@ export default function AddToCartPanel({
   slug: string;
   name: string;
 }) {
-  const { addItem, lines } = useCart();
-  const { getProduct } = useCatalog();
+  const { addItem } = useCart();
   const { t } = useTranslations();
   const [qty, setQty] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
 
-  const availableStock = getProduct(slug)?.availableStock ?? 0;
-  const inCartQty = lines.find((l) => l.slug === slug)?.qty ?? 0;
-  // How many more of this product can actually be added, given what's
-  // already sitting in the cart — never lets the cart exceed real stock.
-  const remaining = Math.max(0, availableStock - inCartQty);
-  const outOfStock = availableStock <= 0;
-  const maxedInCart = !outOfStock && remaining <= 0;
-  // Stock can run out (another tab, or someone else buying the last one)
-  // while this selector is already open — clamp what's displayed/added
-  // against the current `remaining` on every render rather than trusting
-  // whatever `qty` was set to earlier.
-  const effectiveQty = Math.min(qty, Math.max(remaining, 1));
-
   const handleAdd = () => {
-    if (outOfStock || maxedInCart) return;
-    addItem(slug, effectiveQty);
+    addItem(slug, qty);
     setJustAdded(true);
     window.setTimeout(() => setJustAdded(false), 1800);
   };
@@ -52,19 +41,17 @@ export default function AddToCartPanel({
           <button
             type="button"
             onClick={() => setQty((q) => Math.max(1, q - 1))}
-            disabled={outOfStock || maxedInCart}
+            disabled={qty <= 1}
             aria-label={t("cart.decreaseQty", "Decrease quantity")}
             className="text-ink/60 transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
           >
             <Minus className="h-3.5 w-3.5" />
           </button>
-          <span className="w-4 text-center text-sm font-feature-tabular">
-            {outOfStock || maxedInCart ? 0 : effectiveQty}
-          </span>
+          <span className="w-4 text-center text-sm font-feature-tabular">{qty}</span>
           <button
             type="button"
-            onClick={() => setQty((q) => Math.min(remaining, q + 1))}
-            disabled={outOfStock || maxedInCart || effectiveQty >= remaining}
+            onClick={() => setQty((q) => Math.min(MAX_QTY, q + 1))}
+            disabled={qty >= MAX_QTY}
             aria-label={t("cart.increaseQty", "Increase quantity")}
             className="text-ink/60 transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
           >
@@ -75,19 +62,10 @@ export default function AddToCartPanel({
         <button
           type="button"
           onClick={handleAdd}
-          disabled={outOfStock || maxedInCart}
-          className="inline-flex items-center gap-2.5 rounded-[3px] border border-ink bg-ink px-9 py-4 text-[11px] font-medium uppercase tracking-[0.18em] text-paper transition-colors duration-300 hover:bg-gold-dark hover:border-gold-dark disabled:cursor-not-allowed disabled:border-ink/30 disabled:bg-ink/30 disabled:hover:bg-ink/30"
+          className="inline-flex items-center gap-2.5 rounded-[3px] border border-ink bg-ink px-9 py-4 text-[11px] font-medium uppercase tracking-[0.18em] text-paper transition-colors duration-300 hover:bg-gold-dark hover:border-gold-dark"
         >
           <AnimatePresence mode="wait" initial={false}>
-            {outOfStock ? (
-              <motion.span key="oos" className="inline-flex items-center gap-2">
-                {t("product.outOfStock", "Out of Stock")}
-              </motion.span>
-            ) : maxedInCart ? (
-              <motion.span key="maxed" className="inline-flex items-center gap-2">
-                {t("product.allInCart", "All in Your Cart")}
-              </motion.span>
-            ) : justAdded ? (
+            {justAdded ? (
               <motion.span
                 key="added"
                 initial={{ opacity: 0, y: 6 }}
@@ -113,15 +91,6 @@ export default function AddToCartPanel({
 
         <WishlistButton slug={slug} />
       </div>
-
-      {(outOfStock || availableStock <= LOW_STOCK_DISPLAY_THRESHOLD) && (
-        <p className="mt-4 flex items-start gap-2 text-sm text-amber-700">
-          <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
-          {outOfStock
-            ? t("product.outOfStockNotice", "Currently out of stock.")
-            : t("product.lowStockNotice", "Only {count} in stock.").replace("{count}", String(availableStock))}
-        </p>
-      )}
 
       <p className="sr-only" aria-live="polite">
         {justAdded ? `${name} ${t("product.addedToCartSr", "added to cart")}` : ""}

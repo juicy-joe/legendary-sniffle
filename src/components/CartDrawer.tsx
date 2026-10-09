@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { Minus, Plus, ShoppingBag, TriangleAlert, X } from "lucide-react";
+import { Minus, Plus, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useCatalog } from "@/context/CatalogContext";
 import { EASE } from "@/lib/motion";
@@ -18,20 +18,6 @@ export default function CartDrawer() {
   const { t } = useTranslations();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
-
-  // Defensive clamp — stock can drop below what's already in the cart (a
-  // stale cart from before this stock was depleted, another tab buying the
-  // last unit, an admin adjustment) without the user touching the stepper
-  // at all, so this can't rely on the +/- buttons alone to stay in bounds.
-  useEffect(() => {
-    for (const line of lines) {
-      const product = getProduct(line.slug);
-      if (product && line.qty > product.availableStock) {
-        setQty(line.slug, product.availableStock);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lines, getProduct]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -184,7 +170,7 @@ export default function CartDrawer() {
                                 <button
                                   type="button"
                                   onClick={() => setQty(line.slug, line.qty + 1)}
-                                  disabled={line.qty >= product.availableStock}
+                                  disabled={line.qty >= 20}
                                   aria-label={t("cart.increaseQty", "Increase quantity")}
                                   className="text-ink/60 transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
                                 >
@@ -195,15 +181,6 @@ export default function CartDrawer() {
                                 {formatPrice(product.price * line.qty)}
                               </p>
                             </div>
-                            {line.qty >= product.availableStock && (
-                              <p className="mt-2 flex items-start gap-1.5 text-xs text-amber-700">
-                                <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                                {t("product.lowStockNotice", "Only {count} in stock.").replace(
-                                  "{count}",
-                                  String(product.availableStock)
-                                )}
-                              </p>
-                            )}
                           </div>
                         </li>
                       );
