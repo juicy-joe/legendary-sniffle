@@ -37,3 +37,26 @@ export function negotiateLocale(acceptLanguage: string | null): Locale {
   }
   return defaultLocale;
 }
+
+// ISO 3166-1 alpha-2 country -> site locale. Deliberately only the three
+// countries the site has a real reason to target by geography (Spain,
+// Germany, Iceland) — every other country, including English-speaking ones
+// and any EU country without its own translation, maps to English. This is
+// intentionally a stricter, narrower map than "which countries speak
+// Spanish/German" (e.g. Austria/Switzerland aren't included) — the ask was
+// specifically Spain/Germany/Iceland by IP, everyone else English.
+const countryToLocale: Record<string, Locale> = {
+  ES: "es",
+  DE: "de",
+  IS: "is",
+};
+
+/** Picks a locale from a visitor's country (Vercel's `x-vercel-ip-country`
+ * request header — free, no third-party geo-IP lookup needed). Returns
+ * null for a country with no dedicated locale (or when the header is
+ * absent, e.g. local dev / non-Vercel hosting) so the caller can fall back
+ * to Accept-Language instead of forcing English over a real signal. */
+export function localeFromCountry(countryCode: string | null): Locale | null {
+  if (!countryCode) return null;
+  return countryToLocale[countryCode.toUpperCase()] ?? null;
+}

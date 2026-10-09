@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/session";
 import { WHOLESALE_SESSION_COOKIE, verifyWholesaleSessionToken } from "@/lib/wholesale-session";
-import { LOCALE_COOKIE, negotiateLocale } from "@/lib/i18n-shared";
+import { LOCALE_COOKIE, negotiateLocale, localeFromCountry, defaultLocale } from "@/lib/i18n-shared";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -14,11 +14,23 @@ export async function proxy(request: NextRequest) {
   const response = await handleWholesaleAuth(request, pathname);
 
   // First visit only — once a visitor (or the language switcher) has set
-  // NEXT_LOCALE explicitly, that choice always wins over the browser
-  // header; see getLocale() in src/lib/i18n.ts. The admin panel is
+  // NEXT_LOCALE explicitly, that choice always wins over any auto-detected
+  // one; see getLocale() in src/lib/i18n.ts. The admin panel is
   // deliberately excluded (English-only, matched above before this runs).
+  //
+  // Geo-IP (Vercel's own `x-vercel-ip-country` header, free — no
+  // third-party lookup) is the authoritative signal when it's present: a
+  // Spanish/German/Icelandic IP always gets that language, and every other
+  // country gets English, regardless of the browser's own Accept-Language.
+  // That header only exists on Vercel's infrastructure though, so local
+  // dev (and any non-Vercel environment) falls back to Accept-Language
+  // purely so testing locally doesn't always land on English — a real
+  // visitor in production always has the header and never hits that path.
   if (!request.cookies.get(LOCALE_COOKIE)) {
-    const locale = negotiateLocale(request.headers.get("accept-language"));
+    const countryCode = request.headers.get("x-vercel-ip-country");
+    const locale = countryCode
+      ? localeFromCountry(countryCode) ?? defaultLocale
+      : negotiateLocale(request.headers.get("accept-language"));
     response.cookies.set(LOCALE_COOKIE, locale, { path: "/", maxAge: 60 * 60 * 24 * 365 });
   }
 
