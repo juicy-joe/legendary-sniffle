@@ -228,7 +228,7 @@ export default function Navbar({ links }: { links: { href: string; label: string
               >
                 <ShoppingBag className="h-4 w-4" /> {t("nav.cart", "Cart")} ({cartCount})
               </button>
-              <LanguageSwitcher />
+              <LanguageSwitcher dropUp />
             </div>
           </motion.div>
         )}

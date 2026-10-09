@@ -17,7 +17,7 @@ const supportedLocales: Locale[] = ["en", "es", "de", "is"];
 // refresh re-runs every Server Component with the new locale already in
 // place — same cookie proxy.ts itself sets on first visit, so a manual
 // choice here persists exactly the way the auto-detected one does.
-export default function LanguageSwitcher({ dark = false }: { dark?: boolean }) {
+export default function LanguageSwitcher({ dark = false, dropUp = false }: { dark?: boolean; dropUp?: boolean }) {
   const { locale } = useTranslations();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -51,7 +51,11 @@ export default function LanguageSwitcher({ dark = false }: { dark?: boolean }) {
             className="fixed inset-0 z-40 cursor-default"
             onClick={() => setOpen(false)}
           />
-          <ul className="absolute right-0 top-full z-50 mt-2 w-44 rounded-[3px] border border-ink/10 bg-paper py-1.5 shadow-lg">
+          <ul
+            className={`absolute right-0 z-50 w-44 rounded-[3px] border border-ink/10 bg-paper py-1.5 shadow-lg ${
+              dropUp ? "bottom-full mb-2" : "top-full mt-2"
+            }`}
+          >
             {supportedLocales.map((l) => (
               <li key={l}>
                 <button
