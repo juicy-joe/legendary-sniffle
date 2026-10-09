@@ -1,22 +1,54 @@
 import "server-only";
 import { cookies, headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { LOCALE_COOKIE, isLocale, negotiateLocale, type Locale } from "./i18n-shared";
+import {
+  LOCALE_COOKIE,
+  LOCALE_HEADER,
+  isLocale,
+  negotiateLocale,
+  routableLocales,
+  defaultLocale,
+  type Locale,
+} from "./i18n-shared";
 
 // Re-exported so existing server-side call sites can keep importing
 // everything locale-related from "@/lib/i18n" — only client components need
 // to reach for "@/lib/i18n-shared" directly (see its own comment for why).
 export { locales, defaultLocale, localeNames, LOCALE_COOKIE, negotiateLocale, type Locale } from "./i18n-shared";
 
-/** The current request's locale — an explicit cookie (set by the language
- * switcher, or by proxy.ts on first visit from Accept-Language) always
- * wins; otherwise English. */
+/** Builds a page's `alternates` metadata (canonical + hreflang) from its
+ * locale-agnostic path, e.g. localeAlternates("es", "/table-lamps") for a
+ * page reached at /es/table-lamps. `path` is always the UNPREFIXED route
+ * (what the page itself is mounted at, e.g. "/table-lamps" or "/" for the
+ * homepage) — this derives every locale's URL from it, so canonicals never
+ * drift from hreflang the way they would if each were built by hand at the
+ * call site. x-default points at English, the site's fallback locale for
+ * any visitor/crawler whose language isn't one of the four translated
+ * ones. */
+export function localeAlternates(locale: Locale, path: string) {
+  const urlFor = (l: Locale) => (path === "/" ? `/${l}` : `/${l}${path}`);
+  const languages: Record<string, string> = { "x-default": urlFor(defaultLocale) };
+  for (const l of routableLocales) languages[l] = urlFor(l);
+  return { canonical: urlFor(locale), languages };
+}
+
+/** The current request's locale. proxy.ts resolves the URL's locale prefix
+ * (/es/..., /de/..., ...) and attaches it as the x-locale request header
+ * before rewriting to the unprefixed route — that header is authoritative
+ * whenever present, since it reflects exactly what's in the address bar
+ * right now. The NEXT_LOCALE cookie (set by the same rewrite, and by the
+ * language switcher) is only a fallback for requests that never went
+ * through that rewrite at all — practically, just the admin panel and API
+ * routes, which proxy.ts deliberately excludes from locale routing. */
 export async function getLocale(): Promise<Locale> {
+  const headerList = await headers();
+  const headerValue = headerList.get(LOCALE_HEADER);
+  if (headerValue && isLocale(headerValue)) return headerValue;
+
   const store = await cookies();
   const cookieValue = store.get(LOCALE_COOKIE)?.value;
   if (cookieValue && isLocale(cookieValue)) return cookieValue;
 
-  const headerList = await headers();
   return negotiateLocale(headerList.get("accept-language"));
 }
 

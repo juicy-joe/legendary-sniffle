@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/Link";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import { getDesigners } from "@/lib/catalog";
 import { slugify } from "@/lib/slugify";
-import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { getLocale, getUiTranslations, localeAlternates, t } from "@/lib/i18n";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Our Designers",
-  description:
-    "Meet the designers behind Ollerialight's hand-blown glass table lamps, from design philosophy to the collections they've created.",
-  alternates: { canonical: "/designers" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return {
+    title: "Our Designers",
+    description:
+      "Meet the designers behind Ollerialight's hand-blown glass table lamps, from design philosophy to the collections they've created.",
+    alternates: localeAlternates(locale, "/designers"),
+  };
+}
 
 export default async function DesignersPage() {
   const locale = await getLocale();
@@ -26,7 +29,7 @@ export default async function DesignersPage() {
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+            { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/${locale}` },
             { "@type": "ListItem", position: 2, name: "Designers" },
           ],
         })}
@@ -43,7 +46,7 @@ export default async function DesignersPage() {
               "@type": "Person",
               name: d.shortName || d.name,
               description: d.bio,
-              url: `${siteUrl}/designers/${slugify(d.shortName || d.name)}`,
+              url: `${siteUrl}/${locale}/designers/${slugify(d.shortName || d.name)}`,
             },
           })),
         })}

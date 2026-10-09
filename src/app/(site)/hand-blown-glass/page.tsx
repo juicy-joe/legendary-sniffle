@@ -1,19 +1,22 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/Link";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import ProductCard from "@/components/ProductCard";
 import { getCatalog } from "@/lib/catalog";
-import { getLocale, getUiTranslations, getContentFields, t } from "@/lib/i18n";
+import { getLocale, getUiTranslations, getContentFields, localeAlternates, t } from "@/lib/i18n";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
 import TrackViewItemList from "@/components/analytics/TrackViewItemList";
 
-export const metadata: Metadata = {
-  title: "Hand-Blown Glass Table Lamps",
-  description:
-    "How Ollerialight's hand-blown crystalline glass table lamps are made, and the two different colouring techniques behind MoodMAX and NatureSPHERE's.",
-  alternates: { canonical: "/hand-blown-glass" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return {
+    title: "Hand-Blown Glass Table Lamps",
+    description:
+      "How Ollerialight's hand-blown crystalline glass table lamps are made, and the two different colouring techniques behind MoodMAX and NatureSPHERE's.",
+    alternates: localeAlternates(locale, "/hand-blown-glass"),
+  };
+}
 
 // English fallbacks — the single source of truth for this page's copy, used
 // whenever a locale has no translation row yet (see getContentFields).
@@ -60,8 +63,8 @@ export default async function HandBlownGlassPage() {
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
-            { "@type": "ListItem", position: 2, name: "Table Lamps", item: `${siteUrl}/table-lamps` },
+            { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/${locale}` },
+            { "@type": "ListItem", position: 2, name: "Table Lamps", item: `${siteUrl}/${locale}/table-lamps` },
             { "@type": "ListItem", position: 3, name: "Hand-Blown Glass" },
           ],
         })}
@@ -72,13 +75,13 @@ export default async function HandBlownGlassPage() {
           "@context": "https://schema.org",
           "@type": "CollectionPage",
           name: "Hand-Blown Glass Table Lamps",
-          url: `${siteUrl}/hand-blown-glass`,
+          url: `${siteUrl}/${locale}/hand-blown-glass`,
           mainEntity: {
             "@type": "ItemList",
             itemListElement: catalog.map((p, i) => ({
               "@type": "ListItem",
               position: i + 1,
-              url: `${siteUrl}/products/${p.slug}`,
+              url: `${siteUrl}/${locale}/products/${p.slug}`,
               name: p.name,
             })),
           },

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/wholesale-auth";
+import { getLocale } from "@/lib/i18n";
 import {
   createWholesaleSessionToken,
   WHOLESALE_SESSION_COOKIE,
@@ -61,5 +62,6 @@ export async function setWholesalePassword(
   const store = await cookies();
   store.set(WHOLESALE_SESSION_COOKIE, token, wholesaleSessionCookieOptions);
 
-  redirect("/trade/portal");
+  const locale = await getLocale();
+  redirect(`/${locale}/trade/portal`);
 }

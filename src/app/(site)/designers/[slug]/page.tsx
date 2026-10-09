@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/Link";
 import { notFound } from "next/navigation";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import ProductCard from "@/components/ProductCard";
 import { getCatalog, getDesigners } from "@/lib/catalog";
 import { slugify } from "@/lib/slugify";
-import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { getLocale, getUiTranslations, localeAlternates, t } from "@/lib/i18n";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
 import { getSettings } from "@/lib/settings";
@@ -21,7 +21,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const designers = await getDesigners("en");
+  const [designers, locale] = await Promise.all([getDesigners("en"), getLocale()]);
   const designer = designers.find((d) => slugify(d.shortName || d.name) === slug);
   if (!designer) return {};
 
@@ -29,7 +29,7 @@ export async function generateMetadata({
   return {
     title: name,
     description: `${name}, ${designer.origin} — designer of Ollerialight's hand-blown glass table lamps. ${designer.bio}`.slice(0, 160),
-    alternates: { canonical: `/designers/${slug}` },
+    alternates: localeAlternates(locale, `/designers/${slug}`),
   };
 }
 
@@ -60,8 +60,8 @@ export default async function DesignerPage({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
-            { "@type": "ListItem", position: 2, name: "Designers", item: `${siteUrl}/designers` },
+            { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/${locale}` },
+            { "@type": "ListItem", position: 2, name: "Designers", item: `${siteUrl}/${locale}/designers` },
             { "@type": "ListItem", position: 3, name },
           ],
         })}
@@ -73,7 +73,7 @@ export default async function DesignerPage({
           "@type": "Person",
           name,
           description: designer.bio,
-          url: `${siteUrl}/designers/${slug}`,
+          url: `${siteUrl}/${locale}/designers/${slug}`,
           worksFor: { "@type": "Organization", name: settings.siteName, url: siteUrl },
         })}
       />

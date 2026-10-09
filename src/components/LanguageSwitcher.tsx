@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { localeNames, LOCALE_COOKIE, type Locale } from "@/lib/i18n-shared";
+import { useRouter, usePathname } from "next/navigation";
+import { localeNames, stripLocalePrefix, type Locale } from "@/lib/i18n-shared";
 import { useTranslations } from "@/components/TranslationsProvider";
 import FlagIcon from "@/components/FlagIcon";
 
@@ -12,20 +12,38 @@ import FlagIcon from "@/components/FlagIcon";
 // silently does nothing.
 const supportedLocales: Locale[] = ["en", "es", "de", "is"];
 
-// Setting the cookie directly (not a server action) so the switch is
-// instant and works from anywhere the component is mounted, then a router
-// refresh re-runs every Server Component with the new locale already in
-// place — same cookie proxy.ts itself sets on first visit, so a manual
-// choice here persists exactly the way the auto-detected one does.
+// Navigates to the SAME page under a different locale prefix — e.g.
+// switching from /de/products/foo lands on /es/products/foo, never the
+// homepage. usePathname() already gives back the real (prefixed) URL
+// here (unlike a Server Component, which only ever sees the
+// post-middleware-rewrite unprefixed path), so stripping the current
+// prefix and adding the new one is all this needs; proxy.ts's rewrite
+// then takes over on the next request exactly like any other locale URL.
+// Deliberately a real navigation (not just setting the cookie and
+// refreshing) — the master spec requires the URL itself to reflect the
+// chosen language, not just a cookie, for hreflang/canonical/Ads
+// landing-page correctness.
 export default function LanguageSwitcher({ dark = false, dropUp = false }: { dark?: boolean; dropUp?: boolean }) {
   const { locale } = useTranslations();
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   function choose(next: Locale) {
-    // eslint-disable-next-line react-hooks/immutability -- document.cookie is a browser API setter, not React state
-    document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=${60 * 60 * 24 * 365}`;
     setOpen(false);
+    const { rest } = stripLocalePrefix(pathname);
+    // Next.js's client router treats this as a navigation within the same
+    // route segment — from its point of view /en/table-lamps and
+    // /is/table-lamps both resolve to the identical (site) layout +
+    // table-lamps page, since the locale prefix only exists via proxy.ts's
+    // rewrite and was never part of the actual route tree. That means
+    // push() alone can leave the ROOT LAYOUT (and everything it set up —
+    // <html lang>, TranslationsProvider's locale/dict, every <Link>'s
+    // locale-prefixing) stale, still reflecting the locale the page was
+    // first loaded with. refresh() busts that cache and forces a genuine
+    // re-render of the whole tree against the new URL, same as it always
+    // has for any other post-navigation data change.
+    router.push(rest === "/" ? `/${next}` : `/${next}${rest}`);
     router.refresh();
   }
 

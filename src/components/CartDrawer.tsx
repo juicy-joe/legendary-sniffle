@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
+import Link from "@/components/Link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";

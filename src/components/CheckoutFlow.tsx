@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/Link";
 import { ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useCatalog } from "@/context/CatalogContext";

@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/lib/wholesale-auth";
+import { getLocale } from "@/lib/i18n";
+import { stripLocalePrefix } from "@/lib/i18n-shared";
 import {
   createWholesaleSessionToken,
   WHOLESALE_SESSION_COOKIE,
@@ -60,11 +62,19 @@ export async function wholesaleLogin(
   const store = await cookies();
   store.set(WHOLESALE_SESSION_COOKIE, token, wholesaleSessionCookieOptions);
 
-  redirect(from && from.startsWith("/trade") ? from : "/trade/portal");
+  // `from` arrives already locale-prefixed (proxy.ts builds it that way
+  // when it bounces an unauthenticated visitor here) — stripping the
+  // prefix first so this same-site check still works regardless of which
+  // locale it was prefixed with, same as it always checked the unprefixed
+  // "/trade" shape before locale URLs existed.
+  const locale = await getLocale();
+  const isSameSiteTradeUrl = from ? stripLocalePrefix(from).rest.startsWith("/trade") : false;
+  redirect(isSameSiteTradeUrl && from ? from : `/${locale}/trade/portal`);
 }
 
 export async function wholesaleLogout() {
   const store = await cookies();
   store.delete(WHOLESALE_SESSION_COOKIE);
-  redirect("/trade/login");
+  const locale = await getLocale();
+  redirect(`/${locale}/trade/login`);
 }

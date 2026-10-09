@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/Link";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import { getContactInfo } from "@/lib/content";
 import { getSettings } from "@/lib/settings";
-import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { getLocale, getUiTranslations, localeAlternates, t } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "How Ollerialight collects, uses, and protects your personal information.",
-  alternates: { canonical: "/privacy" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return {
+    title: "Privacy Policy",
+    description: "How Ollerialight collects, uses, and protects your personal information.",
+    alternates: localeAlternates(locale, "/privacy"),
+  };
+}
 
 const lastUpdated = "August 12, 2026";
 

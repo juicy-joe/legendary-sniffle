@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/Link";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import WholesaleApplyForm from "@/components/WholesaleApplyForm";
 import { getLocale, getUiTranslations, t } from "@/lib/i18n";

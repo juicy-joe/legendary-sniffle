@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/Link";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import { getContactInfo } from "@/lib/content";
-import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { getLocale, getUiTranslations, localeAlternates, t } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "Terms and Conditions",
-  description: "The terms and conditions governing purchases made on Ollerialight.",
-  alternates: { canonical: "/terms" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return {
+    title: "Terms and Conditions",
+    description: "The terms and conditions governing purchases made on Ollerialight.",
+    alternates: localeAlternates(locale, "/terms"),
+  };
+}
 
 const lastUpdated = "1 October 2026";
 

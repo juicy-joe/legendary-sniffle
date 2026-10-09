@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/Link";
 import { getStoredConsent, setConsent } from "@/lib/analytics/consent";
 import { flushPendingAttribution } from "@/lib/attribution";
 

@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/Link";
 import { ArrowRight, Percent, ShieldCheck, Users } from "lucide-react";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import MagneticButton from "@/components/MagneticButton";
 import { getTradeContent } from "@/lib/content";
-import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { getLocale, getUiTranslations, localeAlternates, t } from "@/lib/i18n";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Trade Accounts",
-  description: "Ollerialight trade accounts for retailers, designers, and hospitality buyers — wholesale pricing on the full collection.",
-  alternates: { canonical: "/trade" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return {
+    title: "Trade Accounts",
+    description: "Ollerialight trade accounts for retailers, designers, and hospitality buyers — wholesale pricing on the full collection.",
+    alternates: localeAlternates(locale, "/trade"),
+  };
+}
 
 export default async function TradePage() {
   const locale = await getLocale();
@@ -59,7 +62,7 @@ export default async function TradePage() {
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+            { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/${locale}` },
             { "@type": "ListItem", position: 2, name: "B2B" },
           ],
         })}

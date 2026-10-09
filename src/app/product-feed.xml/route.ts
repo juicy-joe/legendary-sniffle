@@ -6,19 +6,21 @@
 // the product; otherwise g:identifier_exists=no is set instead of
 // fabricating one, per Google's own guidance for goods with no
 // real-world identifier.
+import type { NextRequest } from "next/server";
 import { getCatalog } from "@/lib/catalog";
 import { getSettings } from "@/lib/settings";
 import { siteUrl } from "@/lib/site";
 import { getStockLevels } from "@/lib/stock-levels";
+import { defaultLocale, isRoutableLocale, type Locale } from "@/lib/i18n-shared";
 
 // Must run fresh on every request, never a cached/prerendered snapshot —
 // Merchant Center needs this feed's price/availability/SKU to reflect the
 // live database, not whatever it looked like at the last deploy. Route
 // Handlers with no explicit config can still be eligible for static
-// prerendering (this one calls getCatalog("en"), which deliberately skips
-// the cookies()-based locale lookup to avoid *that* kind of dynamic
-// rendering) — this makes the "always live" requirement explicit instead
-// of relying on an absence of dynamic APIs to imply it.
+// prerendering (this one calls getCatalog(locale) with an explicit locale,
+// which deliberately skips the cookies()-based lookup to avoid *that* kind
+// of dynamic rendering) — this makes the "always live" requirement
+// explicit instead of relying on an absence of dynamic APIs to imply it.
 export const dynamic = "force-dynamic";
 
 function escapeXml(value: string): string {
@@ -34,8 +36,22 @@ function cdata(value: string): string {
   return `<![CDATA[${value.replace(/]]>/g, "]]]]><![CDATA[>")}]]>`;
 }
 
-export async function GET() {
-  const [products, settings, stockLevels] = await Promise.all([getCatalog("en"), getSettings(), getStockLevels()]);
+// One feed route serves all locales — Merchant Center is configured with
+// one feed URL per target country/language (?locale=es, ?locale=de, ...),
+// each a distinct, stable URL per Google's multi-language feed setup, all
+// backed by the exact same product data so there's no second place prices
+// or stock could drift from the storefront. Absent or unrecognized
+// ?locale falls back to English, matching every other locale-aware read
+// path in this app.
+export async function GET(request: NextRequest) {
+  const requestedLocale = request.nextUrl.searchParams.get("locale");
+  const locale: Locale = requestedLocale && isRoutableLocale(requestedLocale) ? requestedLocale : defaultLocale;
+
+  const [products, settings, stockLevels] = await Promise.all([
+    getCatalog(locale),
+    getSettings(),
+    getStockLevels(),
+  ]);
 
   const items = products
     // A product with no photography yet has nothing Merchant Center can
@@ -44,7 +60,7 @@ export async function GET() {
     .filter((p) => p.images && p.images.length > 0)
     .map((p) => {
       const inStock = (stockLevels.get(p.id)?.available ?? 0) > 0;
-      const url = `${siteUrl}/products/${p.slug}`;
+      const url = `${siteUrl}/${locale}/products/${p.slug}`;
       const images = p.images!;
       const additionalImages = images
         .slice(1, 11)

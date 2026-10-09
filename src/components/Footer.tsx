@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Link";
 import { InstagramIcon, FacebookIcon, LinkedinIcon } from "./SocialIcons";
 import Newsletter from "./Newsletter";
 import LanguageSwitcher from "./LanguageSwitcher";

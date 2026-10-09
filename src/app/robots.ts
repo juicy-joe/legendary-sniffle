@@ -13,7 +13,12 @@ export default function robots(): MetadataRoute.Robots {
       // stay crawlable — they're real lead-gen pages, and Google's own
       // guidance prefers a noindex meta tag over a robots disallow for a
       // page you want evaluated but excluded, not blocked outright.
-      disallow: ["/admin", "/api/", "/checkout", "/trade/portal"],
+      // /admin and /api/ are never locale-prefixed (proxy.ts excludes them
+      // from locale routing entirely), but /checkout and /trade/portal are
+      // reached as /en/checkout, /es/checkout, etc. — the "/*/" wildcard
+      // (Google's documented robots.txt wildcard syntax) covers all four
+      // without hardcoding each locale here a second time.
+      disallow: ["/admin", "/api/", "/*/checkout", "/*/trade/portal"],
     },
     sitemap: `${siteUrl}/sitemap.xml`,
   };

@@ -19,6 +19,12 @@ export const localeNames: Record<Locale, string> = {
 
 export const LOCALE_COOKIE = "NEXT_LOCALE";
 
+// Request header proxy.ts attaches (alongside rewriting the URL) so the
+// rendered page can read back exactly which locale prefix the incoming
+// request matched, within the same request — see getLocale() in
+// src/lib/i18n.ts for why this is preferred over the cookie.
+export const LOCALE_HEADER = "x-locale";
+
 export function isLocale(value: string): value is Locale {
   return value === "en" || (locales as readonly string[]).includes(value);
 }
@@ -59,4 +65,40 @@ const countryToLocale: Record<string, Locale> = {
 export function localeFromCountry(countryCode: string | null): Locale | null {
   if (!countryCode) return null;
   return countryToLocale[countryCode.toUpperCase()] ?? null;
+}
+
+// The locales that actually get their own URL prefix (/en/, /es/, /de/,
+// /is/) — the same four LanguageSwitcher offers. "fr"/"it"/"tr" stay valid
+// Locale values (translation data could exist for them some day) but have
+// no routable prefix yet, so they're deliberately excluded here rather than
+// derived from `locales`.
+export const routableLocales: Locale[] = ["en", "es", "de", "is"];
+
+export function isRoutableLocale(value: string): value is Locale {
+  return (routableLocales as string[]).includes(value);
+}
+
+/** Prefixes an internal, site-relative href with a locale segment, e.g.
+ * localizedHref("es", "/table-lamps") -> "/es/table-lamps". Anything that
+ * isn't an internal absolute path — external URLs, protocol-relative
+ * "//...", mailto:/tel:, hash-only "#..." anchors — is returned unchanged,
+ * since those were never meant to carry a locale prefix. Used by
+ * src/components/Link.tsx so every internal <Link> in the app gets the
+ * current locale's URL for free, without each call site doing it by hand. */
+export function localizedHref(locale: Locale, href: string): string {
+  if (!href.startsWith("/") || href.startsWith("//")) return href;
+  return href === "/" ? `/${locale}` : `/${locale}${href}`;
+}
+
+/** Strips a routable locale prefix off a pathname, e.g. "/es/table-lamps"
+ * -> "/table-lamps", "/en" -> "/". A pathname with no locale prefix is
+ * returned unchanged. Used both by proxy.ts (to recover the real route
+ * after reading the prefix) and by the language switcher (to rebuild the
+ * current path under a different locale). */
+export function stripLocalePrefix(pathname: string): { locale: Locale | null; rest: string } {
+  const match = pathname.match(/^\/([a-z]{2})(\/.*)?$/);
+  if (match && isRoutableLocale(match[1])) {
+    return { locale: match[1], rest: match[2] || "/" };
+  }
+  return { locale: null, rest: pathname };
 }

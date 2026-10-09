@@ -34,19 +34,23 @@ const nextConfig: NextConfig = {
   // Permanent redirects for products renamed via the admin panel after
   // being indexed under their old slugs, plus one product unpublished
   // (visible: false) rather than renamed — sent to the closest living
-  // collection page instead of left as a dead link. Single hop each
-  // (A -> C, never A -> B -> C) per the SEO redirect-chain rule.
+  // collection page instead of left as a dead link. Destinations go
+  // straight to the /en/-prefixed URL (these are pre-dating this site's
+  // locale URLs entirely — there's no original locale to preserve) so each
+  // is a single hop, not a second redirect through proxy.ts's own
+  // unprefixed -> locale-prefixed redirect (A -> C, never A -> B -> C,
+  // per the SEO redirect-chain rule).
   async redirects() {
     return [
-      { source: "/products/mushroom-lake", destination: "/products/lavaglow", permanent: true },
-      { source: "/products/geysir-s", destination: "/products/geyserglow", permanent: true },
-      { source: "/products/pine-and-ice", destination: "/collections/naturesphere", permanent: true },
+      { source: "/products/mushroom-lake", destination: "/en/products/lavaglow", permanent: true },
+      { source: "/products/geysir-s", destination: "/en/products/geyserglow", permanent: true },
+      { source: "/products/pine-and-ice", destination: "/en/collections/naturesphere", permanent: true },
       // Product renamed from "Saturns" to "Sunny Beach" — slug updated to
       // match (see prisma data change in the same commit as this redirect).
-      { source: "/products/saturns", destination: "/products/sunny-beach", permanent: true },
+      { source: "/products/saturns", destination: "/en/products/sunny-beach", permanent: true },
       // The listing/hub page moved from /products to /table-lamps; the
       // product detail route (/products/[slug]) is unaffected and unchanged.
-      { source: "/products", destination: "/table-lamps", permanent: true },
+      { source: "/products", destination: "/en/table-lamps", permanent: true },
     ];
   },
 

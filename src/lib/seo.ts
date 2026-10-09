@@ -9,6 +9,7 @@
 // designer, materials, and description instead.
 import type { CatalogProduct } from "./catalog";
 import { siteUrl } from "./site";
+import type { Locale } from "./i18n-shared";
 
 type SeoProduct = Pick<
   CatalogProduct,
@@ -82,8 +83,8 @@ export function productPhotoAlt(product: Pick<CatalogProduct, "name" | "designer
  * schema.prisma) rather than being a second stored value that could drift
  * out of sync with it. gtin is only ever included when a genuine one has
  * been entered — never derived from sku/barcode, never invented. */
-export function productJsonLd(product: SeoProduct, siteName: string, inStock: boolean) {
-  const url = `${siteUrl}/products/${product.slug}`;
+export function productJsonLd(product: SeoProduct, siteName: string, inStock: boolean, locale: Locale) {
+  const url = `${siteUrl}/${locale}/products/${product.slug}`;
   const images = product.images?.length
     ? product.images.map((img) => img.src)
     : [`${siteUrl}/opengraph-image`];

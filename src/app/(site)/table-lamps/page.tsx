@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/Link";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import ProductsExplorer from "@/components/ProductsExplorer";
 import CollectionsShowcase, { type CollectionSummary } from "@/components/CollectionsShowcase";
 import { getCatalog, getCollections } from "@/lib/catalog";
 import { getProductsContent } from "@/lib/content";
 import { slugify } from "@/lib/slugify";
-import { getLocale, getUiTranslations, getContentFields, t } from "@/lib/i18n";
+import { getLocale, getUiTranslations, getContentFields, localeAlternates, t } from "@/lib/i18n";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
 import TrackViewItemList from "@/components/analytics/TrackViewItemList";
@@ -74,12 +74,15 @@ const EN = {
   ...Object.fromEntries(faqsEn.flatMap((f, i) => [[`faq${i}Q`, f.q], [`faq${i}A`, f.a]])),
 };
 
-export const metadata: Metadata = {
-  title: "Designer Table Lamps — Hand-Blown Glass",
-  description:
-    "Discover Ollerialight's designer table lamps: mouth-blown crystalline glass, hand-painted in MoodMAX and coloured through during melting in NatureSPHERE's. Sculptural lighting for contemporary interiors.",
-  alternates: { canonical: "/table-lamps" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return {
+    title: "Designer Table Lamps — Hand-Blown Glass",
+    description:
+      "Discover Ollerialight's designer table lamps: mouth-blown crystalline glass, hand-painted in MoodMAX and coloured through during melting in NatureSPHERE's. Sculptural lighting for contemporary interiors.",
+    alternates: localeAlternates(locale, "/table-lamps"),
+  };
+}
 
 export default async function TableLampsPage() {
   const locale = await getLocale();
@@ -126,7 +129,7 @@ export default async function TableLampsPage() {
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+            { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/${locale}` },
             { "@type": "ListItem", position: 2, name: "Table Lamps" },
           ],
         })}

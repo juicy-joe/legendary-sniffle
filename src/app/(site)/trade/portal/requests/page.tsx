@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/Link";
 import { ArrowLeft } from "lucide-react";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -14,12 +14,12 @@ export const metadata: Metadata = {
 };
 
 export default async function TradeRequestsPage() {
-  const session = await getWholesaleSession();
-  if (!session) redirect("/trade/login");
-  const account = await getApprovedWholesaleAccount(session.sub);
-  if (!account) redirect("/trade/login");
-
   const locale = await getLocale();
+  const session = await getWholesaleSession();
+  if (!session) redirect(`/${locale}/trade/login`);
+  const account = await getApprovedWholesaleAccount(session.sub);
+  if (!account) redirect(`/${locale}/trade/login`);
+
   const [requests, dict] = await Promise.all([
     prisma.specialOrderRequest.findMany({
       where: { wholesaleAccountId: account.id },

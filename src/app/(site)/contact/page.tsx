@@ -1,20 +1,23 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/Link";
 import { Mail, MapPin, Phone, Clock } from "lucide-react";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import ContactForm from "@/components/ContactForm";
 import { getContactInfo } from "@/lib/content";
-import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { getLocale, getUiTranslations, localeAlternates, t } from "@/lib/i18n";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
 import { getSettings } from "@/lib/settings";
 
-export const metadata: Metadata = {
-  title: "Contact Us",
-  description:
-    "Get in touch with Ollerialight to commission a piece, ask about a finish, or book a private consultation with our design team.",
-  alternates: { canonical: "/contact" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return {
+    title: "Contact Us",
+    description:
+      "Get in touch with Ollerialight to commission a piece, ask about a finish, or book a private consultation with our design team.",
+    alternates: localeAlternates(locale, "/contact"),
+  };
+}
 
 export default async function ContactPage() {
   const locale = await getLocale();
@@ -57,7 +60,7 @@ export default async function ContactPage() {
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+            { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/${locale}` },
             { "@type": "ListItem", position: 2, name: "Contact" },
           ],
         })}
@@ -68,7 +71,7 @@ export default async function ContactPage() {
           "@context": "https://schema.org",
           "@type": "ContactPage",
           name: `Contact ${settings.siteName}`,
-          url: `${siteUrl}/contact`,
+          url: `${siteUrl}/${locale}/contact`,
           mainEntity: {
             "@type": "Organization",
             name: settings.siteName,

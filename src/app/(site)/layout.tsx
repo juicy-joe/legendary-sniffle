@@ -13,7 +13,7 @@ import { getSettings } from "@/lib/settings";
 import { getContactInfo } from "@/lib/content";
 import { siteUrl } from "@/lib/site";
 import { jsonLdScriptProps } from "@/lib/json-ld";
-import { getLocale, getUiTranslations } from "@/lib/i18n";
+import { getLocale, getUiTranslations, localeAlternates, type Locale } from "@/lib/i18n";
 import TranslationsProvider from "@/components/TranslationsProvider";
 import GtmLoader from "@/components/analytics/GtmLoader";
 import ConsentBanner from "@/components/analytics/ConsentBanner";
@@ -44,6 +44,19 @@ const archivoText = Archivo({
   display: "swap",
 });
 
+// og:locale wants the full IETF form, not the bare ISO code — only "fr"/
+// "it"/"tr" are absent since they're not routable locales (see
+// routableLocales in i18n-shared.ts), so they'll never reach getLocale().
+const ogLocale: Record<Locale, string> = {
+  en: "en_US",
+  es: "es_ES",
+  de: "de_DE",
+  is: "is_IS",
+  fr: "fr_FR",
+  it: "it_IT",
+  tr: "tr_TR",
+};
+
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
@@ -55,7 +68,7 @@ export const viewport: Viewport = {
 // is what actually renders there — sourced from the admin-editable Settings
 // singleton (src/lib/settings.ts) rather than hardcoded.
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSettings();
+  const [settings, locale] = await Promise.all([getSettings(), getLocale()]);
   return {
     metadataBase: new URL(siteUrl),
     title: {
@@ -63,7 +76,7 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${settings.siteName}`,
     },
     description: settings.defaultMetaDesc,
-    alternates: { canonical: "/" },
+    alternates: localeAlternates(locale, "/"),
     keywords: [
       "luxury table lamps",
       "designer lamps",
@@ -76,10 +89,10 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: settings.defaultMetaTitle,
       description: settings.defaultMetaDesc,
-      url: siteUrl,
+      url: `${siteUrl}/${locale}`,
       siteName: settings.siteName,
       type: "website",
-      locale: "en_US",
+      locale: ogLocale[locale],
     },
     twitter: {
       card: "summary_large_image",

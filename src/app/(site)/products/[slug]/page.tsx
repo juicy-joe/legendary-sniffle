@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/Link";
 import { notFound } from "next/navigation";
 import LampIllustration from "@/components/LampIllustration";
 import ProductPhoto from "@/components/ProductPhoto";
@@ -11,7 +11,7 @@ import { getStockLevels } from "@/lib/stock-levels";
 import { siteUrl } from "@/lib/site";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { formatPrice } from "@/lib/format";
-import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { getLocale, getUiTranslations, localeAlternates, t } from "@/lib/i18n";
 import { productSeoTitle, productSeoDescription, productOgImage, productJsonLd, productPhotoAlt } from "@/lib/seo";
 import { getSettings } from "@/lib/settings";
 import { collectionHref } from "@/lib/collection-links";
@@ -32,7 +32,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const [product, settings] = await Promise.all([getProductBySlug(slug), getSettings()]);
+  const [product, settings, locale] = await Promise.all([getProductBySlug(slug), getSettings(), getLocale()]);
   if (!product) return {};
 
   const title = productSeoTitle(product);
@@ -42,7 +42,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: `/products/${product.slug}` },
+    alternates: localeAlternates(locale, `/products/${product.slug}`),
     openGraph: {
       title: `${product.name} | ${settings.siteName}`,
       description,
@@ -89,13 +89,16 @@ export default async function ProductPage({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
-            { "@type": "ListItem", position: 2, name: "Table Lamps", item: `${siteUrl}/table-lamps` },
+            { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/${locale}` },
+            { "@type": "ListItem", position: 2, name: "Table Lamps", item: `${siteUrl}/${locale}/table-lamps` },
             { "@type": "ListItem", position: 3, name: product.name },
           ],
         })}
       />
-      <script type="application/ld+json" {...jsonLdScriptProps(productJsonLd(product, settings.siteName, inStock))} />
+      <script
+        type="application/ld+json"
+        {...jsonLdScriptProps(productJsonLd(product, settings.siteName, inStock, locale))}
+      />
 
       <nav aria-label="Breadcrumb" className="mb-10 flex items-center gap-2 text-xs text-ink/65">
         <Link href="/" className="hover:text-ink">{t(dict, "breadcrumb.home", "Home")}</Link>

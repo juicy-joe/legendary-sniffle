@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/Link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getWholesaleSession } from "@/lib/get-wholesale-session";
@@ -15,14 +15,15 @@ export const metadata: Metadata = {
 };
 
 export default async function TradePortalPage() {
+  const locale = await getLocale();
   const session = await getWholesaleSession();
   // proxy.ts already guards this route, but a direct check here means the
   // page never renders with a null account even in a race between the
   // session expiring and the redirect happening.
-  if (!session) redirect("/trade/login");
+  if (!session) redirect(`/${locale}/trade/login`);
 
   const account = await getApprovedWholesaleAccount(session.sub);
-  if (!account) redirect("/trade/login");
+  if (!account) redirect(`/${locale}/trade/login`);
 
   const products = await prisma.product.findMany({
     orderBy: { name: "asc" },
@@ -35,7 +36,6 @@ export default async function TradePortalPage() {
     },
   });
 
-  const locale = await getLocale();
   const [priceByProductId, shippingRates, dict] = await Promise.all([
     getWholesalePrices(account, products),
     getShippingRates(),

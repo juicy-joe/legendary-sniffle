@@ -5,7 +5,7 @@ import { getSettings } from "@/lib/settings";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
 import TrackViewItemList from "@/components/analytics/TrackViewItemList";
-import { getLocale, getContentFields } from "@/lib/i18n";
+import { getLocale, getContentFields, localeAlternates } from "@/lib/i18n";
 
 const COLLECTION_NAME = "MoodMAX Collection";
 const INTRO_EN =
@@ -14,11 +14,14 @@ const STORY_EN = `MoodMAX began with a simple idea: a table lamp should set a mo
 const DESCRIPTION =
   "MoodMAX: mouth-blown crystalline glass table lamps with hand-painted gradients, designed by J. J. Finnbogason. Ambient mood lighting, not just brightness.";
 
-export const metadata: Metadata = {
-  title: "MoodMAX Collection — Hand-Blown Glass Mood Lamps",
-  description: DESCRIPTION,
-  alternates: { canonical: "/collections/moodmax" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return {
+    title: "MoodMAX Collection — Hand-Blown Glass Mood Lamps",
+    description: DESCRIPTION,
+    alternates: localeAlternates(locale, "/collections/moodmax"),
+  };
+}
 
 export default async function MoodMaxCollectionPage() {
   const locale = await getLocale();
@@ -41,8 +44,8 @@ export default async function MoodMaxCollectionPage() {
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
-            { "@type": "ListItem", position: 2, name: "Table Lamps", item: `${siteUrl}/table-lamps` },
+            { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/${locale}` },
+            { "@type": "ListItem", position: 2, name: "Table Lamps", item: `${siteUrl}/${locale}/table-lamps` },
             { "@type": "ListItem", position: 3, name: "MoodMAX Collection" },
           ],
         })}
@@ -54,14 +57,14 @@ export default async function MoodMaxCollectionPage() {
           "@type": "CollectionPage",
           name: "MoodMAX Collection",
           description: DESCRIPTION,
-          url: `${siteUrl}/collections/moodmax`,
+          url: `${siteUrl}/${locale}/collections/moodmax`,
           isPartOf: { "@type": "WebSite", name: settings.siteName, url: siteUrl },
           mainEntity: {
             "@type": "ItemList",
             itemListElement: products.map((p, i) => ({
               "@type": "ListItem",
               position: i + 1,
-              url: `${siteUrl}/products/${p.slug}`,
+              url: `${siteUrl}/${locale}/products/${p.slug}`,
               name: p.name,
             })),
           },

@@ -1,21 +1,24 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/Link";
 import { ArrowRight, Gem, Hammer, Leaf, Sparkles } from "lucide-react";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import MagneticButton from "@/components/MagneticButton";
 import { getDesigners } from "@/lib/catalog";
 import { getAboutContent } from "@/lib/content";
-import { getLocale, getUiTranslations, t } from "@/lib/i18n";
+import { getLocale, getUiTranslations, localeAlternates, t } from "@/lib/i18n";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
 import { slugify } from "@/lib/slugify";
 
-export const metadata: Metadata = {
-  title: "About Us",
-  description:
-    "Ollerialight was founded to give master lighting designers a home. Learn our story, meet our resident designers, and see how every lamp is made.",
-  alternates: { canonical: "/about" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return {
+    title: "About Us",
+    description:
+      "Ollerialight was founded to give master lighting designers a home. Learn our story, meet our resident designers, and see how every lamp is made.",
+    alternates: localeAlternates(locale, "/about"),
+  };
+}
 
 const values = [
   {
@@ -60,7 +63,7 @@ export default async function AboutPage() {
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+            { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/${locale}` },
             { "@type": "ListItem", position: 2, name: "About Us" },
           ],
         })}

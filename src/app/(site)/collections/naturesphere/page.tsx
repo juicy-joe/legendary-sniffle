@@ -5,7 +5,7 @@ import { getSettings } from "@/lib/settings";
 import { jsonLdScriptProps } from "@/lib/json-ld";
 import { siteUrl } from "@/lib/site";
 import TrackViewItemList from "@/components/analytics/TrackViewItemList";
-import { getLocale, getContentFields } from "@/lib/i18n";
+import { getLocale, getContentFields, localeAlternates } from "@/lib/i18n";
 
 const COLLECTION_NAME = "NatureSPHERE's";
 const INTRO_EN =
@@ -14,11 +14,14 @@ const STORY_EN = `NatureSPHERE's takes its colour and texture directly from Icel
 const DESCRIPTION =
   "NatureSPHERE's: hand-blown crystalline glass spheres coloured through during melting, inspired by the Icelandic landscape — each one a unique, one-of-a-kind piece designed by J. J. Finnbogason.";
 
-export const metadata: Metadata = {
-  title: "NatureSPHERE's Collection — Hand-Blown Glass Lamps",
-  description: DESCRIPTION,
-  alternates: { canonical: "/collections/naturesphere" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return {
+    title: "NatureSPHERE's Collection — Hand-Blown Glass Lamps",
+    description: DESCRIPTION,
+    alternates: localeAlternates(locale, "/collections/naturesphere"),
+  };
+}
 
 export default async function NatureSphereCollectionPage() {
   const locale = await getLocale();
@@ -41,8 +44,8 @@ export default async function NatureSphereCollectionPage() {
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
-            { "@type": "ListItem", position: 2, name: "Table Lamps", item: `${siteUrl}/table-lamps` },
+            { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/${locale}` },
+            { "@type": "ListItem", position: 2, name: "Table Lamps", item: `${siteUrl}/${locale}/table-lamps` },
             { "@type": "ListItem", position: 3, name: "NatureSPHERE's Collection" },
           ],
         })}
@@ -54,14 +57,14 @@ export default async function NatureSphereCollectionPage() {
           "@type": "CollectionPage",
           name: "NatureSPHERE's Collection",
           description: DESCRIPTION,
-          url: `${siteUrl}/collections/naturesphere`,
+          url: `${siteUrl}/${locale}/collections/naturesphere`,
           isPartOf: { "@type": "WebSite", name: settings.siteName, url: siteUrl },
           mainEntity: {
             "@type": "ItemList",
             itemListElement: products.map((p, i) => ({
               "@type": "ListItem",
               position: i + 1,
-              url: `${siteUrl}/products/${p.slug}`,
+              url: `${siteUrl}/${locale}/products/${p.slug}`,
               name: p.name,
             })),
           },
